@@ -1,0 +1,7 @@
+interface:
+  display_name: "Java Code Design"
+  short_description: "Java/Spring 코드 설계와 모듈 구조 지침"
+  default_prompt: "Use $java-code-design to design, write, or review Java code and modular Spring Boot structure."
+
+policy:
+  allow_implicit_invocation: true

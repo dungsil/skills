@@ -1,0 +1,7 @@
+interface:
+  display_name: "Requirement Quality Gate"
+  short_description: "요구사항 충족 여부를 증거 기반으로 검증"
+  default_prompt: "Use $requirement-quality-gate to verify whether an implementation satisfies a stated requirement."
+
+policy:
+  allow_implicit_invocation: true

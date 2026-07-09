@@ -1,0 +1,16 @@
+{
+  "name": "@dungsil/skills",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.14",
+  "keywords": [
+    "tanstack-intent"
+  ],
+  "scripts": {
+    "lint": "intent validate skills --check",
+    "validate:skills": "bun run lint"
+  },
+  "devDependencies": {
+    "@tanstack/intent": "0.3.5"
+  }
+}

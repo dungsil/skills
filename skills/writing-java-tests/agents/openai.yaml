@@ -1,0 +1,7 @@
+interface:
+  display_name: "Writing Java Tests"
+  short_description: "Java/JUnit 테스트 작성과 레벨 선택"
+  default_prompt: "Use $writing-java-tests to design, write, or review Java JUnit tests."
+
+policy:
+  allow_implicit_invocation: true
