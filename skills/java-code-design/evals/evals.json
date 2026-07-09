@@ -1,0 +1,35 @@
+{
+  "skill_name": "java-code-design",
+  "evals": [
+    {
+      "id": "port-leaks-jpa-query",
+      "prompt": "이 use case port 설계가 괜찮은지 봐줘. port 메서드가 findByDeletedFalseAndStatusIn처럼 JPA query method 이름을 그대로 쓰고 있어.",
+      "expected_output": "JPA/adapter assumption이 application port에 누출되었다고 지적하고, application need 중심의 port 이름과 signature를 제안한다.",
+      "assertions": [
+        "The output identifies the JPA query method naming as an adapter leak.",
+        "The output proposes a port contract named around application intent rather than persistence mechanics.",
+        "The output keeps concrete repository or JPA details outside the application port."
+      ]
+    },
+    {
+      "id": "shared-vs-common-module",
+      "prompt": "여러 모듈에서 쓰는 문자열 정규화 유틸을 packages/shared-text에 두려고 해. shared kernel로 봐도 될까?",
+      "expected_output": "technical utility는 shared kernel이 아니라 common/support module 후보라고 판단하고, shared를 DDD 공유 개념에만 쓰도록 권고한다.",
+      "assertions": [
+        "The output distinguishes shared kernel concepts from technical common/support utilities.",
+        "The output recommends a common/support module name instead of a shared-* module.",
+        "The output explains the boundary in terms of domain language or dependency responsibility."
+      ]
+    },
+    {
+      "id": "record-or-class-domain",
+      "prompt": "이 도메인 객체는 값만 들고 있는데 record로 만들지 class로 만들지 결정해줘. 생성 시 정규화와 실패 누적 검증이 필요할 수도 있어.",
+      "expected_output": "transparent immutable carrier면 record를 고려하되, invariant, normalization, identity, lifecycle, framework construction이 있으면 class가 낫다고 판단한다.",
+      "assertions": [
+        "The output ties record/class choice to invariants, normalization, identity, lifecycle, or framework constraints.",
+        "The output avoids choosing a Java feature only because it is newer.",
+        "The output asks for or states the public contract before recommending convenience methods."
+      ]
+    }
+  ]
+}

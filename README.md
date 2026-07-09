@@ -7,6 +7,13 @@
 pnpm dlx skills add dungsil/skills -g
 ```
 
+## 개발/검증
+
+```bash
+bun install
+bun run validate:skills
+```
+
 ## 스킬 목록
 
 ## 공통

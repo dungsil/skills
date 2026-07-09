@@ -2,6 +2,20 @@
 
 Use this reference when designing, migrating, or reviewing a modular Spring Boot Gradle project.
 
+## Contents
+
+- Baseline
+- Context Boundaries
+- Default Layout
+- Module Roles
+- Dependency Direction
+- Naming And Packages
+- Source Sets
+- Gradle Structure
+- Build And Environment
+- Spring Runtime Composition
+- Starter Scope
+
 ## Baseline
 
 - Structure modules by responsibility, not by product names copied from a template.

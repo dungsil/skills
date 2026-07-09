@@ -54,6 +54,16 @@ Keep the body short. Let focused tests carry edge-case detail when the Javadoc w
   - If two similar methods intentionally have different contracts, document that difference briefly.
   - If changing one method must not mechanically change another, state that the contracts are different and should be checked separately.
 
+## Common Edge Cases
+
+- Omit record accessor Javadocs unless the accessor contract differs from the component name, nullness, normalization, or domain invariant.
+- Document sealed interfaces by their permitted domain variants and selection rule; do not restate every implementation detail.
+- Document enum constants only when each constant has caller-visible policy, persistence mapping, or domain meaning that is not obvious from the name.
+- Document exception types by the caller-visible failure condition and recovery meaning; avoid stack-trace or implementation prose.
+- Include `package-info.java` with `@NullMarked` by default for Java packages; also use it for package-level contracts, architectural role, or domain language that applies to every type in the package. Do not repeat it in every nested package unless that nested package needs its own nullness default or package-level contract.
+- For Spring `@ConfigurationProperties` carriers, document external configuration meaning, defaulting, units, and validation constraints rather than Spring binding mechanics.
+- For factories returning result/error carriers such as `Either<List<Problem>, T>`, make `@return` state the success value and the collected failure shape without showing usage examples.
+
 ## Review Checklist
 
 - First line is a short summary phrase, not a full sentence.

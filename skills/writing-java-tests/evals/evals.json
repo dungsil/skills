@@ -1,0 +1,35 @@
+{
+  "skill_name": "writing-java-tests",
+  "evals": [
+    {
+      "id": "lowest-useful-level",
+      "prompt": "도메인 값 객체의 isDeleted()와 setDeleted() 계약을 검증하는 테스트를 추가하려고 해. 어떤 테스트 레벨과 구조가 맞아?",
+      "expected_output": "순수 도메인 helper 계약이므로 unit test를 선택하고, 불필요한 Spring/E2E 설정 없이 성공/경계/예외 순으로 작은 테스트를 제안한다.",
+      "assertions": [
+        "The output chooses unit test as the lowest useful level.",
+        "The output avoids Spring Boot or E2E setup for pure domain behavior.",
+        "The output orders valid cases before boundary or invalid cases."
+      ]
+    },
+    {
+      "id": "adapter-policy-unit",
+      "prompt": "REST E2E에서 이미 전체 조회 흐름은 검증했어. persistence adapter가 repository 호출 때 activeOnly=true를 강제하는 정책만 테스트하고 싶어.",
+      "expected_output": "중복 E2E 필드 검증을 피하고 adapter-specific policy만 unit test로 검증하도록 안내한다.",
+      "assertions": [
+        "The output avoids duplicate coverage across test levels.",
+        "The output keeps the adapter unit test focused on the activeOnly=true policy.",
+        "The output uses JUnit assertions and Mockito only if interaction matters."
+      ]
+    },
+    {
+      "id": "jspecify-nullability",
+      "prompt": "@NullMarked 클래스의 non-null 파라미터에 null을 넣는 테스트를 쓰려는데, 방어 로직이 있는지도 확인하고 싶어.",
+      "expected_output": "일반 null 테스트는 계약 위반이라 피하고, misuse defense를 검증해야 할 때만 정적 검사 억제와 의도 명시를 요구한다.",
+      "assertions": [
+        "The output treats non-null parameters under JSpecify as non-null contracts.",
+        "The output avoids null tests unless testing explicit misuse defense.",
+        "The output requires clear intent and static-analysis suppression for deliberate contract violation tests."
+      ]
+    }
+  ]
+}

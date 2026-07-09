@@ -1,0 +1,35 @@
+{
+  "skill_name": "writing-javadoc",
+  "evals": [
+    {
+      "id": "record-accessor-omit",
+      "prompt": "이 Java record의 각 accessor에 Javadoc을 달아야 하는지 보고, 필요한 Javadoc만 한국어로 작성해줘.",
+      "expected_output": "단순 record accessor Javadoc은 생략하고, 계약이 달라지는 component나 type-level 계약만 간결한 한국어 Javadoc으로 작성한다.",
+      "assertions": [
+        "The output avoids boilerplate Javadocs for obvious record accessors.",
+        "The output writes Korean contract-focused prose when documentation is useful.",
+        "The output does not include usage examples."
+      ]
+    },
+    {
+      "id": "factory-either-return",
+      "prompt": "domain factory가 Either<List<Problem>, Order>를 반환해. 이 메서드 Javadoc의 @return 문구를 프로젝트 스타일로 써줘.",
+      "expected_output": "성공 시 생성되는 값과 실패 시 누적되는 Problem 목록의 의미를 짧게 설명하는 한국어 @return을 작성한다.",
+      "assertions": [
+        "The output describes both success and failure shapes in @return.",
+        "The output uses concise Korean declarative style.",
+        "The output keeps code literals inside {@code} where needed."
+      ]
+    },
+    {
+      "id": "configuration-properties",
+      "prompt": "Spring @ConfigurationProperties 클래스 Javadoc을 봐줘. 어떤 내용을 남기고 어떤 설명을 빼야 해?",
+      "expected_output": "외부 설정 의미, 기본값, 단위, 검증 제약은 남기고 Spring binding mechanics 설명은 제거하도록 안내한다.",
+      "assertions": [
+        "The output focuses on configuration contract visible to callers/operators.",
+        "The output removes framework mechanics that Claude or Java developers already know.",
+        "The output follows the Korean Javadoc style rules."
+      ]
+    }
+  ]
+}

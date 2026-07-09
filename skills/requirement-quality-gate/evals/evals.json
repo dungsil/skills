@@ -1,0 +1,35 @@
+{
+  "skill_name": "requirement-quality-gate",
+  "evals": [
+    {
+      "id": "diff-requirement-mapping",
+      "prompt": "요구사항: 사용자는 저장 후에만 검사를 실행할 수 있어야 한다. 현재 브랜치 diff가 이 요구사항을 만족하는지 품질 게이트로 봐줘.",
+      "expected_output": "요구사항을 acceptance criteria로 분해하고, diff/source/test evidence를 매핑한 뒤 PASS/WARNING/FAIL 중 하나로 결론을 낸다.",
+      "assertions": [
+        "The output extracts explicit acceptance criteria from the requirement.",
+        "The output cites implementation evidence rather than relying only on tests or file names.",
+        "The output separates final decision, evidence, risks, and scope limits."
+      ]
+    },
+    {
+      "id": "no-relevant-change",
+      "prompt": "요구사항: 관리자는 삭제된 항목도 조회할 수 있어야 한다. 작업트리에서 관련 변경이 있는지 검증 보고서로 확인해줘.",
+      "expected_output": "관련 구현 증거가 없으면 NO_CHANGES_FOUND 또는 NEEDS_REVIEW로 판단하고, 근거 부족을 명확히 밝힌다.",
+      "assertions": [
+        "The output does not invent implementation evidence.",
+        "The output reports missing or weak mapping confidence as a limitation.",
+        "The output keeps unrelated changes visible instead of forcing them into the requirement."
+      ]
+    },
+    {
+      "id": "high-risk-warning",
+      "prompt": "요구사항: 결제 취소는 중복 요청에도 한 번만 처리되어야 한다. 구현은 있어 보이는데 테스트가 없는 상태야. 품질 게이트로 판단해줘.",
+      "expected_output": "idempotency, transaction, concurrency evidence를 확인하고, 고위험 동작에 검증이 부족하면 적어도 WARNING으로 분류한다.",
+      "assertions": [
+        "The output treats payment idempotency as high-risk behavior.",
+        "The output checks implementation evidence for transaction or concurrency handling.",
+        "The output marks missing meaningful verification as a risk or warning."
+      ]
+    }
+  ]
+}

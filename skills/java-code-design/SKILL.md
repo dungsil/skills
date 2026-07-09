@@ -1,6 +1,6 @@
 ---
 name: java-code-design
-description: Design, write, or review Java production code and modular Spring Boot project structure using modern Java, JSpecify nullness, Lombok, Spring, JPA, domain/application/adapter boundaries, shared kernel/common module separation, multi-module Gradle apps/packages/starters, and clear public API contracts. Use only for Java design work, including domain models, use cases, ports, adapters, shared kernel, common/support modules, validation call sites, null/optional policies, public/internal APIs, or Spring module structure decisions.
+description: Design, write, or review Java production code and modular Spring Boot structure when the task requires design judgment about domain models, use cases, ports, adapters, shared kernel/common modules, JSpecify nullness, validation boundaries, API contracts, or Gradle module roles. Do not use for simple Java syntax/API lookups, generic Spring configuration help, or dependency installation unless a design boundary or public contract decision is involved.
 ---
 
 # Java Code Design
@@ -39,6 +39,15 @@ Use this skill when shaping Java production code that should be easy to call, ha
 - Mark concrete classes `final` by default when they have no explicit extension contract. Leave them non-final only for a framework proxy, documented inheritance point, sealed hierarchy, test double, or established local pattern.
 - Use sealed types, pattern matching, switch expressions, collection factories, `copyOf`, and `Stream.toList()` when they improve clarity or safety.
 - Keep newer features subordinate to domain clarity, persistence constraints, Spring/Jackson binding behavior, and JSpecify nullness contracts.
+
+## Gotchas
+
+- Do not put Spring stereotypes on application ports or domain types.
+- Do not treat JPA entities as domain models by default.
+- Do not name application ports after JPA query methods, HTTP endpoints, cache keys, or adapter mechanics.
+- Do not create `shared-*` modules for technical utilities; reserve `shared` for deliberate shared-kernel concepts.
+- Do not add runtime null checks only to duplicate JSpecify non-null contracts.
+- Do not split modules when the split only mirrors a template and does not protect behavior, ownership, dependency direction, or repeated wiring.
 
 ## Nullness Contracts
 

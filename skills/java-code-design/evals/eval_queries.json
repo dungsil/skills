@@ -1,0 +1,66 @@
+[
+  {
+    "query": "이 도메인 객체를 record로 만들지 class로 만들지 봐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Spring Boot 모듈을 apps/packages/starters 구조로 나누려는데 경계가 맞는지 리뷰해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "use case port 이름에 JPA findBy... 메서드명을 써도 괜찮아?",
+    "should_trigger": true
+  },
+  {
+    "query": "JSpecify 기준으로 이 public API의 null 반환 계약을 어떻게 표현할지 봐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "packages/shared에 넣은 pagination 타입이 shared kernel인지 common module인지 판단해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "이 adapter가 domain exception을 HTTP status로 번역하는 위치가 맞는지 리뷰해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Lombok 생성자를 쓸지 직접 생성자를 쓸지 API contract 관점에서 봐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "새 Spring Boot starter를 분리해야 하는지 기존 starter에 넣어도 되는지 결정해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Java에서 Consumer 반대 함수형 인터페이스가 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "Spring Boot에서 application.yml profile 설정법 알려줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Gradle에서 dependencyInsight 명령 어떻게 써?",
+    "should_trigger": false
+  },
+  {
+    "query": "Java 21 switch expression 문법 예시 보여줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Maven에서 특정 테스트 클래스 하나만 실행하는 명령 알려줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Spring WebClient timeout 설정 속성 이름이 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "JPA @ManyToOne fetch 기본값이 LAZY야 EAGER야?",
+    "should_trigger": false
+  },
+  {
+    "query": "Java 문자열이 blank인지 확인하는 표준 API 알려줘",
+    "should_trigger": false
+  }
+]
