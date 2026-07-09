@@ -7,13 +7,6 @@
 pnpm dlx skills add dungsil/skills -g
 ```
 
-## 개발/검증
-
-```bash
-bun install
-bun run validate:skills
-```
-
 ## 스킬 목록
 
 ## 공통
@@ -32,6 +25,14 @@ bun run validate:skills
 | [writing-java-tests] | Java 테스트 코드 작성 지침 |
 |  [writing-javadoc]   | Javadoc 작성 지침     |
 
+
+
+## 개발/검증
+
+```bash
+bun install
+bun run validate:skills
+```
 
 ## 라이선스
 이 저장소의 스킬과 스크립트는 [MIT-0](./LICENSE) 혹은 [Unlicense](./UNLICENSE)에 따라 배포됩니다.
