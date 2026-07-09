@@ -62,5 +62,13 @@
   {
     "query": "Java 문자열이 blank인지 확인하는 표준 API 알려줘",
     "should_trigger": false
+  },
+  {
+    "query": "Java에서 Predicate와 Function 차이가 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "List.of와 Arrays.asList 차이를 알려줘",
+    "should_trigger": false
   }
 ]

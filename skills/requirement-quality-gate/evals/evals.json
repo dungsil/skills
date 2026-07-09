@@ -30,6 +30,16 @@
         "The output checks implementation evidence for transaction or concurrency handling.",
         "The output marks missing meaningful verification as a risk or warning."
       ]
+    },
+    {
+      "id": "split-mixed-requirements",
+      "prompt": "요구사항: 라이선스 조회는 삭제된 항목을 제외해야 하고, 생성 API는 SPDX ID를 필수로 검증해야 하며, 목록 화면은 이름순 정렬이어야 한다. 현재 변경이 요구사항을 만족하는지 품질 게이트로 봐줘.",
+      "expected_output": "여러 독립 요구사항을 하나의 verdict로 합치지 않고 각 요구사항을 별도 gate item 또는 acceptance criteria 묶음으로 분리한 뒤 evidence와 status를 따로 판단한다.",
+      "assertions": [
+        "The output identifies that the prompt contains multiple independent requirements.",
+        "The output evaluates each requirement separately or asks the user to choose one target requirement.",
+        "The output does not collapse unrelated behavior into one PASS/WARNING/FAIL verdict."
+      ]
     }
   ]
 }

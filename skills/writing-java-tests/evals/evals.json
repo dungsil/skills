@@ -30,6 +30,16 @@
         "The output avoids null tests unless testing explicit misuse defense.",
         "The output requires clear intent and static-analysis suppression for deliberate contract violation tests."
       ]
+    },
+    {
+      "id": "e2e-jsonpath-not-raw-contains",
+      "prompt": "E2E 테스트에서 라이선스 조회 응답 JSON에 MIT가 있는지 확인하려고 response body 문자열에 contains(\"MIT\")를 쓰려 해.",
+      "expected_output": "raw string contains 검증을 피하고 MockMvc/WebTestClient/REST-assured 등 사용 중인 도구의 jsonPath 또는 파싱된 JSON 필드 assertion으로 응답 구조와 값 계약을 검증하도록 안내한다.",
+      "assertions": [
+        "The output rejects raw string contains for JSON body contract checks.",
+        "The output recommends jsonPath or parsed JSON assertions at the field path.",
+        "The output keeps Hamcrest usage limited to jsonPath assertions when needed."
+      ]
     }
   ]
 }
