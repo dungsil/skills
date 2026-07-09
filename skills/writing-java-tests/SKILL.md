@@ -68,6 +68,14 @@ Use `assertAll` when one action produces a state with multiple observable proper
 
 Avoid asserting exception messages unless the message is part of the public contract.
 
+## Gotchas
+
+- Do not write null tests for non-null JSpecify contracts.
+- Do not create controller unit tests only to mirror JSON response shape.
+- Do not duplicate E2E coverage with repository or adapter tests unless the lower-level policy differs.
+- Do not use AssertJ only because examples online use it; follow the project assertion stack.
+- Do not verify JSON responses with raw string `contains`; use `jsonPath` or parsed JSON assertions at the intended field path.
+
 ## Nullability Policy
 
 Respect JSpecify nullability contracts. Treat declared annotations as the source of truth.

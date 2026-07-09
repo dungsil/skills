@@ -39,6 +39,14 @@ Use this skill to turn one stated requirement into a concise evidence-backed qua
 - Every `PASS` or `WARNING` must cite source, diff, test, CLI, HTTP, browser, database, or stated manual-limit evidence.
 - Keep unrelated changed files visible as unmapped changes or limitations; do not force them into the requirement.
 
+## Gotchas
+
+- Do not merge several independent requirements into one broad verdict; split them into separate gate items or ask which one to evaluate.
+- Do not treat tests as a substitute for implementation evidence.
+- Do not implement fixes while running the gate unless the user separately asks for changes.
+- Do not infer hidden acceptance criteria from likely product intent; mark assumptions and unstated behavior separately.
+- Do not hide unrelated changed files just because they do not affect the final status.
+
 ## Verification Checklist
 
 Before reporting:
