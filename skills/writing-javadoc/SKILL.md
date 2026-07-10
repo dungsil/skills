@@ -10,49 +10,63 @@ Use this skill to write concise, contract-focused Javadoc that matches the surro
 ## Core Rules
 
 - Write Javadocs in Korean. Keep Java identifiers, API names, tags, and code literals in their original form.
-  - Do not return example code or generate usage examples.
-  - Do not add new `@author`, `@version`, or `@since` tags.
-  - Preserve existing `@author`, `@version`, and `@since` tags when revising existing Javadocs unless the user explicitly asks to remove them.
-  - Document public and protected members when their contract is useful to callers.
-  - Document package-private and private members only when the behavior is complex, non-obvious, or intentionally differs from nearby public methods.
-  - Do not generate boilerplate documentation for simple fields or type member properties.
-  - Keep documentation close to the code's actual behavior and tested contract.
+- Do not return example code or generate usage examples.
+- Do not add new `@author`, `@version`, or `@since` tags.
+- Preserve existing `@author`, `@version`, and `@since` tags when revising existing Javadocs unless the user explicitly asks to remove them.
+- Document public and protected members when their contract is useful to callers.
+- Document package-private and private members only when the behavior is complex, non-obvious, or intentionally differs from nearby public methods.
+- Do not generate boilerplate documentation for simple fields or type member properties.
+- Keep documentation close to the code's actual behavior and tested contract.
 
 ## Korean Style
 
 - Use concise report-style declarative sentences.
-  - Do not use endings like `~입니다.`
-  - Change `~합니다.` to `~한다.`
-  - Prefer natural Korean developer wording. Avoid parser-like wording such as `소비한다` unless the code is actually parser/tokenizer logic.
-  - Keep the first line as a short summary phrase, similar to `문자열 정규화`.
-  - Do not add a period to the first summary line unless surrounding Javadocs require it for consistency.
+- Do not use endings like `~입니다.`
+- Change `~합니다.` to `~한다.`
+- Prefer natural Korean developer wording. Avoid parser-like wording such as `소비한다` unless the code is actually parser/tokenizer logic.
+- Keep the first line as a short summary phrase, similar to `문자열 정규화`.
+- Do not add a period to the first summary line unless surrounding Javadocs require it for consistency.
 
 ## Method Javadoc Shape
 
 Use this order for method Javadocs:
 
 1. Short summary phrase.
-   1. A blank line followed by a standalone `<p>` when detail is useful. Omit the closing `</p>` tag.
-   2. One or two behavior sentences.
-   3. `@param` tags.
-   4. `@return` tag for non-void methods unless the summary already makes the return value completely obvious.
-   5. `@throws` tags for documented exceptions.
+2. When additional detail is needed, place `<p>` on the line immediately after the summary. Do not insert an empty Javadoc line before it or add `</p>`.
+3. One or two behavior sentences.
+4. `@param` tags.
+5. `@return` tag for non-void methods unless the summary already makes the return value completely obvious.
+6. `@throws` tags for documented exceptions.
+
+Use this format when a method needs a detail paragraph and has parameter, return value, and exception contracts:
+
+```text
+/**
+ * 사용자 이름 정규화
+ * <p>
+ * 앞뒤 공백을 제거하고 연속된 공백을 하나로 축약한다.
+ *
+ * @param value 정규화할 사용자 이름
+ * @return 정규화된 사용자 이름
+ * @throws IllegalArgumentException {@code value}가 {@code null}인 경우
+ */
+```
 
 Keep the body short. Let focused tests carry edge-case detail when the Javadoc would become long.
 
 ## Contract Documentation
 
 - Document what the method promises, not how every line is implemented.
-  - Document `null` behavior when it is part of the public contract.
-  - Put exception behavior in `@throws`, not in the prose body.
-  - Only document exceptions callers can reasonably trigger or need to know.
-  - Use `@see` for references to other types or members.
-  - Use `@param <T>` for generic type parameters when the type parameter's role is not obvious.
-  - Use `{@code}` for inline code snippets, including `true`, `false`, and `null`.
-  - Avoid HTML tags in Javadocs except for `<p>` when paragraph separation is needed. Place `<p>` on its own line at the paragraph break and omit `</p>`.
-  - Use `@deprecated` to mark a member as deprecated and provide an alternative.
-  - If two similar methods intentionally have different contracts, document that difference briefly.
-  - If changing one method must not mechanically change another, state that the contracts are different and should be checked separately.
+- Document `null` behavior when it is part of the public contract.
+- Put exception behavior in `@throws`, not in the prose body.
+- Only document exceptions callers can reasonably trigger or need to know.
+- Use `@see` for references to other types or members.
+- Use `@param <T>` for generic type parameters when the type parameter's role is not obvious.
+- Use `{@code}` for inline code snippets, including `true`, `false`, and `null`.
+- Avoid HTML tags in Javadocs except for `<p>` when paragraph separation is needed. Place `<p>` on its own line at the paragraph break and omit `</p>`.
+- Use `@deprecated` to mark a member as deprecated and provide an alternative.
+- If two similar methods intentionally have different contracts, document that difference briefly.
+- If changing one method must not mechanically change another, state that the contracts are different and should be checked separately.
 
 ## Common Edge Cases
 
@@ -60,18 +74,19 @@ Keep the body short. Let focused tests carry edge-case detail when the Javadoc w
 - Document sealed interfaces by their permitted domain variants and selection rule; do not restate every implementation detail.
 - Document enum constants only when each constant has caller-visible policy, persistence mapping, or domain meaning that is not obvious from the name.
 - Document exception types by the caller-visible failure condition and recovery meaning; avoid stack-trace or implementation prose.
-- Include `package-info.java` with `@NullMarked` by default for Java packages; also use it for package-level contracts, architectural role, or domain language that applies to every type in the package. Do not repeat it in every nested package unless that nested package needs its own nullness default or package-level contract.
+- Include `package-info.java` with `@NullMarked` by default for Java packages; also use it for package-level contracts, architectural role, or domain language that applies to every type in the package.
+  Do not repeat it in every nested package unless that nested package needs its own nullness default or package-level contract.
 - For Spring `@ConfigurationProperties` carriers, document external configuration meaning, defaulting, units, and validation constraints rather than Spring binding mechanics.
 - For factories returning result/error carriers such as `Either<List<Problem>, T>`, make `@return` state the success value and the collected failure shape without showing usage examples.
 
 ## Review Checklist
 
 - First line is a short summary phrase, not a full sentence.
-  - First line does not end with a needless period.
-  - Prose is not longer than the surrounding Javadoc style.
-  - `@throws` is used for exception contracts.
-  - No example code or usage examples are included.
-  - Existing `@author`, `@version`, and `@since` tags are preserved unless removal was explicitly requested.
-  - No new `@author`, `@version`, or `@since` tags are added.
-  - No HTML tags are added except standalone `<p>` tags at paragraph breaks, with no `</p>` closing tags.
-  - Sentence endings follow the project style.
+- First line does not end with a needless period.
+- Prose is not longer than the surrounding Javadoc style.
+- `@throws` is used for exception contracts.
+- No example code or usage examples are included.
+- Existing `@author`, `@version`, and `@since` tags are preserved unless removal was explicitly requested.
+- No new `@author`, `@version`, or `@since` tags are added.
+- No HTML tags are added except standalone `<p>` tags at paragraph breaks, with no `</p>` closing tags.
+- Sentence endings follow the project style.
