@@ -32,7 +32,7 @@ Use this skill to write concise, contract-focused Javadoc that matches the surro
 Use this order for method Javadocs:
 
 1. Short summary phrase.
-   1. `{@code <p>}` when detail is useful.
+   1. A blank line followed by a standalone `<p>` when detail is useful. Omit the closing `</p>` tag.
    2. One or two behavior sentences.
    3. `@param` tags.
    4. `@return` tag for non-void methods unless the summary already makes the return value completely obvious.
@@ -49,7 +49,7 @@ Keep the body short. Let focused tests carry edge-case detail when the Javadoc w
   - Use `@see` for references to other types or members.
   - Use `@param <T>` for generic type parameters when the type parameter's role is not obvious.
   - Use `{@code}` for inline code snippets, including `true`, `false`, and `null`.
-  - Avoid HTML tags in Javadocs except for `{@code <p>}` when paragraph separation is needed.
+  - Avoid HTML tags in Javadocs except for `<p>` when paragraph separation is needed. Place `<p>` on its own line at the paragraph break and omit `</p>`.
   - Use `@deprecated` to mark a member as deprecated and provide an alternative.
   - If two similar methods intentionally have different contracts, document that difference briefly.
   - If changing one method must not mechanically change another, state that the contracts are different and should be checked separately.
@@ -73,5 +73,5 @@ Keep the body short. Let focused tests carry edge-case detail when the Javadoc w
   - No example code or usage examples are included.
   - Existing `@author`, `@version`, and `@since` tags are preserved unless removal was explicitly requested.
   - No new `@author`, `@version`, or `@since` tags are added.
-  - No HTML tags are added except `{@code <p>}`.
+  - No HTML tags are added except standalone `<p>` tags at paragraph breaks, with no `</p>` closing tags.
   - Sentence endings follow the project style.
