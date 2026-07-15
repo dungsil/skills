@@ -59,7 +59,7 @@ Use `@BeforeEach` when multiple test cases repeat the same setup or fixture crea
 - Use `shouldBeRejectedWhen...` for invalid inputs.
 - Use `shouldBeReturned...When...` for getter/helper return behavior.
 - Use `shouldBeThrownWhen...` for expected exception paths.
-- Keep detailed behavior text in `@DisplayName`; match the repository's language and style.
+- Keep detailed behavior text in `@DisplayName`; match the repository's language, but Korean test cases must always end with `~해야 한다` or `~이어야 한다`.
 - Always write E2E with uppercase `E2E` in class and file names, such as `UserProfileE2ETest`.
 
 ## Assertions
