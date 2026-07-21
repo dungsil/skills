@@ -2,57 +2,42 @@
 
 Every quality gate requires independent subagent review before the final report.
 
-## Tier Requirements
+## Assignment
 
-- `LIGHT`: one independent reviewer may verify scope, evidence, and verdict together.
-- `HEAVY`: run the two-wave procedure below. One reviewer cannot cover multiple first-wave roles.
+1. Split the source requirement into independent requirement or gate items before dispatch.
+2. Dispatch exactly one subagent per item, in parallel when there are multiple items.
+3. Each reviewer owns scope, evidence, and verdict verification end to end for its assigned item.
+4. Do not create separate scope, evidence, verdict, or adversarial reviewers. Add another review pass only when the user explicitly requests it.
+
+One independent item means one reviewer. Review tier changes review depth, not reviewer count or topology.
 
 ## Review Packet
 
-Give every reviewer:
+Give each reviewer only the material relevant to its assigned item:
 
-- original source requirement and requested review scope
+- source requirement and requested review scope
 - extracted criteria with evidence domains and `In scope` values
-- implementation evidence table and test or execution results
-- separate gates and their current-gate impact
+- implementation evidence and test or execution results
+- separate-gate relationship and current-gate impact
 - draft criterion and gate statuses
 - known ambiguities and limits
 
-## HEAVY Wave 1: Specialist Reviewers
+## Reviewer Result
 
-Dispatch three independent subagents in parallel:
-
-1. **Scope reviewer:** verify every criterion and separate gate belongs to the source requirement and requested scope; detect hidden criteria, mixed execution actors, and code/operation contamination.
-2. **Evidence reviewer:** verify every criterion has domain-appropriate primary evidence; detect tests replacing implementation evidence, unsupported positive judgments, and out-of-scope evidence treated as a defect.
-3. **Verdict reviewer:** verify every criterion status, aggregate calculation, severity, separate-gate impact, and ambiguity treatment; detect limitations mislabeled as blockers or unrelated gate results contaminating the current status.
-
-Each specialist returns, for every reviewed item:
+Each reviewer returns:
 
 - `PASS` or `CHANGES_REQUIRED`
-- exact evidence or rule supporting the result
-- objections and required changes
-- unresolved ambiguity or limitation
+- scope result: criteria belong to the source requirement and requested scope
+- evidence result: every judgment has domain-appropriate primary evidence
+- verdict result: statuses, severity, aggregation, and separate-gate impact are correct
+- exact supporting evidence or rule
+- objections, required changes, and unresolved ambiguity or limitation
 
-The main agent resolves every finding, records accepted and rejected objections with reasons, updates the draft, and recalculates affected statuses. A reviewer call without item-level results or resolution is incomplete.
-
-## HEAVY Wave 2: Adversarial Verification
-
-After Wave 1 resolution, dispatch a fourth subagent that did not draft the report or perform a specialist review. Give it the original packet, all specialist findings, resolutions, and the revised report.
-
-The adversarial verifier must assume the revised verdict is wrong and try to falsify it by:
-
-- finding a source obligation omitted, invented, or assigned to the wrong gate
-- finding a positive criterion without primary implementation or domain evidence
-- finding tests or execution claims used as substitutes for implementation
-- finding an out-of-scope or separate-gate result that changes the current gate
-- constructing a plausible counterexample or alternate interpretation that changes the outcome
-- checking that every accepted change was applied and every status was recalculated
-
-If it returns `CHANGES_REQUIRED`, revise the report, rerun every affected specialist reviewer, then rerun adversarial verification. Repeat until the adversarial verifier returns `PASS` with no unresolved blocking objection.
+For `HEAVY`, the same reviewer also attempts a plausible counterexample or alternate interpretation that could change its assigned item's outcome.
 
 ## Completion
 
-- `LIGHT` is complete after the independent reviewer result and all disagreements are resolved.
-- `HEAVY` is complete only after all three specialist results, their resolutions, any required specialist reruns, and a final adversarial `PASS` are recorded.
-- If any required subagent is unavailable, mark independent verification incomplete. A structured self-challenge may document risks but is not independent review and cannot satisfy the completion rule.
+The main agent resolves every finding, records accepted and rejected objections with reasons, updates the draft, and recalculates affected statuses. A reviewer call without item-level results or resolution is incomplete.
+
+Independent review is complete when every independent item has one reviewer result and all disagreements are resolved. If a required subagent is unavailable, mark that item's independent verification incomplete; a self-review cannot satisfy the independent-review requirement.
 

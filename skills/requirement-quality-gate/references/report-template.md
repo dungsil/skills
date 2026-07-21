@@ -81,16 +81,13 @@ Return only the Markdown report unless the user asks for additional commentary. 
 
 | Item | Result |
 |---|---|
-| Reviewers used | `<서브에이전트 목록>` |
-| Scope reviewer | `<항목별 결과와 근거>` |
-| Evidence reviewer | `<항목별 결과와 근거>` |
-| Verdict reviewer | `<항목별 결과와 근거>` |
-| Adversarial verifier | `<최종 적대 검증 결과와 반례 시도>` |
+| Reviewers used | `<요구사항 또는 게이트 항목 → 서브에이전트 목록>` |
+| Requirement assignments | `<각 리뷰어에게 할당한 독립 요구사항 또는 게이트 항목>` |
+| Per-requirement results | `<각 항목의 범위·증거·판정 결과와 근거>` |
 | Disagreements | `<이견 또는 없음>` |
 | Resolution | `<수용·기각 근거와 반영한 변경>` |
-| Re-review iterations | `<재검토 횟수와 대상 또는 없음>` |
 
-`경량 검토`는 한 명의 독립 리뷰어가 세 항목을 함께 검증할 수 있다. `심층 검토`는 범위·증거·판정 전담 서브에이전트 3명의 항목별 검증과 별도 적대 검증자의 최종 통과가 모두 필요하다. 필수 서브에이전트를 사용할 수 없으면 독립 검증 미완료로 표시한다.
+독립 요구사항 또는 게이트 항목마다 서브에이전트 한 명을 할당한다. 각 리뷰어가 할당 항목의 범위·증거·판정을 함께 검증하며, 여러 항목은 병렬로 검토한다. 검토 유형은 깊이만 바꾸며 리뷰어 수나 구조를 바꾸지 않는다. 사용자가 추가 검증을 명시하지 않으면 역할별 리뷰어나 별도 적대 검증자를 추가하지 않는다.
 
 ## 8. Risks and Recommended Actions
 
