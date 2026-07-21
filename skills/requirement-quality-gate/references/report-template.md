@@ -1,6 +1,6 @@
 # Requirement Quality Gate Report Template
 
-Return only the Markdown report unless the user asks for additional commentary. Use the user's language for display text and prose.
+Return only the Markdown report unless the user asks for additional commentary. Use the user's language for display text and prose. Keep acceptance criteria within the selected evidence boundary; list operational completion claims under external validation instead.
 
 # Requirement Quality Gate Report
 
@@ -11,16 +11,21 @@ Return only the Markdown report unless the user asks for additional commentary. 
 | Status | `<PASS | WARNING | FAIL | NEEDS_REVIEW | NO_CHANGES_FOUND | ERROR>` |
 | Review tier | `<LIGHT | HEAVY>` |
 | Judgment | `<one-sentence final judgment>` |
+| Evidence boundary | `<CODE | RUNTIME | MIXED>` |
 | Success criteria | `<short summary>` |
 | Evidence coverage | `<performed and missing evidence scenarios>` |
 
 ## 2. Reviewed Requirement
 
-> `<requirement text>`
+> `<source requirement only; exclude review scope, supplied evidence, and limits>`
 
 | Item | Details |
 |---|---|
-| Acceptance criteria | `<AC-1: criterion; AC-2: criterion>` |
+| Review scope | `<artifacts to inspect and requested evidence boundary>` |
+| Supplied evidence | `<user-stated files, tests, outputs, or none>` |
+| Input limits | `<unavailable runtime or operational evidence, or none>` |
+| Acceptance criteria within boundary | `<AC-1: source-stated required behavior; never files, tests, logs, or evidence-only statements>` |
+| External validation items | `<deployment, target database execution, manual operation, live external state, or none>` |
 | Constraints and non-goals | `<constraints, non-goals, or none>` |
 | Ambiguities | `<ambiguities or none>` |
 
@@ -35,6 +40,8 @@ Return only the Markdown report unless the user asks for additional commentary. 
 | Mapping rationale | `<why these files/evidence are relevant>` |
 
 ## 4. Criteria Results
+
+Only source-derived acceptance criteria belong in this table. Do not add implementation evidence or external validation as criterion rows.
 
 | Acceptance criterion | Status | Severity | Implementation evidence | Judgment | Recommendation |
 |---|---|---|---|---|---|
@@ -70,4 +77,5 @@ Return only the Markdown report unless the user asks for additional commentary. 
 | Comparison method | `<merge-base diff | direct diff | staged | unstaged | mixed | provided diff | none>` |
 | Reviewed files | `<files>` |
 | Excluded files | `<files and reasons>` |
+| External validation items | `<items not decidable from the reviewed evidence, or none>` |
 | Limits | `<limits or none>` |
