@@ -1,6 +1,6 @@
 # Requirement Quality Gate Report Template
 
-Return only the Markdown report unless the user asks for additional commentary. Use the user's language for display text and prose. Report independent gates separately; never let a separate gate lower the current gate's status.
+Return only the Markdown report unless the user asks for additional commentary. Use the user's language for headings, labels, values, and prose. In Korean reports, use the Korean display values defined by the skill and do not expose internal canonical tokens. Report independent gates separately; never let a separate gate lower the current gate's status.
 
 # Requirement Quality Gate Report
 
@@ -8,17 +8,17 @@ Return only the Markdown report unless the user asks for additional commentary. 
 
 | Item | Value |
 |---|---|
-| Status | `<PASS | WARNING | FAIL | NEEDS_REVIEW | NO_CHANGES_FOUND | ERROR>` |
-| Review tier | `<LIGHT | HEAVY>` |
+| Status | `<통과 | 경고 | 실패 | 검토 필요 | 관련 변경 없음 | 오류>` |
+| Review tier | `<경량 검토 | 심층 검토>` |
 | Judgment | `<one-sentence judgment for this gate only>` |
 | Evaluated scope | `<user-requested scope>` |
-| Gate type | `<code implementation | test verification | migration implementation | operation execution | deployment | data state | manual verification>` |
-| Evidence boundary | `<CODE | RUNTIME | MIXED; evidence sources inspected, not gate scope>` |
-| Included evidence domains | `<CODE, TEST, MIGRATION, OPERATION, DEPLOYMENT, DATA, MANUAL as applicable>` |
+| Gate type | `<코드 구현 | 테스트 검증 | 마이그레이션 구현 | 운영 실행 | 배포 | 데이터 상태 | 수동 검증>` |
+| Evidence boundary | `<코드 증거 | 실행 증거 | 혼합 증거; 검사한 증거 출처이며 게이트 범위가 아님>` |
+| Included evidence domains | `<코드, 테스트, 마이그레이션, 운영 실행, 배포, 데이터, 수동 검증 중 해당 항목>` |
 | Excluded evidence domains | `<excluded domains and why>` |
-| Separate gates | `<gate names and statuses, or none>` |
-| Independent review performed | `<yes | no>` |
-| Independent review result | `<accepted changes, no-change conclusion, fallback, or not applicable>` |
+| Separate gates | `<게이트 이름과 상태 또는 없음>` |
+| Independent review performed | `<예 | 아니요>` |
+| Independent review result | `<반영한 변경 | 변경 없음 | 자체 반증 대체 | 해당 없음>` |
 | Success criteria | `<short summary of in-scope criteria>` |
 | Evidence coverage | `<performed and missing evidence scenarios>` |
 
@@ -29,12 +29,12 @@ Return only the Markdown report unless the user asks for additional commentary. 
 | Item | Details |
 |---|---|
 | Review scope | `<artifacts and outcomes the user requested>` |
-| Supplied evidence | `<user-stated files, tests, outputs, or none>` |
-| Input limits | `<unavailable evidence or none>` |
+| Supplied evidence | `<사용자가 제시한 파일, 테스트, 출력 또는 없음>` |
+| Input limits | `<사용할 수 없는 증거 또는 없음>` |
 | Current gate criteria | `<in-scope source-stated required behavior>` |
-| Separate gate obligations | `<source-stated obligations assigned to other gates, or none>` |
-| Constraints and non-goals | `<constraints, non-goals, or none>` |
-| Ambiguities | `<resolved and unresolved ambiguities, their outcome impact, or none>` |
+| Separate gate obligations | `<다른 게이트로 분리한 원 요구사항 또는 없음>` |
+| Constraints and non-goals | `<제약과 비목표 또는 없음>` |
+| Ambiguities | `<해소되거나 미해소된 모호성, 결과 영향 또는 없음>` |
 
 ## 3. Implementation Mapping
 
@@ -42,24 +42,24 @@ Return only the Markdown report unless the user asks for additional commentary. 
 |---|---|
 | Mapping confidence | `<0.00-1.00>` |
 | Relevant implementation files | `<file list>` |
-| Relevant tests or verification files | `<test or verification files, or none>` |
-| Mapping status | `<satisfied | not satisfied | partially satisfied | unknown | not applicable>` |
+| Relevant tests or verification files | `<관련 테스트 또는 검증 파일, 없으면 없음>` |
+| Mapping status | `<충족 | 미충족 | 부분 충족 | 확인 불가 | 해당 없음>` |
 | Mapping rationale | `<why these files and evidence are relevant>` |
 
 ## 4. Criteria Results
 
-Every row must derive from the source requirement. Evidence-only statements never become criteria. Out-of-scope source obligations may remain for traceability only when marked `In scope=false`, `OUT_OF_SCOPE` or `SEPARATE_GATE`, and impact `none`.
+모든 행은 원 요구사항에서 도출해야 한다. 증거만 설명하는 문장은 승인 기준이 아니다. 범위 밖 원 요구사항을 추적 목적으로 남길 때는 범위를 `제외`, 상태를 `범위 밖` 또는 `별도 게이트`, 종합 판정 영향을 `영향 없음`으로 표시한다.
 
 ```text
-overall status =
-  aggregate(status of acceptance criteria where in_scope = true)
+종합 상태 =
+  범위가 "포함"인 승인 기준 상태만 집계
 ```
 
 | ID | Criterion | Evidence domain | In scope | Status | Severity | Implementation or primary evidence | Overall status impact | Judgment | Recommendation |
 |---|---|---|---|---|---|---|---|---|---|
-| `AC-1` | `<required behavior>` | `<CODE | TEST | MIGRATION | OPERATION | DEPLOYMENT | DATA | MANUAL>` | `<true | false>` | `<satisfied | satisfied with risk | not satisfied | unknown | OUT_OF_SCOPE | SEPARATE_GATE | not applicable>` | `<critical | high | medium | low | none>` | `<evidence>` | `<included | none>` | `<judgment>` | `<recommendation>` |
+| `AC-1` | `<required behavior>` | `<코드 | 테스트 | 마이그레이션 | 운영 실행 | 배포 | 데이터 | 수동 검증>` | `<포함 | 제외>` | `<충족 | 위험 동반 충족 | 미충족 | 확인 불가 | 범위 밖 | 별도 게이트 | 해당 없음>` | `<치명적 | 높음 | 중간 | 낮음 | 없음>` | `<evidence>` | `<종합 판정 반영 | 영향 없음>` | `<judgment>` | `<recommendation>` |
 
-Rows with `In scope=false`, `OUT_OF_SCOPE`, `SEPARATE_GATE`, or `not applicable` never affect the current gate's status.
+범위가 `제외`이거나 상태가 `범위 밖`, `별도 게이트`, `해당 없음`인 행은 현재 게이트 상태에 영향을 주지 않는다.
 
 ## 5. Test and Verification Evidence
 
@@ -73,22 +73,22 @@ Rows with `In scope=false`, `OUT_OF_SCOPE`, `SEPARATE_GATE`, or `not applicable`
 
 | Gate | Evidence domain | Status | Reason | Impact on current gate |
 |---|---|---|---|---|
-| `<gate>` | `<CODE | TEST | MIGRATION | OPERATION | DEPLOYMENT | DATA | MANUAL>` | `<PASS | WARNING | FAIL | NEEDS_REVIEW | NO_CHANGES_FOUND | ERROR>` | `<reason>` | `<none>` |
+| `<gate>` | `<코드 | 테스트 | 마이그레이션 | 운영 실행 | 배포 | 데이터 | 수동 검증>` | `<통과 | 경고 | 실패 | 검토 필요 | 관련 변경 없음 | 오류>` | `<reason>` | `<영향 없음>` |
 
-Use `none` when the row belongs to an independent gate. Missing evidence for that gate must not lower the current gate.
+독립 게이트의 현재 게이트 영향에는 `영향 없음`을 사용한다. 해당 게이트의 증거 부재가 현재 게이트를 하향해서는 안 된다.
 
 ## 7. Independent Review
 
 | Item | Result |
 |---|---|
-| Reviewer used | `<yes | no>` |
+| Reviewer used | `<예 | 아니요>` |
 | Scope review | `<result>` |
 | Evidence review | `<result>` |
 | Verdict review | `<result>` |
-| Disagreements | `<issues or none>` |
+| Disagreements | `<이견 또는 없음>` |
 | Resolution | `<accepted/rejected findings, reasons, and resulting draft changes>` |
 
-For `HEAVY`, record the independent reviewer or the structured self-challenge fallback. A reviewer call without findings resolution is incomplete.
+`심층 검토`에서는 독립 리뷰어 또는 구조화된 자체 반증 대체 결과를 기록한다. 리뷰어 호출 후 이견을 해소하지 않았다면 검토가 완료된 것이 아니다.
 
 ## 8. Risks and Recommended Actions
 
@@ -96,7 +96,7 @@ For `HEAVY`, record the independent reviewer or the structured self-challenge fa
 
 | Severity | Risk | Related criteria or files |
 |---|---|---|
-| `<critical | high | medium | low>` | `<in-scope risk>` | `<criteria or files>` |
+| `<치명적 | 높음 | 중간 | 낮음>` | `<in-scope risk>` | `<criteria or files>` |
 
 ### Recommended Actions
 
@@ -108,10 +108,10 @@ For `HEAVY`, record the independent reviewer or the structured self-challenge fa
 
 | Item | Value |
 |---|---|
-| Change scope | `<user scope | branch diff | working tree | untracked files | searched source | none>` |
-| Comparison method | `<merge-base diff | direct diff | staged | unstaged | mixed | provided diff | none>` |
+| Change scope | `<사용자 지정 범위 | 브랜치 diff | 작업 트리 | 미추적 파일 | 검색한 소스 | 없음>` |
+| Comparison method | `<merge-base 비교 | 직접 diff | 스테이징 변경 | 미스테이징 변경 | 혼합 | 제공된 diff | 없음>` |
 | Reviewed files | `<files>` |
 | Excluded files | `<files and reasons>` |
-| External validation or separate gates | `<items not decidable in this gate, or none>` |
-| Limits | `<limits or none>` |
+| External validation or separate gates | `<현재 게이트에서 판단할 수 없는 항목 또는 없음>` |
+| Limits | `<제한사항 또는 없음>` |
 

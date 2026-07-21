@@ -4,7 +4,7 @@
     {
       "id": "diff-requirement-mapping",
       "prompt": "요구사항: 사용자는 저장 후에만 검사를 실행할 수 있어야 한다. 현재 브랜치 diff가 이 요구사항을 만족하는지 품질 게이트로 봐줘.",
-      "expected_output": "요구사항을 acceptance criteria로 분해하고, diff/source/test evidence를 매핑한 뒤 PASS/WARNING/FAIL 중 하나로 결론을 낸다.",
+      "expected_output": "요구사항을 acceptance criteria로 분해하고, diff/source/test evidence를 매핑한 뒤 통과/경고/실패 중 하나로 결론을 낸다.",
       "assertions": [
         "The output extracts explicit acceptance criteria from the requirement.",
         "The output cites implementation evidence rather than relying only on tests or file names.",
@@ -14,7 +14,7 @@
     {
       "id": "no-relevant-change",
       "prompt": "요구사항: 관리자는 삭제된 항목도 조회할 수 있어야 한다. 작업트리에서 관련 변경이 있는지 검증 보고서로 확인해줘.",
-      "expected_output": "관련 구현 증거가 없으면 NO_CHANGES_FOUND 또는 NEEDS_REVIEW로 판단하고, 근거 부족을 명확히 밝힌다.",
+      "expected_output": "관련 구현 증거가 없으면 관련 변경 없음 또는 검토 필요로 판단하고, 근거 부족을 명확히 밝힌다.",
       "assertions": [
         "The output does not invent implementation evidence.",
         "The output reports missing or weak mapping confidence as a limitation.",
@@ -24,7 +24,7 @@
     {
       "id": "high-risk-warning",
       "prompt": "요구사항: 결제 취소는 중복 요청에도 한 번만 처리되어야 한다. 구현은 있어 보이는데 테스트가 없는 상태야. 품질 게이트로 판단해줘.",
-      "expected_output": "idempotency, transaction, concurrency evidence를 확인하고, 고위험 동작에 검증이 부족하면 적어도 WARNING으로 분류한다.",
+      "expected_output": "idempotency, transaction, concurrency evidence를 확인하고, 고위험 동작에 검증이 부족하면 적어도 경고로 분류한다.",
       "assertions": [
         "The output treats payment idempotency as high-risk behavior.",
         "The output checks implementation evidence for transaction or concurrency handling.",
@@ -45,7 +45,7 @@
     {
       "id": "code-only-operational-boundary",
       "prompt": "요구사항: 사용자 테이블의 기존 행을 새 컬럼 값으로 일회성 백필하고 배포한다. 현재 브랜치의 코드와 테스트만 보고 품질 게이트 보고서를 작성해줘. 운영 DB나 배포 로그에는 접근할 수 없어.",
-      "expected_output": "코드와 테스트로 판정 가능한 백필 구현 동작을 현재 게이트로 다루고, 실제 대상 DB 실행과 배포 완료는 별도 OPERATION/DEPLOYMENT 게이트 또는 범위 밖 항목으로 분리해 현재 코드 게이트의 상태 계산에서 제외한다.",
+      "expected_output": "코드와 테스트로 판정 가능한 백필 구현 동작을 현재 게이트로 다루고, 실제 대상 DB 실행과 배포 완료는 별도 운영 실행/배포 게이트 또는 범위 밖 항목으로 분리해 현재 코드 게이트의 상태 계산에서 제외한다.",
       "assertions": [
         "The output does not create an in-scope code criterion requiring proof that a target or production database backfill or deployment actually occurred.",
         "The output limits the current code gate criteria to behavior verifiable from code and test evidence.",
@@ -58,7 +58,7 @@
     {
       "id": "license-backfill-operation-separation",
       "prompt": "이건 코드 검증이다. 요구사항: Declared License와 검출 License가 일치하면 자동 리뷰한다. 선언 외 추가 검출 라이선스가 모두 소스 공개 의무 없음, Restriction 없음, 신규 라이선스 없음이면 자동 리뷰한다. 기존 미검토 OSS Version 전체를 자동 리뷰하는 백필 기능을 추가하고 수행한다. 확인된 source/diff 구현 증거(검토 완료): 자동 리뷰 정책 코드, 소스 공개 의무 및 Restriction 판정, 신규 라이선스 차단, License Detect 연동, 백필 Reader/Processor/Writer/CLI 구현. 보조 검증 증거: dry-run/apply 통합 테스트 통과, 관련 Gradle 테스트 BUILD SUCCESSFUL. 운영 DB 실행 로그는 없다. 품질 게이트 보고서를 작성해줘.",
-      "expected_output": "코드 구현 품질 게이트는 정책, License Detect 연동, 백필 기능 구현을 source evidence와 보조 test evidence로 PASS 처리한다. 운영 DB 백필 실행 완료는 별도 OPERATION 게이트 NEEDS_REVIEW이며 현재 코드 게이트 영향은 none이다.",
+      "expected_output": "코드 구현 품질 게이트는 정책, License Detect 연동, 백필 기능 구현을 source evidence와 보조 test evidence로 통과 처리한다. 운영 DB 백필 실행 완료는 별도 운영 실행 게이트 검토 필요이며 현재 코드 게이트 영향은 영향 없음이다.",
       "assertions": [
         "The code implementation gate has Overall status PASS.",
         "The automatic-review policy, License Detect integration, and backfill implementation are satisfied in-scope CODE or MIGRATION criteria supported by implementation evidence.",
@@ -66,13 +66,14 @@
         "Production database execution is a separate OPERATION gate with status NEEDS_REVIEW and impact none on the code gate.",
         "The absence of production execution logs is not a WARNING or FAIL reason for the code gate.",
         "Criteria expose evidence domain, in-scope status, and overall-status impact, and excluded rows are not aggregated.",
-        "The report includes Separate Gates and Independent Review results."
+        "The report includes Separate Gates and Independent Review results.",
+        "The Korean report renders statuses, domains, scope flags, impacts, booleans, and severities as Korean display values instead of canonical code tokens."
       ]
     },
     {
       "id": "example-resolves-nonblocking-ambiguity",
       "prompt": "이건 코드 검증이다. 요구사항 문구에는 ‘신규 License 없으면 Reviewed: True’와 ‘신규 라이선스의 경우 무시’가 함께 있다. 구체 예시는 신규 라이선스가 있으면 Reviewed: False라고 한다. 구현은 신규 라이선스를 차단하며 관련 정책 코드와 테스트가 확인됐다. 품질 게이트로 판단해줘.",
-      "expected_output": "구체 예시를 우선하면 신규 라이선스 차단 구현은 코드 기준을 만족하므로 PASS가 가능하다. 문구 충돌은 비차단 제한사항 또는 명세 정리 권고로 기록하고, 그 자체만으로 WARNING이나 NEEDS_REVIEW로 낮추지 않는다.",
+      "expected_output": "구체 예시를 우선하면 신규 라이선스 차단 구현은 코드 기준을 만족하므로 통과가 가능하다. 문구 충돌은 비차단 제한사항 또는 명세 정리 권고로 기록하고, 그 자체만으로 경고나 검토 필요로 낮추지 않는다.",
       "assertions": [
         "The output uses the concrete Reviewed: False example to resolve the conflicting prose for the evaluated behavior.",
         "The implementation may receive PASS when it matches the resolved example and source evidence supports it.",
