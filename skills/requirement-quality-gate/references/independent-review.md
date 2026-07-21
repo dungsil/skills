@@ -4,12 +4,12 @@ Every quality gate requires independent subagent review before the final report.
 
 ## Assignment
 
-1. Split the source requirement into independent requirement or gate items before dispatch.
-2. Dispatch exactly one subagent per item, in parallel when there are multiple items.
-3. Each reviewer owns scope, evidence, and verdict verification end to end for its assigned item.
-4. Do not create separate scope, evidence, verdict, or adversarial reviewers. Add another review pass only when the user explicitly requests it.
+1. Split the request into independent source requirements before dispatch. Keep every criterion and evidence-domain gate under its parent requirement.
+2. Dispatch exactly one subagent per independent source requirement, in parallel when there are multiple requirements.
+3. Each reviewer owns scope, evidence, and verdict verification for all criteria and gate items derived from its assigned requirement.
+4. Do not create extra reviewers when one requirement splits into `CODE`, `OPERATION`, `DEPLOYMENT`, `DATA`, or other gates. Do not create separate scope, evidence, verdict, or adversarial reviewers unless the user explicitly requests another review pass.
 
-One independent item means one reviewer. Review tier changes review depth, not reviewer count or topology.
+One independent source requirement means one reviewer. Review tier and gate count change review depth, not reviewer count or topology.
 
 ## Review Packet
 
@@ -39,15 +39,15 @@ For `HEAVY`, the same reviewer also attempts a plausible counterexample or alter
 
 The main agent resolves every finding, records accepted and rejected objections with reasons, updates the draft, and recalculates affected statuses. A reviewer call without item-level results or resolution is incomplete.
 
-Independent review is complete when every independent item has one reviewer result and all disagreements are resolved. If a required subagent is unavailable, mark that item's independent verification incomplete; a self-review cannot satisfy the independent-review requirement.
+Independent review is complete when every independent source requirement has one reviewer result and all disagreements are resolved. If a required subagent is unavailable, mark that requirement's independent verification incomplete; a self-review cannot satisfy the independent-review requirement.
 
 ## Optional Post-report Adversarial Verification
 
 Run this only when the user explicitly requests adversarial verification after the initial report.
 
 1. Use the existing report, original requirement, and cited evidence as the review packet.
-2. Dispatch one new adversarial subagent per independent requirement or gate item, in parallel.
-3. Each verifier tries to falsify only its assigned item's result by finding:
+2. Dispatch one new adversarial subagent per independent source requirement, in parallel. The verifier covers every criterion and gate item derived from that requirement.
+3. Each verifier tries to falsify its assigned requirement's result by finding:
    - an omitted, invented, or mis-scoped obligation
    - a positive judgment without domain-appropriate primary evidence
    - a test or execution claim substituted for implementation evidence

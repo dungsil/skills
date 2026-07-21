@@ -9,7 +9,7 @@
         "The output extracts explicit acceptance criteria from the requirement.",
         "The output cites implementation evidence rather than relying only on tests or file names.",
         "The output separates final decision, evidence, risks, and scope limits.",
-        "The output assigns one independent subagent to each independent requirement or gate item, and that reviewer covers scope, evidence, and verdict end to end."
+        "The output assigns one independent subagent to each independent source requirement, and that reviewer covers all criteria and gate items derived from the requirement end to end."
       ]
     },
     {
@@ -30,7 +30,7 @@
         "The output treats payment idempotency as high-risk behavior.",
         "The output checks implementation evidence for transaction or concurrency handling.",
         "The output marks missing meaningful verification as a risk or warning.",
-        "For HEAVY review, the output assigns exactly one subagent to each independent requirement or gate item; the same reviewer performs deeper scope, evidence, verdict, and counterexample analysis for its assigned item."
+        "For HEAVY review, the output assigns exactly one subagent to each independent source requirement; the same reviewer performs deeper analysis across every criterion and gate derived from that requirement."
       ]
     },
     {
@@ -67,7 +67,7 @@
         "Production database execution is a separate OPERATION gate with status NEEDS_REVIEW and impact none on the code gate.",
         "The absence of production execution logs is not a WARNING or FAIL reason for the code gate.",
         "Criteria expose evidence domain, in-scope status, and overall-status impact, and excluded rows are not aggregated.",
-        "The report assigns one subagent to each independent requirement or gate item and records that reviewer's item-level scope, evidence, verdict, objections, and resolutions.",
+        "The report assigns one subagent to each independent source requirement and records that reviewer's results across all criteria and separate gates derived from the requirement.",
         "The Korean report renders statuses, domains, scope flags, impacts, booleans, and severities as Korean display values instead of canonical code tokens."
       ]
     },
@@ -86,10 +86,10 @@
     {
       "id": "post-report-adversarial-trigger",
       "prompt": "방금 작성한 품질 게이트 보고서를 적대적으로 검증해줘.",
-      "expected_output": "기존 보고서의 독립 요구사항 또는 게이트 항목마다 새 적대 검증자 한 명을 병렬 할당하고, 판정을 뒤집을 수 있는 누락·증거 오류·범위 오염·반례를 시도한 뒤 추가 검증 결과만 보고한다.",
+      "expected_output": "기존 보고서의 독립 요구사항마다 새 적대 검증자 한 명을 병렬 할당하고, 각 검증자가 해당 요구사항에서 파생된 모든 기준과 게이트를 대상으로 누락·증거 오류·범위 오염·반례를 시도한 뒤 추가 검증 결과만 보고한다.",
       "assertions": [
         "The output treats adversarial verification as an explicit post-report follow-up rather than part of the initial gate report.",
-        "The output assigns one new adversarial subagent to each independent requirement or gate item.",
+        "The output assigns one new adversarial subagent to each independent source requirement, covering every criterion and gate item derived from that requirement.",
         "Each verifier attempts to falsify its assigned result using scope, primary evidence, aggregation, and a plausible counterexample or alternate interpretation.",
         "The output returns an adversarial-verification addendum and does not rewrite the full report unless requested.",
         "The workflow does not automatically start another adversarial round."

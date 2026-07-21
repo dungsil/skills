@@ -81,13 +81,13 @@ Return only the Markdown report unless the user asks for additional commentary. 
 
 | Item | Result |
 |---|---|
-| Reviewers used | `<요구사항 또는 게이트 항목 → 서브에이전트 목록>` |
-| Requirement assignments | `<각 리뷰어에게 할당한 독립 요구사항 또는 게이트 항목>` |
-| Per-requirement results | `<각 항목의 범위·증거·판정 결과와 근거>` |
+| Reviewers used | `<독립 요구사항 → 서브에이전트 목록>` |
+| Requirement assignments | `<각 리뷰어에게 할당한 독립 요구사항과 파생 게이트>` |
+| Per-requirement results | `<각 요구사항의 전체 기준·게이트에 대한 범위·증거·판정 결과>` |
 | Disagreements | `<이견 또는 없음>` |
 | Resolution | `<수용·기각 근거와 반영한 변경>` |
 
-독립 요구사항 또는 게이트 항목마다 서브에이전트 한 명을 할당한다. 각 리뷰어가 할당 항목의 범위·증거·판정을 함께 검증하며, 여러 항목은 병렬로 검토한다. 검토 유형은 깊이만 바꾸며 리뷰어 수나 구조를 바꾸지 않는다. 사용자가 추가 검증을 명시하지 않으면 역할별 리뷰어나 별도 적대 검증자를 추가하지 않는다.
+독립 요구사항마다 서브에이전트 한 명을 할당한다. 각 리뷰어가 해당 요구사항에서 파생된 모든 기준과 게이트의 범위·증거·판정을 함께 검증한다. 하나의 요구사항이 코드·운영·배포·데이터 게이트로 분리되어도 리뷰어를 추가하지 않는다. 여러 독립 요구사항만 병렬로 검토한다.
 
 ## 8. Risks and Recommended Actions
 
@@ -121,7 +121,7 @@ Include this section only when the user explicitly requests post-report adversar
 | Item | Result |
 |---|---|
 | Trigger | `<사용자 요청 문구>` |
-| Assignments | `<요구사항 또는 게이트 항목 → 적대 검증자>` |
+| Assignments | `<독립 요구사항 → 적대 검증자와 파생 게이트>` |
 | Findings | `<항목별 유지 또는 변경 필요, 근거, 반례 시도>` |
 | Resolution | `<수용·기각 근거와 상태 변경>` |
 | Original verdict | `<유효 | 수정 필요>` |

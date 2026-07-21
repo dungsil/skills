@@ -40,13 +40,13 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
 4. **Choose the review tier:**
    - `LIGHT`: narrow UI, copy, validation, or local behavior.
    - `HEAVY`: security, auth, permissions, persistence, transactions, concurrency, cache invalidation, external integrations, broad cross-layer changes, or user-requested rigor. Reviewers apply deeper evidence checks and counterexample analysis, but the assignment topology does not change.
-   - Every independent requirement or gate item gets exactly one subagent reviewer that verifies its scope, evidence, and verdict end to end.
+   - Every independent source requirement gets exactly one subagent reviewer that verifies all criteria and gate items derived from that requirement end to end.
 5. **Gather evidence:** inspect user-provided artifacts first, then the current branch against the likely base, working-tree/staged/untracked changes, and finally relevant existing source found by requirement terms.
 6. **Map evidence:** prefer service, controller, use case, adapter, repository, endpoint, handler, policy, validator, migration, and integration code over DTOs, generated output, docs, or superficial name matches.
    - A positive `CODE` or `MIGRATION` judgment requires source or diff implementation evidence. Tests and command results are supporting evidence, not substitutes.
    - Other gates require primary evidence for their domain: test source/results for `TEST`, execution records for `OPERATION`, release records for `DEPLOYMENT`, observed state for `DATA`, and recorded human observation for `MANUAL`.
 7. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
-8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent requirement or gate item in parallel, resolve every disagreement, update the draft, and recalculate status.
+8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent source requirement in parallel, resolve every disagreement, update the draft, and recalculate status.
 9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). A shorter report must preserve the same gate, scope, separate-gate, and independent-review facts.
 
 ## Optional Post-report Adversarial Verification
@@ -107,6 +107,6 @@ Before reporting:
 - Every positive `CODE`/`MIGRATION` judgment has implementation evidence; tests are supplemental.
 - Separate gates show their own status and impact `none` on the current gate.
 - Missing or unrun verification is visible without becoming a hidden criterion.
-- Every independent requirement or gate item has one reviewer result covering scope, evidence, verdict, disagreements, and resulting changes. No role-based or extra adversarial reviewer is added unless the user explicitly requests it.
+- Every independent source requirement has one reviewer result covering all of its criteria and gate items, including scope, evidence, verdict, disagreements, and resulting changes. Splitting a requirement into separate evidence-domain gates does not add reviewers.
 - Mapping relevance remains separate from correctness judgment.
 - Final status, severity, limits, and recommendations use the user's language.
