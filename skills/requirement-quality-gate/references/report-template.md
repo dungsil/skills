@@ -1,6 +1,6 @@
 # Requirement Quality Gate Report Template
 
-Return only the Markdown report unless the user asks for additional commentary. Use the user's language for headings, labels, values, and prose. In Korean reports, use the Korean display values defined by the skill and do not expose internal canonical tokens. Report independent gates separately; never let a separate gate lower the current gate's status.
+Return only the Markdown report unless the user asks for additional commentary. Use the user's language for headings, labels, values, and prose. Before writing a Korean report, read [korean-report-values.md](korean-report-values.md) and do not expose internal canonical tokens. Report independent gates separately; never let a separate gate lower the current gate's status.
 
 # Requirement Quality Gate Report
 
