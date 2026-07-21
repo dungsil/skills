@@ -1,6 +1,6 @@
 ---
 name: requirement-quality-gate
-description: Verifies whether source code, diffs, tests, runtime evidence, or implementation artifacts satisfy stated product or engineering requirements. Separates implementation gates from operation, deployment, data, and manual gates. Use for requirement quality gates, acceptance-criteria checks, implementation verification reports, or change-to-requirement mapping.
+description: Verifies whether source code, diffs, tests, runtime evidence, or implementation artifacts satisfy stated product or engineering requirements. Separates implementation gates from operation, deployment, data, and manual gates. Use for requirement quality gates, acceptance-criteria checks, implementation verification reports, change-to-requirement mapping, or user-requested adversarial verification of an existing gate report.
 ---
 
 # Requirement Quality Gate
@@ -48,6 +48,17 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
 7. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
 8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent requirement or gate item in parallel, resolve every disagreement, update the draft, and recalculate status.
 9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). A shorter report must preserve the same gate, scope, separate-gate, and independent-review facts.
+
+## Optional Post-report Adversarial Verification
+
+Do not run adversarial verification as part of the initial gate report. Run it only after a report exists and the user explicitly requests it with wording such as:
+
+- `적대적 검증해줘`
+- `이 보고서를 반증해줘`
+- `품질 게이트 적대 검증`
+- `$requirement-quality-gate adversarial`
+
+Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). Return an adversarial-verification addendum unless the user asks for a revised full report.
 
 ## Status Aggregation
 

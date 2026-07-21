@@ -114,3 +114,16 @@ Return only the Markdown report unless the user asks for additional commentary. 
 | External validation or separate gates | `<현재 게이트에서 판단할 수 없는 항목 또는 없음>` |
 | Limits | `<제한사항 또는 없음>` |
 
+## Optional Adversarial Verification Addendum
+
+Include this section only when the user explicitly requests post-report adversarial verification. Return only this addendum unless the user requests a revised full report.
+
+| Item | Result |
+|---|---|
+| Trigger | `<사용자 요청 문구>` |
+| Assignments | `<요구사항 또는 게이트 항목 → 적대 검증자>` |
+| Findings | `<항목별 유지 또는 변경 필요, 근거, 반례 시도>` |
+| Resolution | `<수용·기각 근거와 상태 변경>` |
+| Original verdict | `<유효 | 수정 필요>` |
+
+

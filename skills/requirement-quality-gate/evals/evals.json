@@ -82,6 +82,18 @@
         "The ambiguity alone does not force WARNING or NEEDS_REVIEW when alternate interpretations do not change the evaluated outcome.",
         "Tests supplement rather than replace the policy implementation evidence."
       ]
+    },
+    {
+      "id": "post-report-adversarial-trigger",
+      "prompt": "방금 작성한 품질 게이트 보고서를 적대적으로 검증해줘.",
+      "expected_output": "기존 보고서의 독립 요구사항 또는 게이트 항목마다 새 적대 검증자 한 명을 병렬 할당하고, 판정을 뒤집을 수 있는 누락·증거 오류·범위 오염·반례를 시도한 뒤 추가 검증 결과만 보고한다.",
+      "assertions": [
+        "The output treats adversarial verification as an explicit post-report follow-up rather than part of the initial gate report.",
+        "The output assigns one new adversarial subagent to each independent requirement or gate item.",
+        "Each verifier attempts to falsify its assigned result using scope, primary evidence, aggregation, and a plausible counterexample or alternate interpretation.",
+        "The output returns an adversarial-verification addendum and does not rewrite the full report unless requested.",
+        "The workflow does not automatically start another adversarial round."
+      ]
     }
   ]
 }
