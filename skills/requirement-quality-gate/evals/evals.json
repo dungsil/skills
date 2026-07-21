@@ -8,7 +8,8 @@
       "assertions": [
         "The output extracts explicit acceptance criteria from the requirement.",
         "The output cites implementation evidence rather than relying only on tests or file names.",
-        "The output separates final decision, evidence, risks, and scope limits."
+        "The output separates final decision, evidence, risks, and scope limits.",
+        "The output performs and reports independent subagent review of scope, evidence, and verdict even when the review tier is LIGHT."
       ]
     },
     {
@@ -29,7 +30,7 @@
         "The output treats payment idempotency as high-risk behavior.",
         "The output checks implementation evidence for transaction or concurrency handling.",
         "The output marks missing meaningful verification as a risk or warning.",
-        "The output performs and reports an independent scope, evidence, and verdict review, or records the structured self-review fallback when an independent reviewer is unavailable."
+        "For HEAVY review, the output reports three distinct specialist subagents for scope, evidence, and verdict plus a separate adversarial verifier that attempts to falsify the revised result and reaches final PASS, or marks independent verification incomplete if any required subagent is unavailable."
       ]
     },
     {
@@ -66,7 +67,7 @@
         "Production database execution is a separate OPERATION gate with status NEEDS_REVIEW and impact none on the code gate.",
         "The absence of production execution logs is not a WARNING or FAIL reason for the code gate.",
         "Criteria expose evidence domain, in-scope status, and overall-status impact, and excluded rows are not aggregated.",
-        "The report includes Separate Gates and Independent Review results.",
+        "The HEAVY report records item-level scope, evidence, and verdict specialist reviews, their resolutions, and a separate adversarial verifier PASS after attempting to falsify the revised result.",
         "The Korean report renders statuses, domains, scope flags, impacts, booleans, and severities as Korean display values instead of canonical code tokens."
       ]
     },

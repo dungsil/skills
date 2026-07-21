@@ -38,14 +38,15 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
    - Out-of-scope source obligations may remain as traceability rows, but must use `In scope=false`, `OUT_OF_SCOPE` or `SEPARATE_GATE`, and impact `none`.
    - Review instructions, supplied evidence, likely safeguards, and recommendations cannot add criteria.
 4. **Choose the review tier:**
-   - `LIGHT`: narrow UI, copy, validation, or local behavior. Independent review is optional.
-   - `HEAVY`: security, auth, permissions, persistence, transactions, concurrency, cache invalidation, external integrations, broad cross-layer changes, or user-requested rigor. Independent review is required before the final report.
+   - `LIGHT`: narrow UI, copy, validation, or local behavior.
+   - `HEAVY`: security, auth, permissions, persistence, transactions, concurrency, cache invalidation, external integrations, broad cross-layer changes, or user-requested rigor. It requires dedicated scope, evidence, and verdict subagents followed by a separate adversarial verifier.
+   - Both tiers require independent subagent review before the final report.
 5. **Gather evidence:** inspect user-provided artifacts first, then the current branch against the likely base, working-tree/staged/untracked changes, and finally relevant existing source found by requirement terms.
 6. **Map evidence:** prefer service, controller, use case, adapter, repository, endpoint, handler, policy, validator, migration, and integration code over DTOs, generated output, docs, or superficial name matches.
    - A positive `CODE` or `MIGRATION` judgment requires source or diff implementation evidence. Tests and command results are supporting evidence, not substitutes.
    - Other gates require primary evidence for their domain: test source/results for `TEST`, execution records for `OPERATION`, release records for `DEPLOYMENT`, observed state for `DATA`, and recorded human observation for `MANUAL`.
 7. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
-8. **Review `HEAVY` drafts independently:** read [references/heavy-review.md](references/heavy-review.md), resolve every disagreement, update the draft, and recalculate status.
+8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), execute the tier-specific reviewer topology, resolve every disagreement, update the draft, and recalculate status.
 9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). A shorter report must preserve the same gate, scope, separate-gate, and independent-review facts.
 
 ## Status Aggregation
@@ -95,6 +96,6 @@ Before reporting:
 - Every positive `CODE`/`MIGRATION` judgment has implementation evidence; tests are supplemental.
 - Separate gates show their own status and impact `none` on the current gate.
 - Missing or unrun verification is visible without becoming a hidden criterion.
-- `HEAVY` independent review results, disagreements, resolutions, and resulting changes are recorded; unavailable review is disclosed with the self-challenge result.
+- Independent review results, disagreements, resolutions, and resulting changes are recorded for every tier. `HEAVY` also records separate scope, evidence, and verdict reviewer results plus the final adversarial verification and any re-review iterations.
 - Mapping relevance remains separate from correctness judgment.
 - Final status, severity, limits, and recommendations use the user's language.

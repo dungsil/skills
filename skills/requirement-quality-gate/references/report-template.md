@@ -81,14 +81,16 @@ Return only the Markdown report unless the user asks for additional commentary. 
 
 | Item | Result |
 |---|---|
-| Reviewer used | `<예 | 아니요>` |
-| Scope review | `<result>` |
-| Evidence review | `<result>` |
-| Verdict review | `<result>` |
+| Reviewers used | `<서브에이전트 목록>` |
+| Scope reviewer | `<항목별 결과와 근거>` |
+| Evidence reviewer | `<항목별 결과와 근거>` |
+| Verdict reviewer | `<항목별 결과와 근거>` |
+| Adversarial verifier | `<최종 적대 검증 결과와 반례 시도>` |
 | Disagreements | `<이견 또는 없음>` |
-| Resolution | `<accepted/rejected findings, reasons, and resulting draft changes>` |
+| Resolution | `<수용·기각 근거와 반영한 변경>` |
+| Re-review iterations | `<재검토 횟수와 대상 또는 없음>` |
 
-`심층 검토`에서는 독립 리뷰어 또는 구조화된 자체 반증 대체 결과를 기록한다. 리뷰어 호출 후 이견을 해소하지 않았다면 검토가 완료된 것이 아니다.
+`경량 검토`는 한 명의 독립 리뷰어가 세 항목을 함께 검증할 수 있다. `심층 검토`는 범위·증거·판정 전담 서브에이전트 3명의 항목별 검증과 별도 적대 검증자의 최종 통과가 모두 필요하다. 필수 서브에이전트를 사용할 수 없으면 독립 검증 미완료로 표시한다.
 
 ## 8. Risks and Recommended Actions
 
