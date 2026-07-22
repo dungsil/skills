@@ -1,0 +1,7 @@
+interface:
+  display_name: "Writing KDoc"
+  short_description: "한국어 KDoc 계약 문서 작성과 검토"
+  default_prompt: "Use $writing-kdoc to write or review concise Korean KDoc comments for Kotlin code."
+
+policy:
+  allow_implicit_invocation: true

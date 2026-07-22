@@ -1,0 +1,35 @@
+{
+  "skill_name": "writing-kdoc",
+  "evals": [
+    {
+      "id": "inline-parameter-return",
+      "prompt": "이 Kotlin 함수의 number 파라미터와 반환값을 KDoc으로 설명해줘. 단순 계약인데 @param과 @return을 써야 할까?",
+      "expected_output": "불필요한 @param과 @return을 생략하고, 한국어 본문에서 [number]를 링크해 함수 계약과 반환 의미를 간결하게 설명한다.",
+      "assertions": [
+        "The output avoids @param and @return for a short contract.",
+        "The output links the parameter as [number].",
+        "The output follows concise Korean declarative style."
+      ]
+    },
+    {
+      "id": "primary-constructor-property",
+      "prompt": "primary constructor의 timeoutMillis 프로퍼티에 단위와 기본값 계약이 있어. Kotlin 클래스 KDoc을 작성해줘.",
+      "expected_output": "클래스 KDoc에서 @property timeoutMillis로 밀리초 단위와 기본값의 의미를 설명하고, 이름과 타입만 반복하는 문구는 생략한다.",
+      "assertions": [
+        "The output uses @property for the primary-constructor property.",
+        "The output documents units and default semantics.",
+        "The output avoids restating only the property name and type."
+      ]
+    },
+    {
+      "id": "deprecated-extension",
+      "prompt": "String 확장 함수가 더 이상 권장되지 않아. receiver 제약과 대체 API를 포함한 KDoc을 검토해줘.",
+      "expected_output": "receiver 계약은 본문 링크나 @receiver로 설명하고, KDoc @deprecated 태그 대신 Kotlin @Deprecated annotation에 대체 API를 지정하도록 안내한다.",
+      "assertions": [
+        "The output documents the extension receiver contract.",
+        "The output rejects the KDoc @deprecated tag.",
+        "The output uses Kotlin @Deprecated replacement guidance."
+      ]
+    }
+  ]
+}
