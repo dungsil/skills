@@ -27,6 +27,7 @@ pnpm dlx skills add dungsil/skills -g
 |  [java-code-design]  | Java 프로젝트 설계 지침   |
 | [kotlin-code-design] | Kotlin 프로젝트 설계 지침 |
 | [writing-java-tests] | Java 테스트 코드 작성 지침 |
+| [writing-kotlin-tests] | Kotlin 테스트 코드 작성 지침 |
 |  [writing-javadoc]   | Javadoc 작성 지침     |
 |    [writing-kdoc]    | KDoc 작성 지침        |
 
@@ -52,5 +53,6 @@ bun run validate:skills
 [java-code-design]: skills/java-code-design
 [kotlin-code-design]: skills/kotlin-code-design
 [writing-java-tests]: skills/writing-java-tests
+[writing-kotlin-tests]: skills/writing-kotlin-tests
 [writing-javadoc]: skills/writing-javadoc
 [writing-kdoc]: skills/writing-kdoc
