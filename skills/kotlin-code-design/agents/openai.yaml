@@ -1,0 +1,7 @@
+interface:
+  display_name: "Kotlin Code Design"
+  short_description: "Kotlin·헥사고날·Spring 코드 및 모듈 설계"
+  default_prompt: "Use $kotlin-code-design to design or review idiomatic Kotlin and modular Spring Boot production code."
+
+policy:
+  allow_implicit_invocation: true

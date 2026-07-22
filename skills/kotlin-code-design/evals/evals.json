@@ -1,0 +1,85 @@
+{
+  "skill_name": "kotlin-code-design",
+  "evals": [
+    {
+      "id": "platform-type-null-boundary",
+      "prompt": "Java SDK의 getDisplayName() 반환값을 Kotlin 서비스 곳곳에서 !!로 쓰고 있어. 이 코드를 Kotlin답게 고쳐줘.",
+      "expected_output": "Java platform type의 nullability를 한 경계에서 명시하고 검증하거나 nullable contract로 변환하며, 내부의 반복된 !!를 제거한다.",
+      "assertions": [
+        "The output identifies the Java platform type as the unsafe boundary.",
+        "The output assigns an explicit nullable or non-null Kotlin type at that boundary.",
+        "The output removes scattered non-null assertions instead of replacing them with equivalent assertions elsewhere."
+      ]
+    },
+    {
+      "id": "scope-function-overuse",
+      "prompt": "apply 안에 let과 run이 중첩된 Kotlin 매핑 코드를 리뷰해줘. this와 it이 여러 번 바뀌어서 읽기 어려워.",
+      "expected_output": "스코프 함수의 의도를 구분하고, 중첩을 이름 있는 지역 변수나 작은 명시적 단계로 풀어 수신자와 반환값을 분명하게 만든다.",
+      "assertions": [
+        "The output explains the relevant receiver and return-value semantics of the scope functions.",
+        "The output recommends named locals or explicit steps where nesting obscures context.",
+        "The output does not replace the code with a different but equally nested scope-function chain."
+      ]
+    },
+    {
+      "id": "coroutine-cancellation-contract",
+      "prompt": "repository가 GlobalScope.launch로 저장 작업을 시작하고 runCatching으로 모든 예외를 Result.failure로 바꿔. 취소도 계속 실패 값으로 내려와. 수정 방향을 제안해줘.",
+      "expected_output": "작업 수명에 맞는 소유 scope나 호출자 구조화 동시성으로 변경하고 CancellationException을 재전파하며, 시작된 작업의 실패 관찰 계약을 명시한다.",
+      "assertions": [
+        "The output rejects GlobalScope for ordinary repository work and assigns lifecycle ownership.",
+        "The output preserves or explicitly rethrows CancellationException.",
+        "The output distinguishes ordinary failure representation from coroutine cancellation."
+      ]
+    },
+    {
+      "id": "published-data-class-compatibility",
+      "prompt": "배포된 Kotlin JVM 라이브러리의 public data class에 기본값 있는 프로퍼티 하나를 추가하면 호환성이 유지될까? 안전한 변경안을 알려줘.",
+      "expected_output": "Kotlin source 호출과 JVM binary compatibility를 분리하고, 생성자와 copy 시그니처 변경 위험을 지적하며 기존 진입점을 보존하는 API 형태를 제안한다.",
+      "assertions": [
+        "The output distinguishes source compatibility from JVM binary compatibility.",
+        "The output identifies generated constructor and copy signatures as compatibility risks.",
+        "The output proposes preserving existing entry points or avoiding an evolvable public data class contract."
+      ]
+    },
+    {
+      "id": "sequence-without-evidence",
+      "prompt": "20개 정도의 리스트에 map과 filter를 한 번씩 쓰는 코드를 성능 때문에 asSequence()로 바꾸려 해. 괜찮을까?",
+      "expected_output": "작고 단순한 파이프라인에는 Sequence 오버헤드가 이득보다 클 수 있으므로 컬렉션을 유지하고, 큰 입력·다단계·조기 종료 또는 측정 근거가 있을 때만 전환하도록 권고한다.",
+      "assertions": [
+        "The output does not assume Sequence is always faster.",
+        "The output keeps eager collection operations for the stated small simple workload.",
+        "The output names laziness, multi-stage processing, early termination, or measurement as reasons to reconsider."
+      ]
+    },
+    {
+      "id": "port-leaks-spring-data",
+      "prompt": "Kotlin use case의 outbound port가 findByDeletedFalseAndStatusIn이라는 Spring Data 메서드 이름과 JpaEntity를 그대로 노출해. 설계를 고쳐줘.",
+      "expected_output": "포트를 애플리케이션 요구 중심의 이름과 도메인 타입 계약으로 바꾸고, Spring Data와 JPA 엔티티를 persistence adapter 내부에 둔다.",
+      "assertions": [
+        "The output identifies Spring Data naming and JPA entities as adapter leakage.",
+        "The output proposes an application-intent port using domain or application types.",
+        "The output keeps repository query mechanics and entity mapping in the persistence adapter."
+      ]
+    },
+    {
+      "id": "spring-jpa-domain-boundary",
+      "prompt": "도메인 모델을 Kotlin data class이자 @Entity로 만들고 모든 프로퍼티를 var로 열어두려 해. Spring/JPA와 헥사고날 관점에서 리뷰해줘.",
+      "expected_output": "도메인 모델과 persistence entity를 기본적으로 분리하고, JPA의 프록시·생성·변경 추적 요구는 adapter entity에 제한하며 도메인 불변식과 불변성을 보존한다.",
+      "assertions": [
+        "The output does not treat a JPA entity as the domain model by default.",
+        "The output contains proxy, construction, or persistence mutability concerns within the adapter.",
+        "The output preserves domain invariants instead of making all domain state publicly mutable."
+      ]
+    },
+    {
+      "id": "shared-vs-common-kotlin",
+      "prompt": "여러 Kotlin 모듈에서 쓰는 문자열 정규화와 Jackson 설정을 packages/shared에 같이 넣으려고 해. 괜찮을까?",
+      "expected_output": "DDD shared kernel과 기술 common/support를 구분하고, 문자열 정규화는 실제 재사용 계약에 맞는 common 모듈로, Jackson 설정은 framework-coupled support나 starter로 분리한다.",
+      "assertions": [
+        "The output reserves shared for deliberately shared domain or application concepts.",
+        "The output places framework-light technical reuse in a named common module.",
+        "The output isolates Jackson or Spring coupling in support or starter infrastructure."
+      ]
+    }
+  ]
+}
