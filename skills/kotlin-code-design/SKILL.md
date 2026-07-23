@@ -29,6 +29,7 @@ Use this skill to keep Kotlin code explicit at boundaries, concise inside them, 
 - Prefer expressions, default parameters, named arguments, extension functions, and standard-library operations when they improve the caller's code. Do not compress code past readability.
 - Prefer `require` for invalid arguments, `check` for invalid object state, and domain-specific results or exceptions when failure is part of the domain contract.
 - Keep public surface area minimal. Published libraries require explicit visibility and return/property types; ordinary application internals do not need ceremonial modifiers or type annotations.
+- Keep one top-level class, interface, or object per `.kt` file and match the filename to it. Nested or `inner` classes may stay with their owner. Allow multiple top-level declarations only in extension-only files that group closely related extension functions or properties.
 - Use collections by default. Use `Sequence` only when lazy multi-stage processing or early termination offsets its overhead.
 - Keep scope functions shallow and intention-revealing. Avoid nested or long chains where `this`, `it`, side effects, or return values become ambiguous.
 - Preserve structured concurrency. Never introduce `GlobalScope` for ordinary work or swallow cancellation.
@@ -56,5 +57,6 @@ Before finishing:
 - Collection pipelines are readable and do not allocate or become lazy without reason.
 - Coroutine ownership, dispatcher choice, exception propagation, and lifecycle are explicit.
 - Java-facing bytecode shape and published API compatibility were checked when relevant.
+- Each Kotlin file has one filename-matched top-level type, except cohesive extension-only files; nested and `inner` classes remain owned by their enclosing type.
 - Module roles, dependency direction, Spring wiring, persistence mapping, and transaction boundaries stay on the correct side of the hexagon.
 - Changed behavior was exercised by a focused test, build, or runnable scenario.
