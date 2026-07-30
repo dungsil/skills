@@ -11,26 +11,35 @@ pnpm dlx skills add dungsil/skills -g
 
 ## 공통
 
-|            스킬 명          | 설명          |
-|:--------------------------:|-------------|
+| 스킬 명                    | 설명                 |
+|----------------------------|----------------------|
 | [requirement-quality-gate] | 요구사항 품질 게이트 |
 
 
-### Java/Kotlin/Spring
 
-> [!IMPORTANT] 
+### Java
+
+> [!IMPORTANT]
 >  아래의 스킬들은 개인의 개발 방식과 선호를 전제로 하므로, 범용적으로 사용하기에는 적합하지 않습니다.
 
 
-|         스킬 명         | 설명                |
-|:--------------------:|-------------------|
-|  [java-code-design]  | Java 프로젝트 설계 지침   |
-| [kotlin-code-design] | Kotlin 프로젝트 설계 지침 |
-| [writing-java-tests] | Java 테스트 코드 작성 지침 |
-| [writing-kotlin-tests] | Kotlin 테스트 코드 작성 지침 |
-|  [writing-javadoc]   | Javadoc 작성 지침     |
-|    [writing-kdoc]    | KDoc 작성 지침        |
+| 스킬 명                | 설명                         |
+|------------------------|------------------------------|
+| [java-code-design]     | Java 프로젝트 설계 지침      |
+| [writing-javadoc]      | Javadoc 작성 지침            |
+| [writing-java-tests]   | Java 테스트 코드 작성 지침   |
 
+
+### Kotlin
+
+> [!IMPORTANT]
+>  아래의 스킬들은 개인의 개발 방식과 선호를 전제로 하므로, 범용적으로 사용하기에는 적합하지 않습니다.
+
+| 스킬 명                | 설명                         |
+|------------------------|------------------------------|
+| [kotlin-code-design]   | Kotlin 프로젝트 설계 지침    |
+| [writing-kotlin-tests] | Kotlin 테스트 코드 작성 지침 |
+| [writing-kdoc]         | KDoc 작성 지침               |
 
 
 ## 개발/검증
@@ -50,9 +59,9 @@ bun run validate:skills
 
 <!-- 링크 -->
 [requirement-quality-gate]: skills/requirement-quality-gate
-[java-code-design]: skills/java-code-design
-[kotlin-code-design]: skills/kotlin-code-design
-[writing-java-tests]: skills/writing-java-tests
-[writing-kotlin-tests]: skills/writing-kotlin-tests
-[writing-javadoc]: skills/writing-javadoc
-[writing-kdoc]: skills/writing-kdoc
+[java-code-design]: skills/java/java-code-design
+[writing-java-tests]: skills/java/writing-java-tests
+[writing-javadoc]: skills/java/writing-javadoc
+[kotlin-code-design]: skills/kotlin/kotlin-code-design
+[writing-kotlin-tests]: skills/kotlin/writing-kotlin-tests
+[writing-kdoc]: skills/kotlin/writing-kdoc

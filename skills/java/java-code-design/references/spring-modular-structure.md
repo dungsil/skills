@@ -113,7 +113,7 @@ Use this reference when designing, migrating, or reviewing a modular Spring Boot
 
 ## Build And Environment
 
-- Root contracts usually include `.editorconfig`, `.env.example`, `.gitignore`, `gradle.properties`, `settings.gradle.kts`, root `build.gradle.kts`, `build-logic/`, `gradle/`, `gradlew`, and `gradlew.bat`.
+- Root contracts usually include `../../../../.editorconfig`, `.env.example`, `../../../../.gitignore`, `gradle.properties`, `settings.gradle.kts`, root `build.gradle.kts`, `build-logic/`, `gradle/`, `gradlew`, and `gradlew.bat`.
 - Commit Gradle wrapper files so contributors and automation do not depend on a global Gradle installation.
 - Use `.env.example` for documented runtime environment variables; keep real values out of version control.
 - Keep explicitly managed plugin versions and non-Boot-managed dependency versions in `gradle.properties`.
