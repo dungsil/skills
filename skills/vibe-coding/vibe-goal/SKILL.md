@@ -1,6 +1,6 @@
 ---
 name: vibe-goal
-description: Drives a whole goal from request to reviewed, committed code — routes into planning, publishes tickets, then dispatches one fresh sub-agent per ticket to implement and review it, gating each wave on the dependency frontier. Use when the user wants a feature taken end to end, says "do this whole thing", or asks to run plan-through-review in one go.
+description: Drives a whole goal from request to reviewed, committed code — routes into planning, publishes tickets, dispatches one fresh sub-agent per ticket to implement and review it, then closes on a standards review plus a requirement quality gate. Use when the user wants a feature taken end to end, says "do this whole thing", or asks to run plan-through-review in one go.
 metadata:
   disable-model-invocation: "true"
   argument-hint: "The goal — an idea, request, spec, or issue reference"
@@ -8,7 +8,7 @@ metadata:
 
 # Driving a Goal to Done
 
-One run from a goal to reviewed, committed code. This skill **orchestrates**; it does not implement. Planning happens through `/vibe-plan` (or `/vibe-deep-plan` first, when the work is too big), each ticket is implemented by a **fresh sub-agent** running `/vibe-implement`, and the whole goal ends on a final review pass.
+One run from a goal to reviewed, committed code. This skill **orchestrates**; it does not implement. Planning happens through `/vibe-plan` (or `/vibe-deep-plan` first, when the work is too big), each ticket is implemented by a **fresh sub-agent** running `/vibe-implement`, and the whole goal closes on a standards review plus a formal requirement quality gate.
 
 The issue tracker and triage label vocabulary should have been provided to you — run `/vibe-init` if `docs/agents/issue-tracker.md` is missing.
 
@@ -110,11 +110,16 @@ Mark the ticket `failed` in the ledger with one line of reason. Tickets it block
 
 ## Stage 4 — Close the goal
 
+A goal is bigger than any one ticket, so its closing verdict is a **gate**, not a fast pass. Per-ticket `/vibe-review` runs already gave you a quick spec read on each slice; at the goal level you want a formal judgement on the goal's definition of done, so run `/requirement-quality-gate` and let it **replace** the Spec axis here. But gate the **definition of done, not the whole spec** — the goal's committed acceptance criteria are the source obligations, not every user story the spec happened to list.
+
 When no ticket is `pending` or `running`:
 
 1. **Full suite once.** Typecheck, tests, and whatever the repo's checks are — run them at the goal level, not per ticket.
-2. **Whole-goal review.** Run `/vibe-review` against the Stage 2 fixed point, passing the spec. Per-ticket reviews saw one slice each; this one sees the seams between them, which is where the interesting findings are.
-3. **Adjudicate.** Present the two axes. Findings the user wants fixed become new tickets and go back through Stage 3 — never patched inline by you.
-4. **Report.** The goal, the tickets that landed with their links, the commits, the review verdict, and anything deliberately left undone.
+2. **Standards axis.** Run `/vibe-review` against the Stage 2 fixed point. Per-ticket reviews each saw one slice; this one sees the seams between them, which is where the interesting findings are. Tell it the Spec axis is being handled by the gate, so it doesn't duplicate it.
+3. **Spec verdict.** Run `/requirement-quality-gate` with the Stage 2 fixed point as the change boundary, scoped to the implementation domains (`CODE`, plus `MIGRATION` when the goal required one). The source requirement is the goal's **definition of done** — the acceptance criteria the run actually committed to (the spec's acceptance criteria, or the ledger's goal line when the spec has none). User stories beyond that stay traceability rows, out of scope; gating every story in a large spec duplicates what the per-ticket reviews already covered. The gate returns per-criterion status and an aggregated `PASS` / `WARNING` / `NEEDS_REVIEW` / `FAIL`.
+   - Default to the gate's `LIGHT` tier. Take `HEAVY` only when the goal touched the domains that always warrant it — security, auth, permissions, persistence, transactions, external integrations — the same rule `vibe-review` escalates on.
+   - Operation, deployment, and data obligations stay **separate gates**. They don't lower the implementation verdict, and you don't run them here unless the user asks.
+4. **Adjudicate.** Present the Standards findings and the gate report side by side, unmerged. Anything the gate marks `not satisfied` or `unknown`, and any Standards finding the user wants fixed, becomes a new ticket back through Stage 3 — never patched inline by you. Re-run the gate after those tickets land; the goal isn't closed on a `FAIL`.
+5. **Report.** The goal, the tickets that landed with their links, the commits, the gate's overall status, the Standards findings, and anything deliberately left undone.
 
 Do not close or modify the parent spec issue.
