@@ -1,0 +1,6 @@
+interface:
+  display_name: "Vibe Modeling"
+  short_description: "프로젝트 도메인 용어와 핵심 결정을 정교화"
+  default_prompt: "Use $vibe-modeling to define and maintain this project's domain language and decisions."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,125 @@
+{
+  "skill_name": "vibe-deep-plan",
+  "evals": [
+    {
+      "id": "chart-map-destination-before-wiring",
+      "prompt": "새 결제 플랫폼으로 이전해야 하는데 범위가 너무 커. 결정 티켓 지도를 만들어줘.",
+      "expected_output": "먼저 목적지를 합의한 뒤, 폭넓게 알려진 결정과 안개를 지도에 기록한다. 명확한 결정은 모두 자식 티켓으로 만든 다음 두 번째 단계에서만 차단 관계를 연결하며, 차팅 세션에서 티켓을 직접 해결하지 않는다.",
+      "assertions": [
+        "The output settles and records the destination before creating the map or decision tickets.",
+        "The output creates every currently specifiable ticket before adding native blocking dependencies in a second pass.",
+        "The output leaves unresolved decisions as tickets or fog and does not resolve a ticket during charting."
+      ]
+    },
+    {
+      "id": "claim-resolve-and-index-one-ticket",
+      "prompt": "결정 티켓 지도에서 다음 가능한 티켓을 처리해줘. 아직 담당자가 지정되지 않았어.",
+      "expected_output": "지도를 먼저 읽고 프런티어의 티켓 하나만 선택해 작업 전 자신에게 할당한다. 해결 내용은 티켓의 해결 댓글로 남기고 닫은 뒤, 지도 Decisions so far에 티켓 이름 링크와 요약 포인터를 추가한다.",
+      "assertions": [
+        "The output claims the chosen ticket by assigning it before performing ticket work.",
+        "The output resolves no more than one non-research ticket in the session.",
+        "The output posts the answer as a resolution comment, closes the ticket, and appends a linked name-and-gist pointer to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "separate-fog-from-sharp-ticket",
+      "prompt": "지도에는 ‘결제 제공자를 어떤 기준으로 고를지 결정’과 ‘나중에 운영 관련 고려사항을 살펴보기’가 떠올랐어. 둘 다 지금 티켓으로 만들까?",
+      "expected_output": "지금 정확히 질문할 수 있는 제공자 선정 기준 결정은 티켓으로 만들고, 아직 구체 질문으로 표현할 수 없는 운영 고려사항은 Not yet specified의 안개로 남긴다. 답을 아직 모르는지는 분류 기준이 아니다.",
+      "assertions": [
+        "The output creates a ticket for a question that can be stated precisely now, even when it is blocked or unanswered.",
+        "The output keeps an in-scope concern that cannot yet be phrased as a precise question in Not yet specified rather than pre-slicing it into tickets.",
+        "The output distinguishes fog from tickets by question sharpness, not by whether an answer is currently known."
+      ]
+    },
+    {
+      "id": "primary-sources-background-research",
+      "prompt": "이 맵의 research 티켓 #7이 OpenAI Responses API의 background mode 동작과 제한을 묻고 있어. 해소해줘.",
+      "expected_output": "백그라운드 에이전트가 OpenAI 공식 문서 등 1차 출처를 조사하고, 각 핵심 주장에 출처를 인용한 Markdown 조사 문서를 기존 리포 규칙에 맞는 위치에 작성한다.",
+      "assertions": [
+        "The output delegates the reading work to a background agent so the main agent can continue working.",
+        "The findings rely on primary sources owned by the API provider, such as official documentation or first-party API references.",
+        "The output writes one Markdown findings file and cites the source for every substantive claim.",
+        "The output records the answer as the ticket's resolution comment, closes the ticket, and appends a one-line gist plus link to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "source-code-and-spec-evidence",
+      "prompt": "research 티켓 #9는 SQLite WAL 모드에서 체크포인트가 언제 필요한지 묻는 티켓이야. 블로그 요약 말고 공식 문서·소스·명세를 근거로 해소해줘.",
+      "expected_output": "백그라운드 에이전트가 SQLite의 공식 문서·소스·명세 같은 1차 출처를 추적하고, 체크포인트 조건별 근거 링크를 포함한 Markdown 조사 결과를 저장한다.",
+      "assertions": [
+        "The output rejects secondary blog posts as the evidentiary basis when authoritative SQLite material is available.",
+        "The findings distinguish claims about checkpoint behavior and attach a primary-source citation to each claim.",
+        "The output persists the research as a single Markdown file in the repository's established notes location or a sensible new location.",
+        "The output records the answer as the ticket's resolution comment, closes the ticket, and appends a one-line gist plus link to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "existing-research-location",
+      "prompt": "이 리포는 docs/research/에 조사 메모를 둬. WebAuthn user verification 요구사항을 묻는 research 티켓 #4를 해소해줘.",
+      "expected_output": "백그라운드 에이전트가 WebAuthn 표준과 벤더의 공식 문서를 근거로 조사하고, 기존 규칙을 따라 docs/research/ 아래의 인용된 Markdown 파일에 결과를 작성한다.",
+      "assertions": [
+        "The output uses the existing docs/research/ convention rather than inventing another storage location.",
+        "The findings trace user-verification claims to the WebAuthn specification or first-party browser documentation.",
+        "The output records citations in the Markdown file instead of only summarizing sources in chat.",
+        "The output records the answer as the ticket's resolution comment, closes the ticket, and appends a one-line gist plus link to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "cleared-map-hands-off-to-spec-stage",
+      "prompt": "이 지도의 티켓이 다 닫혔고 Not yet specified도 비었어. 이제 구현 시작해줘.",
+      "expected_output": "지도가 완료됐음을 확인하고 직접 구현하지 않으며, Destination과 Decisions-so-far를 입력으로 /vibe-plan의 spec 단계로 넘긴다.",
+      "assertions": [
+        "The output recognises the map as complete because no open tickets remain and Not yet specified is empty.",
+        "The output hands off to /vibe-plan at its spec stage instead of writing implementation code itself.",
+        "The output names the map's Destination and Decisions-so-far as the input for that synthesis.",
+        "The output does not skip straight to /vibe-implement unless the remaining effort is one ticket's worth of work."
+      ]
+    },
+    {
+      "id": "session-fills-up-keeps-ticket-claimed",
+      "prompt": "이 티켓 해소하다가 컨텍스트가 거의 찼어. 지금까지 알아낸 걸로 마무리해줘.",
+      "expected_output": "미완성 답변을 resolution comment로 올리지 않고 티켓을 점유 상태로 남긴 뒤, /vibe-handoff로 대화를 넘겨 새 세션에서 이어가게 한다.",
+      "assertions": [
+        "The output declines to post a partial answer as the ticket's resolution comment.",
+        "The output leaves the ticket claimed rather than closing or unassigning it.",
+        "The output uses the /vibe-handoff skill to carry the thread into a fresh session."
+      ]
+    },
+    {
+      "id": "map-never-carries-triage-state",
+      "prompt": "이 지도 이슈에 분류 라벨도 같이 붙여줘.",
+      "expected_output": "상태: 축이 배타적이므로 지도에는 상태:초안만 유지하고 트리아지 상태를 붙이지 않는다고 설명한다.",
+      "assertions": [
+        "The output explains that 상태:초안 and the triage states share one axis and are mutually exclusive.",
+        "The output keeps only 상태:초안 on the map and does not add a triage state to it.",
+        "The output notes that triage states apply again only once implementation tickets are published."
+      ]
+    },
+    {
+      "id": "logic-question-terminal-prototype",
+      "prompt": "프로토타입 티켓을 해소해줘. 장바구니에서 쿠폰을 적용한 뒤 상품을 삭제하면 할인과 합계가 어떻게 바뀌어야 하는지 확신이 없어. 구현 전에 확인할 수 있는 프로토타입을 만들어줘.",
+      "expected_output": "상태 전이 질문을 명시한, 순수 장바구니 로직과 분리된 작은 대화형 터미널 프로토타입을 기존 런타임과 한 명령으로 실행 가능하게 만들고, 매 동작 뒤 전체 상태와 단축키를 다시 보여 준다.",
+      "assertions": [
+        "The output selects the logic/state branch rather than generating UI variations.",
+        "The prototype states the single cart-and-coupon question and uses only in-memory state, with no database or persistence dependency.",
+        "The state-transition logic is a small pure reducer, state machine, or function surface separated from terminal I/O.",
+        "The terminal shell renders the complete relevant state initially and after every action, exposes keyboard or line-input actions, and has one documented project-native run command.",
+        "The output keeps the prototype deliberately throwaway: no production abstractions or tests are added.",
+        "The output links the prototype from the ticket as an asset, posts the verdict as the resolution comment, closes the ticket, and appends the gist to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "ui-variants-captured-not-shipped",
+      "prompt": "프로토타입 티켓을 해소해줘. 설정 페이지의 알림 섹션이 어떤 구조여야 할지 보고 싶어. 기존 /settings 페이지에서 세 가지 안을 비교할 프로토타입을 만들고, 결론이 나면 처리 방법도 알려줘.",
+      "expected_output": "기존 /settings의 데이터 흐름을 유지한 채 ?variant=로 전환되는 구조적으로 다른 세 UI 안과 하단 전환 바를 만들며, 선택 결과는 기록하고 프로토타입 코드는 메인 브랜치에서 제거해 throwaway 브랜치에 보존한다.",
+      "assertions": [
+        "The output selects the UI branch and hosts the variants on the existing settings page instead of inventing a new top-level route.",
+        "The output provides three structurally different variants selected by a shareable, reload-stable variant URL parameter while retaining the page's existing data fetching and auth.",
+        "The floating bottom switcher cycles forward and backward with wrapping, supports arrow keys without intercepting focused text inputs, and is hidden in production builds.",
+        "The output records which variant won and why, folds only the validated decision into real code, and removes the throwaway variants and switcher from main.",
+        "The full prototype is retained as a primary source on a throwaway branch with a context pointer, rather than being shipped as production code.",
+        "The output links the prototype from the ticket as an asset, posts the verdict as the resolution comment, closes the ticket, and appends the gist to the map's Decisions so far."
+      ]
+    }
+  ]
+}

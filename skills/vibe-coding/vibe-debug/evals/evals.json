@@ -1,0 +1,37 @@
+{
+  "skill_name": "vibe-debug",
+  "evals": [
+    {
+      "id": "refuses-theory-without-red-loop",
+      "prompt": "결제 API가 가끔 500을 내는데 원인을 추측해서 고쳐줘. 지금은 재현 명령이나 로그가 없어.",
+      "expected_output": "원인 가설이나 수정을 시작하지 않고, 실제 증상을 검증하는 빠르고 결정적인 red-capable 재현 루프를 먼저 구축한다. 루프를 만들 수 없으면 시도한 방법과 필요한 접근 권한·캡처 산출물·임시 프로덕션 계측 허가를 명시한다.",
+      "assertions": [
+        "The output does not theorize about root causes or propose a fix before a red-capable feedback command exists.",
+        "The output requires one unattended command that exercises the actual bug path and asserts the user's exact symptom.",
+        "When no loop can be built, the output explicitly lists attempted loop-building options and requests environment access, a captured artifact, or permission for temporary production instrumentation."
+      ]
+    },
+    {
+      "id": "reproduces-and-minimises-before-instrumenting",
+      "prompt": "이 curl 스크립트가 주문 생성 때 잘못된 total을 재현해. 다음 단계로 진행해줘.",
+      "expected_output": "스크립트를 여러 번 실행해 사용자가 말한 잘못된 total을 확인하고 정확한 증상을 캡처한다. 그 뒤 입력·호출자·설정·데이터·단계를 하나씩 제거하면서 매번 재실행하여 모든 남은 요소가 load-bearing인 최소 재현으로 줄인다.",
+      "assertions": [
+        "The output verifies that the loop reproduces the user's exact failure mode across multiple runs before advancing.",
+        "The output captures the concrete symptom and does not substitute a nearby failure for the reported bug.",
+        "The output minimises one input, caller, configuration, data item, or step at a time, rerunning after every removal and retaining only load-bearing elements.",
+        "The output does not instrument or fix the issue until reproduction and minimisation are complete."
+      ]
+    },
+    {
+      "id": "instruments-fixes-and-locks-regression",
+      "prompt": "최소 재현은 준비됐고 현재 실패해. 계측해서 고쳐줘.",
+      "expected_output": "먼저 예측을 포함한 3~5개의 순위 가설을 사용자에게 제시한다. 가설을 구분하는 단일 변수의 디버거/표적 로그 계측으로 확인한 뒤, 올바른 seam에 최소 재현을 실패하는 회귀 테스트로 만들고 실패를 확인한 후 수정한다. 수정 뒤 회귀 테스트와 원래 재현 루프를 다시 통과시키고 디버그 계측을 제거한다.",
+      "assertions": [
+        "The output gives 3-5 ranked, falsifiable hypotheses with predictions and shows them to the user before testing.",
+        "The output uses a debugger or targeted, uniquely tagged debug logs to test one hypothesis prediction at a time rather than logging everything.",
+        "The output writes the regression test at a seam that exercises the real bug pattern, observes it fail before the fix, and observes it pass after the fix.",
+        "The output reruns the original feedback loop after the fix and removes all temporary [DEBUG-...] instrumentation before declaring completion."
+      ]
+    }
+  ]
+}

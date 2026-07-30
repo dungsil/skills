@@ -1,0 +1,47 @@
+{
+  "skill_name": "vibe-review",
+  "evals": [
+    {
+      "id": "verify-branch-fixed-point-before-review",
+      "prompt": "release/1.4 브랜치 이후의 변경을 코드 리뷰해줘.",
+      "expected_output": "release/1.4가 유효한 기준점인지와 diff가 비어 있지 않은지를 먼저 확인한 뒤, git diff release/1.4...HEAD 및 release/1.4..HEAD 커밋 목록을 근거로 검토한다.",
+      "assertions": [
+        "The output resolves the supplied branch before beginning either review axis.",
+        "The output uses a three-dot fixed-point diff against HEAD so the comparison is based on the merge-base.",
+        "The output checks that the diff is non-empty and reports the commit range used for review."
+      ]
+    },
+    {
+      "id": "discover-spec-from-agents-plans",
+      "prompt": "HEAD~3 이후 변경을 리뷰해줘. 따로 명세 경로는 안 줄게.",
+      "expected_output": "커밋 메시지의 이슈 참조와 docs/, specs/, .agents/plans/ 아래의 기능 관련 문서를 순서대로 찾아 명세 출처를 결정하며, .agents/plans/의 일치 문서도 후보로 사용한다.",
+      "assertions": [
+        "The output searches commit-message issue references before falling back to repository spec files.",
+        "The output considers matching specification files under docs/, specs/, and .agents/plans/.",
+        "The output asks for a spec only after those discovery sources fail, and states that the Spec axis is unavailable if the user confirms none exists."
+      ]
+    },
+    {
+      "id": "parallel-standards-and-spec-reports",
+      "prompt": "abc123 이후 이 PR을 리뷰해줘. 요구사항은 specs/export.md에 있어.",
+      "expected_output": "Standards와 Spec 검토를 서로 독립적인 병렬 하위 에이전트에 맡기고, 결과를 ## Standards 및 ## Spec 아래 나란히 분리해 보고한 뒤 각 축의 건수와 최악 문제를 별도로 요약한다.",
+      "assertions": [
+        "The output runs Standards and Spec reviews as parallel sub-agent tasks with isolated briefs.",
+        "The Standards brief includes repository standards plus the smell baseline, distinguishes documented violations from judgement-call smells, and skips tool-enforced rules.",
+        "The Spec brief evaluates missing requirements, scope creep, and incorrect implementations against quoted spec requirements.",
+        "The final report preserves separate ## Standards and ## Spec sections and does not merge or rerank their findings across axes.",
+        "The final summary gives totals and the worst issue independently for each axis."
+      ]
+    },
+    {
+      "id": "uses-caller-supplied-fixed-point",
+      "prompt": "vibe-implement가 넘긴 고정점 a1b2c3d와 티켓 #58로 리뷰해줘.",
+      "expected_output": "호출자가 준 고정점을 그대로 사용해 diff를 잡고, 고정점을 다시 묻지 않으며, 티켓을 명세 출처로 두 축 리뷰를 병렬 실행한다.",
+      "assertions": [
+        "The output uses the caller-supplied fixed point without asking the user for one.",
+        "The output verifies the fixed point resolves and the diff is non-empty before spawning sub-agents.",
+        "The output uses the supplied ticket as the Spec axis source."
+      ]
+    }
+  ]
+}

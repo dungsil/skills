@@ -1,0 +1,35 @@
+{
+  "skill_name": "vibe-modeling",
+  "evals": [
+    {
+      "id": "maintains-canonical-context-glossary",
+      "prompt": "CONTEXT.md에 Customer는 주문을 하는 개인 또는 조직이라고 정의되어 있고 _Avoid_: Client, buyer, account라고 되어 있어. 앞으로 customer를 client라고 부르자.",
+      "expected_output": "기존 Customer 용어와 충돌함을 즉시 알리고, Client를 별도 개념으로 뜻하는지 확인한다. 합의된 용어가 생기면 CONTEXT.md의 Language 아래에 간결한 정의와 피해야 할 동의어를 제자리에서 갱신한다.",
+      "assertions": [
+        "The output immediately flags that Client conflicts with the canonical Customer glossary term and asks whether it denotes a distinct concept.",
+        "The output preserves one precise canonical term for a resolved domain concept and lists competing names under _Avoid_.",
+        "The output keeps CONTEXT.md as a domain glossary with tight definitions, excluding implementation details and design specifications."
+      ]
+    },
+    {
+      "id": "records-only-qualified-architecture-decisions",
+      "prompt": "주문과 청구 컨텍스트는 동기 HTTP 대신 도메인 이벤트로 통신하기로 했어. 두 방식의 장애 격리와 결합도를 비교했고, 이 선택은 바꾸기 어렵고 코드만 보고는 이유를 알기 어려워. ADR로 남겨줘.",
+      "expected_output": "기존 docs/adr/ 번호를 확인해 다음 순번의 슬러그 파일을 만들고, 문맥·결정·이유를 1~3문장으로 기록한다.",
+      "assertions": [
+        "The output creates an ADR only after recognizing the decision as hard to reverse, surprising without context, and the result of a real trade-off.",
+        "The output places the ADR in docs/adr/ using the next sequential NNNN-slug.md filename.",
+        "The ADR uses a short title followed by one to three sentences that state the context, decision, and rationale without mandatory boilerplate sections."
+      ]
+    },
+    {
+      "id": "creates-domain-files-lazily",
+      "prompt": "새 저장소에서 주문 용어를 아직 논의하지 않았어. 지금 CONTEXT.md와 docs/adr/를 미리 만들어서 빈 템플릿을 넣어줘.",
+      "expected_output": "아직 기록할 용어 또는 ADR이 없으므로 두 경로를 만들지 않고, 첫 용어 합의나 ADR 필요 시에만 생성한다고 설명한다.",
+      "assertions": [
+        "The output does not create CONTEXT.md before the first domain term is resolved.",
+        "The output does not create docs/adr/ before an ADR is actually needed.",
+        "The output explains that domain glossary and ADR files are created lazily when they have content to record."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Vibe Review"
+  short_description: "변경 diff를 표준과 명세 두 축으로 분리 검토"
+  default_prompt: "Use $vibe-review to review changes since a fixed point against repository standards and the originating spec."
+
+policy:
+  allow_implicit_invocation: true

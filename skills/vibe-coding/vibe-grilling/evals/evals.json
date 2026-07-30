@@ -1,0 +1,35 @@
+{
+  "skill_name": "vibe-grilling",
+  "evals": [
+    {
+      "id": "one-question-with-recommendation",
+      "prompt": "결제 시스템을 새 공급자로 옮길 계획을 집요하게 검토해줘.",
+      "expected_output": "첫 번째 핵심 의사결정 하나만 질문하고 권장 답을 함께 제시한 뒤, 사용자 답변을 기다린다.",
+      "assertions": [
+        "The output asks exactly one decision-oriented question in its turn.",
+        "The output includes a recommended answer for that question.",
+        "The output does not present a multi-question checklist or proceed to implementation."
+      ]
+    },
+    {
+      "id": "inspect-facts-before-asking",
+      "prompt": "배포 계획을 그릴해줘. 이 저장소가 이미 어떤 CI 제공자를 쓰는지도 확인해서 판단해줘.",
+      "expected_output": "CI 제공자처럼 환경에서 확인 가능한 사실은 먼저 조사하고, 조사로 해결되지 않는 배포 의사결정 하나만 사용자에게 묻는다.",
+      "assertions": [
+        "The output investigates the repository for the existing CI provider instead of asking the user for that fact.",
+        "The output distinguishes discovered facts from decisions that require user input.",
+        "The output asks at most one unresolved decision question and gives a recommendation."
+      ]
+    },
+    {
+      "id": "wait-for-shared-understanding-before-action",
+      "prompt": "데이터베이스를 PostgreSQL로 바꾸고 다음 주에 배포하자. 계획의 모든 허점을 질문으로 찾아내고 바로 실행해줘.",
+      "expected_output": "의존하는 결정을 차례로 하나씩 검토하며 지금은 첫 질문과 권장안만 제시하고, 공유된 이해가 확인되기 전에는 마이그레이션이나 배포를 실행하지 않는다.",
+      "assertions": [
+        "The output begins with one consequential decision question rather than batching every branch of the decision tree.",
+        "The output provides a recommended answer and waits for feedback before advancing to dependent questions.",
+        "The output does not perform migration, deployment, or other plan execution before shared understanding is confirmed."
+      ]
+    }
+  ]
+}
