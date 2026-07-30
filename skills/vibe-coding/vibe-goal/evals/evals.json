@@ -1,0 +1,112 @@
+{
+  "skill_name": "vibe-goal",
+  "evals": [
+    {
+      "id": "routes-loose-idea-through-plan-then-tickets",
+      "prompt": "알림 설정 화면을 추가하고 싶어. 계획부터 구현, 리뷰까지 한 번에 끝내줘.",
+      "expected_output": "루틴한 아이디어이므로 vibe-plan으로 라우팅한다고 한 줄로 알리고, 티켓이 발행된 뒤 원장을 만들어 실행 순서를 확인받은 후 프론티어 단위로 서브에이전트를 파견한다.",
+      "assertions": [
+        "The output states which planning route it takes and why in one line before acting.",
+        "The output routes a loose idea to vibe-plan rather than starting implementation directly.",
+        "The output builds a ledger of tickets with blocking edges and status before dispatching any sub-agent.",
+        "The output confirms the execution order with the user before dispatching the first wave."
+      ]
+    },
+    {
+      "id": "routes-oversized-goal-to-deep-plan-first",
+      "prompt": "결제 도메인 전체를 이벤트 소싱으로 옮기고 싶어. 이건 한 세션에 계획이 안 담길 것 같아. 끝까지 끌고 가줘.",
+      "expected_output": "한 세션에 담기지 않는 규모로 판단해 vibe-deep-plan을 먼저 거치고, 지도가 걷힌 뒤 Destination과 Decisions-so-far를 vibe-plan의 스펙 단계 입력으로 넘긴다. 다중 세션 작업임을 알리고 세션이 차면 인계하겠다고 예고한다.",
+      "assertions": [
+        "The output routes the oversized goal to vibe-deep-plan before vibe-plan.",
+        "The output enters vibe-plan at its spec stage using the cleared map's destination and decisions rather than re-interviewing.",
+        "The output warns that this route spans multiple sessions and will hand off with vibe-handoff when the session fills up.",
+        "The output does not attempt to force the whole decision map and its implementation into one context window."
+      ]
+    },
+    {
+      "id": "records-fixed-point-before-first-dispatch",
+      "prompt": "발행된 티켓 세트가 이미 있어. 구현부터 리뷰까지 진행해줘.",
+      "expected_output": "Stage 2로 건너뛰어 현재 커밋을 고정점으로 기록한 원장을 먼저 만들고, 그 고정점을 최종 전체 목표 리뷰의 기준으로 남긴다.",
+      "assertions": [
+        "The output skips the planning stages when a published ticket set is supplied.",
+        "The output records the current commit as the run's fixed point before the first ticket sub-agent starts.",
+        "The output reserves that fixed point for the whole-goal review at the end rather than for a per-ticket review."
+      ]
+    },
+    {
+      "id": "orchestrator-refuses-to-write-code",
+      "prompt": "첫 티켓은 한 줄만 고치면 되니까 네가 직접 수정하고 넘어가.",
+      "expected_output": "오케스트레이터는 프로덕션 코드를 직접 수정하지 않고, 한 줄 변경이라도 해당 티켓의 서브에이전트에 맡긴다고 설명한 뒤 파견한다.",
+      "assertions": [
+        "The output declines to edit source files itself even for a trivial change.",
+        "The output dispatches the change through a ticket sub-agent instead.",
+        "The output explains the reason as preserving the orchestrator's context for the ticket graph."
+      ]
+    },
+    {
+      "id": "dispatches-frontier-wave-with-minimal-prompt",
+      "prompt": "티켓 3개 중 1번과 2번은 블로커가 없고 3번은 1번에 막혀 있어. 이제 실행해줘.",
+      "expected_output": "블로커가 없는 1번과 2번을 한 배치로 동시에 파견하고, 각 서브에이전트에는 티켓 본문과 스펙 링크, vibe-implement만 실행하라는 지시와 범위 경계만 전달한다. 3번은 1번이 landed된 뒤 다음 웨이브로 넘긴다.",
+      "assertions": [
+        "The output dispatches all unblocked tickets in a single concurrent batch rather than serialising them.",
+        "Each sub-agent prompt contains the ticket body, the spec link, and the instruction to run vibe-implement and nothing else.",
+        "The output does not paste conversation history, other tickets, or plan history into the sub-agent prompts.",
+        "The blocked ticket is withheld until its blocker is verified as landed."
+      ]
+    },
+    {
+      "id": "verifies-completion-claim-independently",
+      "prompt": "서브에이전트가 티켓 구현을 완료했다고 보고했어. 다음 티켓으로 넘어가줘.",
+      "expected_output": "완료 보고를 사실로 받아들이지 않고 고정점 이후 커밋 존재와 인수 조건 충족, vibe-review 판정을 확인한 뒤에야 landed로 표시하고 프론티어를 재계산한다.",
+      "assertions": [
+        "The output treats the sub-agent's completed status as a claim requiring verification.",
+        "The verification checks that a commit exists since the fixed point and that the ticket's acceptance criteria are addressed.",
+        "The output only marks the ticket landed after the review findings are fixed or explicitly accepted.",
+        "The ledger and the tracker ticket status are both updated before the next wave."
+      ]
+    },
+    {
+      "id": "diagnoses-failed-ticket-instead-of-redispatch",
+      "prompt": "2번 티켓 서브에이전트가 컨텍스트가 차서 중간에 멈췄어. 다시 시켜줘.",
+      "expected_output": "같은 프롬프트를 그대로 재파견하지 않고 원인을 컨텍스트 초과로 진단해 티켓을 블로킹 관계가 있는 더 작은 슬라이스로 쪼개 발행한 뒤 프론티어에 올린다. 실패 사유를 원장에 한 줄로 남기고 나머지 프론티어는 계속 진행한다.",
+      "assertions": [
+        "The output does not redispatch the identical prompt for the failed ticket.",
+        "The output diagnoses the failure cause and splits the oversized ticket into blocked slices published to the tracker.",
+        "The output records the failure with a one-line reason in the ledger and keeps the remaining frontier moving.",
+        "Tickets blocked by the failed ticket remain pending rather than being dispatched."
+      ]
+    },
+    {
+      "id": "stops-on-terminal-triage-outcome",
+      "prompt": "https://github.com/acme/app/issues/120 이거 계획부터 리뷰까지 다 해줘.",
+      "expected_output": "외부 요청이라 vibe-plan의 트리아지로 들어가고, 결과가 wontfix나 needs-info면 구현 없이 결과를 보고하고 실행을 종료한다. ready-for-human이면 위임 불가 사유를 밝히고 멈춘다.",
+      "assertions": [
+        "The output routes the external issue reference through vibe-plan's triage stage.",
+        "A wontfix or needs-info outcome ends the run with a report and no implementation dispatch.",
+        "A ready-for-human outcome ends the run with the reason it cannot be delegated.",
+        "The output frames the early exit as a successful outcome rather than a failure."
+      ]
+    },
+    {
+      "id": "closes-goal-with-whole-goal-review",
+      "prompt": "티켓 전부 끝났어. 마무리해줘.",
+      "expected_output": "목표 수준에서 전체 테스트와 타입 검사를 한 번 실행하고, Stage 2 고정점과 스펙을 넘겨 vibe-review를 전체 목표 대상으로 수행한다. 사용자가 고치기로 한 지적은 새 티켓으로 만들어 다시 실행 단계로 보내고, 부모 스펙 이슈는 닫지 않는다.",
+      "assertions": [
+        "The full test suite and typecheck run once at the goal level rather than per ticket.",
+        "The output runs vibe-review against the run's original fixed point with the spec, framed as covering the seams between tickets.",
+        "Findings the user wants fixed become new tickets routed back through the frontier stage instead of being patched by the orchestrator.",
+        "The output does not close or modify the parent spec issue."
+      ]
+    },
+    {
+      "id": "rejects-wave-with-undecided-shared-contract",
+      "prompt": "같은 웨이브의 두 티켓이 같은 API 인터페이스를 쓰는데 그 인터페이스 모양은 아직 안 정했어. 그냥 병렬로 돌려줘.",
+      "expected_output": "공유 계약이 결정되지 않은 상태로는 병렬 파견하지 않고, 티켓 절단이 잘못된 신호로 보고 두 티켓을 합치거나 블로킹 간선으로 직렬화한 뒤 파견한다.",
+      "assertions": [
+        "The output refuses to dispatch the wave while the shared interface is undecided.",
+        "The output treats an undecided shared contract as a ticket-cutting defect rather than something the sub-agents should negotiate.",
+        "The resolution merges the tickets or adds a blocking edge to serialise them before dispatch."
+      ]
+    }
+  ]
+}

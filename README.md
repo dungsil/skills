@@ -20,6 +20,7 @@ pnpm dlx skills add dungsil/skills -g
 | 스킬 명          | 설명                                        | 출처                                                                     |
 |------------------|---------------------------------------------|--------------------------------------------------------------------------|
 | [vibe-init]      | [0단계] 바이브 코딩 프로젝트 기본 구조 정의 | [mattpocock/skills] - setup-matt-pocock-skills (MIT)                     |
+| [vibe-goal]      | [전체] 계획→구현→리뷰 완주 오케스트레이터   |                                                                          |
 | [vibe-plan]      | [1단계] 기능 구현 인터뷰 및 스펙/이슈 생성  | [mattpocock/skills] - grill-with-docs, to-spec, to-tickets, triage (MIT) |
 | [vibe-deep-plan] | [1단계] 대규모 기능 구현                    | [mattpocock/skills] - wayfinder, research, prototype (MIT)               |
 | [vibe-implement] | [2단계] 스펙/티켓 기반 구현                 | [mattpocock/skills] - implement, tdd, resolving-merge-conflicts (MIT)    |
@@ -38,10 +39,11 @@ vibe-init                     최초 1회, 리포 설정
     ▼
 요청 / 아이디어
     │
+    ├─▶ vibe-goal  전 과정을 한 번에 완주 (아래 흐름을 대신 운전)
+    │
     ├─ 한 세션에 안 담기는 대규모 ──▶ vibe-deep-plan
     │                                  (결정 티켓 지도 · 세션당 1개 해소)
-    │                                         │ 안개가 걷히면
-    ▼                                         ▼
+    ▼                                         │ 안개가 걷히면
 vibe-plan  ◀────────────────────────────────────
   트리아지 ─▶ 인터뷰 ─▶ 스펙 ─▶ 티켓
     │
@@ -56,6 +58,7 @@ vibe-implement ─▶ vibe-review ─▶ 커밋
 3. **[2단계] `vibe-implement`** — 티켓 하나당 **새 세션**에서 실행. TDD로 구현하고 커밋 전에 리뷰를 거친다.
    - **`vibe-review`** — `vibe-implement`가 시작 시점 커밋을 고정점으로 넘겨 자동 실행된다. 표준·명세 두 축을 병렬로 검토한다.
       * 고위험 변경(보안·인증·영속성·트랜잭션)이거나 요구사항 충족 여부를 판정해야 하면 [requirement-quality-gate]로 에스컬레이션한다.
+4. **[전체] `vibe-goal`** — 위 1~2단계를 직접 부르지 않고 한 번에 맡길 때 사용. 라우팅·계획으로 티켓을 발행한 뒤, 블로커가 풀린 티켓들을 **티켓별 새 서브에이전트**에 `vibe-implement`로 파견하고, 마지막에 전체 목표를 한 번 더 리뷰한다. 오케스트레이터 자신은 코드를 쓰지 않는다.
 
 #### 독립 스킬
 
@@ -118,6 +121,7 @@ bun run validate:skills
 [writing-kotlin-tests]: skills/kotlin/writing-kotlin-tests
 [writing-kdoc]: skills/kotlin/writing-kdoc
 [vibe-init]: skills/vibe-coding/vibe-init
+[vibe-goal]: skills/vibe-coding/vibe-goal
 [vibe-plan]: skills/vibe-coding/vibe-plan
 [vibe-handoff]: skills/vibe-coding/vibe-handoff
 [vibe-implement]: skills/vibe-coding/vibe-implement
