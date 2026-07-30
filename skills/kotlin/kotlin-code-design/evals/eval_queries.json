@@ -1,0 +1,66 @@
+[
+  {
+    "query": "Kotlin aggregate factory에서 여러 value object 검증 오류를 누적하도록 설계해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "use case port가 Spring Data findBy 메서드와 JpaEntity를 노출하는데 고쳐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "packages/shared에 문자열 유틸과 Jackson 설정을 같이 둬도 되는지 봐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Kotlin JPA entity를 data class로 쓰고 domain model과 합쳐도 괜찮아?",
+    "should_trigger": true
+  },
+  {
+    "query": "GlobalScope와 runCatching을 쓰는 repository의 취소 계약을 리뷰해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "배포된 Kotlin JVM API의 data class 프로퍼티를 추가해도 binary compatible한지 봐줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Spring Boot app마다 복사한 설정을 starter로 분리할지 결정해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Java SDK platform type 때문에 Kotlin 서비스에 !!가 퍼졌어. 경계를 설계해줘",
+    "should_trigger": true
+  },
+  {
+    "query": "Kotlin에서 문자열을 소문자로 바꾸는 함수가 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "코틀린 when 문법 예시 보여줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Gradle Kotlin DSL에서 dependency 한 줄 추가하는 법 알려줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Spring Boot application.yml profile 문법 알려줘",
+    "should_trigger": false
+  },
+  {
+    "query": "Kotlin List와 MutableList 차이가 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "coroutine delay 함수 사용법 알려줘",
+    "should_trigger": false
+  },
+  {
+    "query": "JPA ManyToOne 기본 fetch type이 뭐야?",
+    "should_trigger": false
+  },
+  {
+    "query": "Kotlin extension function 문법만 간단히 알려줘",
+    "should_trigger": false
+  }
+]

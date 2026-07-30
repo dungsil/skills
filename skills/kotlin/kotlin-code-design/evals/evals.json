@@ -90,6 +90,46 @@
         "The output allows nested or inner classes to remain with their owning type.",
         "The output permits multiple top-level declarations only for a cohesive extension-only file."
       ]
+    },
+    {
+      "id": "domain-factory-accumulates-validation",
+      "prompt": "Kotlin aggregate 생성자에서 첫 번째 잘못된 값에 require로 바로 실패하고 있어. 자식 value object 여러 개의 검증 오류를 한 번에 돌려주는 도메인 factory로 바꾸고 싶어.",
+      "expected_output": "불완전한 aggregate 생성을 막고 private/internal construction과 factory를 사용하며, 독립적인 자식 검증 결과를 조합해 프로젝트의 닫힌 validation result로 누적 오류를 반환한다.",
+      "assertions": [
+        "The output keeps aggregate construction behind a factory or otherwise prevents partially valid domain objects.",
+        "The output distinguishes ordinary validation failure from exceptional programmer misuse.",
+        "The output accumulates independent child validation errors before constructing the aggregate."
+      ]
+    },
+    {
+      "id": "nullable-single-and-bulk-order-contract",
+      "prompt": "Kotlin outbound port의 단건 조회는 Optional<Entity>를 반환하고, bulk 조회는 누락된 값과 입력 순서 정책이 없어. 포트 계약을 정리해줘.",
+      "expected_output": "단건 일반 부재는 Kotlin nullable domain/application type으로 표현하고 엔티티를 제거하며, bulk 조회의 순서·누락·카디널리티 정책을 명시한다.",
+      "assertions": [
+        "The output replaces Optional with a nullable Kotlin return for ordinary single-result absence.",
+        "The output keeps persistence entities out of the application port.",
+        "The output makes bulk ordering and missing-result behavior explicit."
+      ]
+    },
+    {
+      "id": "corrupt-persisted-row-is-infrastructure-failure",
+      "prompt": "JPA entity를 domain factory로 복원했는데 검증에 실패하면 adapter가 null을 반환해서 not found처럼 처리해. 괜찮은지 리뷰해줘.",
+      "expected_output": "존재하는 저장 행의 도메인 복원 실패를 데이터 무결성 또는 인프라 실패로 처리하고, ordinary absence와 구분하며 adapter 경계에서 원인을 보존해 번역한다.",
+      "assertions": [
+        "The output distinguishes a corrupt persisted row from an absent row.",
+        "The output places the failure translation in the persistence adapter.",
+        "The output preserves meaningful cause or integrity context instead of returning null."
+      ]
+    },
+    {
+      "id": "starter-scope-and-thin-app",
+      "prompt": "모든 Spring 설정, repository scan, error handler, migration 도구를 app 모듈마다 복사하고 있어. Kotlin modular Spring 구조를 개선해줘.",
+      "expected_output": "app을 얇게 유지하고 반복되는 인프라 구성을 관심사별 starter나 adapter로 옮기며, migration은 수명주기와 의존성이 다르면 별도 runnable app으로 분리한다.",
+      "assertions": [
+        "The output keeps runnable app modules focused on composition.",
+        "The output groups reusable Spring configuration by a focused infrastructure concern.",
+        "The output separates migration runtime only when lifecycle or dependency differences justify it."
+      ]
     }
   ]
 }
