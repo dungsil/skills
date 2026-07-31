@@ -12,7 +12,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The Spec axis here is a **fast pass** — one sub-agent reading the diff against the spec, reporting gaps, scope creep, and wrong implementations in under 400 words. When you need a formal verdict instead — acceptance criteria with per-criterion status, evidence-domain separation (`CODE` vs `OPERATION` vs `DATA`), independent reviewer passes, and an aggregated `PASS`/`FAIL`/`NEEDS_REVIEW` — run the `/rq` skill on the same requirement. Reach for it when the change is high-risk (security, auth, permissions, persistence, transactions, integrations), when the user asks whether a requirement is genuinely *met* rather than what's missing, or when this axis surfaces findings the user wants adjudicated rather than listed. It replaces this axis; don't run both and merge them.
+The Spec axis here is a **fast pass** — one sub-agent reading the diff against the spec, reporting gaps, scope creep, and wrong implementations in under 400 words. When you need a formal verdict instead — acceptance criteria with per-criterion status, evidence-domain separation (`CODE` vs `OPERATION` vs `DATA`), independent reviewer passes, and an aggregated `PASS`/`FAIL`/`NEEDS_REVIEW` — run the `/rq` skill on the same requirement. Reach for it when the change is high-risk (security, auth, permissions, persistence, transactions, integrations), when the user asks whether a requirement is genuinely *met* rather than what's missing, or when this axis surfaces findings the user wants adjudicated rather than listed. It replaces this axis; don't run both and merg…
 
 The issue tracker should have been provided to you — run `/vibe-init` if `docs/agents/issue-tracker.md` is missing.
 
@@ -82,6 +82,16 @@ If the spec is missing, skip the Spec sub-agent and note this in the final repor
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate (see _Why two axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes — that's the reranking the separation exists to prevent.
+
+### 6. On pass, close out the issue
+
+If both axes report no findings, and the project tracks work on an issue tracker (GitHub, GitLab, etc. — the workflow in `docs/agents/issue-tracker.md`):
+
+1. Open the originating issue found in step 2.
+2. Check off every acceptance-criteria checkbox in the issue body that the change satisfies.
+3. Close the issue, with a short comment summarising the review result and the commits covered.
+
+If there is no issue tracker, or no originating issue, skip this step and say so. If either axis has findings, leave the issue open and untouched.
 
 ## Why two axes
 
