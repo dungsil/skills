@@ -26,9 +26,9 @@
     {
       "id": "rejected-enhancement-out-of-scope-record",
       "prompt": "새 플러그인 시스템 요청 #88은 제품 범위 밖이라 거절하기로 했어. 비슷한 요청을 나중에 다시 받지 않도록 처리해줘.",
-      "expected_output": "유사한 기존 .agents/out-of-scope 기록을 먼저 확인하고, 없으면 플러그인 시스템 개념의 kebab-case 기록을 만든다. 기록에는 지속 가능한 거절 사유와 #88을 Prior requests로 남기며, AI 고지문이 있는 댓글에서 기록을 연결한 뒤 매핑된 wontfix 상태로 #88을 닫는다.",
+      "expected_output": "유사한 기존 docs/agents/out-of-scope 기록을 먼저 확인하고, 없으면 플러그인 시스템 개념의 kebab-case 기록을 만든다. 기록에는 지속 가능한 거절 사유와 #88을 Prior requests로 남기며, AI 고지문이 있는 댓글에서 기록을 연결한 뒤 매핑된 wontfix 상태로 #88을 닫는다.",
       "assertions": [
-        "The output checks .agents/out-of-scope records by concept similarity and appends #88 to an existing matching concept instead of creating a duplicate.",
+        "The output checks docs/agents/out-of-scope records by concept similarity and appends #88 to an existing matching concept instead of creating a duplicate.",
         "When no matching record exists, the output creates one kebab-case concept file with a substantive, durable rationale and a Prior requests entry for #88.",
         "The output links the out-of-scope record from a disclaimer-prefixed issue comment and applies the label mapped from canonical wontfix before closing the rejected enhancement.",
         "The output does not create an out-of-scope record for an already-implemented request or for a rejected bug."
