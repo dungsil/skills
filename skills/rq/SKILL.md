@@ -1,5 +1,5 @@
 ---
-name: requirement-quality-gate
+name: rq
 description: Verifies whether source code, diffs, tests, runtime evidence, or implementation artifacts satisfy stated product or engineering requirements. Separates implementation gates from operation, deployment, data, and manual gates. Use for requirement quality gates, acceptance-criteria checks, implementation verification reports, change-to-requirement mapping, or user-requested adversarial verification of an existing gate report.
 ---
 
@@ -56,7 +56,7 @@ Do not run adversarial verification as part of the initial gate report. Run it o
 - `적대적 검증해줘`
 - `이 보고서를 반증해줘`
 - `품질 게이트 적대 검증`
-- `$requirement-quality-gate adversarial`
+- `\$rq adversarial`
 
 Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). Return an adversarial-verification addendum unless the user asks for a revised full report.
 

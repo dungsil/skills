@@ -90,11 +90,11 @@
     {
       "id": "closes-goal-with-standards-review-and-quality-gate",
       "prompt": "티켓 전부 끝났어. 마무리해줘.",
-      "expected_output": "목표 수준에서 전체 테스트와 타입 검사를 한 번 실행하고, Stage 2 고정점으로 vibe-review의 표준 축을 돌린 뒤 명세 판정은 requirement-quality-gate로 대체하되, 소스 의무는 목표가 실제로 약속한 인수 조건(완료 정의)으로 좁히고 기본 LIGHT 티어로 판정한다. 미충족·불명 항목은 새 티켓으로 되돌리고, 부모 스펙 이슈는 닫지 않는다.",
+      "expected_output": "목표 수준에서 전체 테스트와 타입 검사를 한 번 실행하고, Stage 2 고정점으로 vibe-review의 표준 축을 돌린 뒤 명세 판정은 rq로 대체하되, 소스 의무는 목표가 실제로 약속한 인수 조건(완료 정의)으로 좁히고 기본 LIGHT 티어로 판정한다. 미충족·불명 항목은 새 티켓으로 되돌리고, 부모 스펙 이슈는 닫지 않는다.",
       "assertions": [
         "The full test suite and typecheck run once at the goal level rather than per ticket.",
         "The output runs vibe-review against the run's original fixed point for the standards axis, framed as covering the seams between tickets.",
-        "The output runs requirement-quality-gate in place of the fast spec axis, with the goal's committed definition of done — not every user story in the spec — as the source obligations, the fixed point as the change boundary, and the LIGHT tier by default (HEAVY only for high-risk domains).",
+        "The output runs rq in place of the fast spec axis, with the goal's committed definition of done — not every user story in the spec — as the source obligations, the fixed point as the change boundary, and the LIGHT tier by default (HEAVY only for high-risk domains).",
         "The standards findings and the gate report are presented side by side without being merged or reranked.",
         "Criteria the gate marks not satisfied or unknown become new tickets routed back through the frontier stage instead of being patched by the orchestrator.",
         "The output does not close or modify the parent spec issue."
