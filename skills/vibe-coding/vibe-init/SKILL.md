@@ -29,7 +29,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
 - `.agents/plans/` — sign that a local-markdown issue tracker convention is already in use
-- `.agents/out-of-scope/` — sign that a rejected-request knowledge base is already in use
+- `docs/agents/out-of-scope/` (or legacy `.agents/out-of-scope/`) — sign that a rejected-request knowledge base is already in use
 - Are `vibe-plan` / `vibe-deep-plan` installed? (a skill folder alongside this one, or the name in your available skills.) They consume the label vocabulary — `vibe-plan` the triage states, `vibe-deep-plan` the planning labels — so this decides whether Section B runs at all.
 - Monorepo signals — a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
@@ -83,6 +83,8 @@ Let them edit before writing.
 Edit `AGENTS.md` if it exists; create it if it doesn't. Never edit `CLAUDE.md` — if only `CLAUDE.md` exists, still create a new `AGENTS.md` and leave `CLAUDE.md` untouched.
 
 If an `## Agent skills` block already exists in `AGENTS.md`, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
+
+**`.gitignore`** — if the repo uses git, ensure `.agents/` is ignored: when `.gitignore` doesn't already cover it, append a `.agents/` entry (create the file if needed). If the issue tracker is **local markdown**, ask the user whether `.agents/plans/` should be tracked; if they want it tracked, add a `!.agents/plans/` negation (or ignore only `.agents/worktrees/`) — otherwise keep the default and ignore all of `.agents/`.
 
 The block:
 
