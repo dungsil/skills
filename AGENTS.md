@@ -12,3 +12,17 @@ PLEASE STRICTLY FOLLOW THE BEST PRACTICES FOR SKILL: https://platform.claude.com
 
 - After creating or changing any skill under `skills/`, run `bun run lint`.
 - The validation uses TanStack Intent and must pass before considering the skill update complete.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked as local Markdown under `.agents/plans/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical triage and planning roles use the default Korean label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repository uses a single-context domain model. See `docs/agents/domain.md`.
