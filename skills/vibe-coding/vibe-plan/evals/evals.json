@@ -82,7 +82,7 @@
       "assertions": [
         "The output synthesises the spec from existing conversation context without conducting a new interview.",
         "The output proposes the seams it will test at, preferring existing and highest seams, and confirms them with the user.",
-        "The published spec follows the spec template sections and receives the configured ready-for-agent role label."
+        "The published spec uses the Korean section headers 문제 정의, 해결 방안, 사용자 스토리, 구현 결정사항, 테스트 결정사항, 범위 밖, and 추가 참고사항, and receives the configured ready-for-agent role label."
       ]
     },
     {
@@ -112,8 +112,8 @@
       "assertions": [
         "Each ticket is created as an issue and then attached to the spec issue as a GitHub sub-issue rather than only referenced in prose.",
         "The sub-issue and dependency API calls pass the numeric database id, not the #number or node_id.",
-        "Blocking edges are expressed as native issue dependencies, with a task list plus Part of #<parent> used only when sub-issues are unavailable.",
-        "The ticket body omits a Parent section when the native sub-issue link already records the parent."
+        "Blocking edges are expressed as native issue dependencies, with a task list plus 상위 이슈: #<parent> used only when sub-issues are unavailable.",
+        "The ticket body omits an 상위 이슈 section when the native sub-issue link already records the parent."
       ]
     },
     {
@@ -123,8 +123,8 @@
       "assertions": [
         "Each ticket is created as a GitLab task on the spec issue rather than a standalone issue linked only by text.",
         "Blocking edges use the /blocked_by quick action posted as a note on the blocked ticket.",
-        "Where tasks or native blocking links are unavailable, the output falls back to Part of #<parent> and a Blocked by line respectively.",
-        "The ticket body omits a Parent section when the native task relationship already records the parent."
+        "Where tasks or native blocking links are unavailable, the output falls back to 상위 이슈: #<parent> and a 선행 작업 line respectively.",
+        "The ticket body omits an 상위 이슈 section when the native task relationship already records the parent."
       ]
     },
     {

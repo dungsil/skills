@@ -172,15 +172,15 @@ Check with the user that these seams match their expectations.
 
 <spec-template>
 
-## Problem Statement
+## 문제 정의
 
 The problem that the user is facing, from the user's perspective.
 
-## Solution
+## 해결 방안
 
 The solution to the problem, from the user's perspective.
 
-## User Stories
+## 사용자 스토리
 
 A LONG, numbered list of user stories. Each user story should be in the format of:
 
@@ -192,7 +192,7 @@ A LONG, numbered list of user stories. Each user story should be in the format o
 
 This list of user stories should be extremely extensive and cover all aspects of the feature.
 
-## Implementation Decisions
+## 구현 결정사항
 
 A list of implementation decisions that were made. This can include:
 
@@ -208,7 +208,7 @@ Do NOT include specific file paths or code snippets. They may end up being outda
 
 Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts — not a working demo, just the important bits.
 
-## Testing Decisions
+## 테스트 결정사항
 
 A list of testing decisions that were made. Include:
 
@@ -216,11 +216,11 @@ A list of testing decisions that were made. Include:
 - Which modules will be tested
 - Prior art for the tests (i.e. similar types of tests in the codebase)
 
-## Out of Scope
+## 범위 밖
 
 A description of the things that are out of scope for this spec.
 
-## Further Notes
+## 추가 참고사항
 
 Any further notes about the feature.
 
@@ -271,10 +271,10 @@ Iterate until the user approves the breakdown.
 
 Publish the approved tickets in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. **How** depends on the tracker `/vibe-init` configured — the tickets are the same either way, only the shape of the parent link and the blocking edges changes. Apply the `ready-for-agent` triage label (see `docs/agents/triage-labels.md` for the actual label string) unless instructed otherwise — the tickets are agent-grabbable by construction.
 
-- **Local files** → write one file per ticket under `.agents/plans/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below — one ticket per file, never a single combined file.
-- **GitHub** → create each ticket as a **sub-issue** of the spec issue, so the parent renders its progress and the children stay navigable in the UI. Create the issue first (`gh issue create`), then link it with `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is the child's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). Where sub-issues aren't enabled, fall back to a task list in the parent body plus `Part of #<parent>` at the top of each child. For blocking edges use GitHub's **native issue dependencies**: `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`.
-- **GitLab** → create each ticket as a **task** on the spec issue (GitLab's child work item type), so the parent tracks them as a checklist of real work items rather than plain text. Where tasks aren't available, fall back to `Part of #<parent>` at the top of each child description. For blocking edges use GitLab's **native blocking link** via the quick action: `glab issue note <child> --message "/blocked_by #<blocker>"` (Premium/Ultimate; on the free tier fall back to a `Blocked by: #<n>, #<n>` line at the top of the description).
-- **Another tracker (Linear, Jira, …)** → publish one issue per ticket, using the platform's native parent/sub-issue relationship and its native blocking relationship where it has them; otherwise set each ticket's "Blocked by" to the blocking issues.
+- **Local files** → write one file per ticket under `.agents/plans/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "선행 작업" lists the numbers/titles it depends on. Use the per-ticket file template below — one ticket per file, never a single combined file.
+- **GitHub** → create each ticket as a **sub-issue** of the spec issue, so the parent renders its progress and the children stay navigable in the UI. Create the issue first (`gh issue create`), then link it with `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is the child's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). Where sub-issues aren't enabled, fall back to a task list in the parent body plus `상위 이슈: #<parent>` at the top of each child. For blocking edges use GitHub's **native issue dependencies**: `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`.
+- **GitLab** → create each ticket as a **task** on the spec issue (GitLab's child work item type), so the parent tracks them as a checklist of real work items rather than plain text. Where tasks aren't available, fall back to `상위 이슈: #<parent>` at the top of each child description. For blocking edges use GitLab's **native blocking link** via the quick action: `glab issue note <child> --message "/blocked_by #<blocker>"` (Premium/Ultimate; on the free tier fall back to a `선행 작업: #<n>, #<n>` line at the top of the description).
+- **Another tracker (Linear, Jira, …)** → publish one issue per ticket, using the platform's native parent/sub-issue relationship and its native blocking relationship where it has them; otherwise set each ticket's "선행 작업" to the blocking issues.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
@@ -282,13 +282,13 @@ Do NOT close or modify any parent issue.
 
 <local-ticket-template>
 
-# <NN> — <Ticket title>
+# <NN> — <티켓 제목>
 
-**What to build:** the end-to-end behaviour this ticket makes work, from the user's perspective — not a layer-by-layer implementation list.
+**구현할 내용:** the end-to-end behaviour this ticket makes work, from the user's perspective — not a layer-by-layer implementation list.
 
-**Blocked by:** the numbers/titles of the tickets that gate this one, or "None — can start immediately".
+**선행 작업:** the numbers/titles of the tickets that gate this one, or "None — can start immediately".
 
-**Status:** ready-for-agent
+**상태:** ready-for-agent
 
 - [ ] Acceptance criterion 1
 - [ ] Acceptance criterion 2
@@ -297,20 +297,20 @@ Do NOT close or modify any parent issue.
 
 <issue-template>
 
-## Parent
+## 상위 이슈
 
 A reference to the parent issue on the tracker. Omit this section when the ticket is already attached natively — a GitHub sub-issue or a GitLab task carries the parent link in the tracker itself, so restating it in the body is duplication. Keep it only as the fallback when no native relationship was available.
 
-## What to build
+## 구현할 내용
 
 The end-to-end behaviour this ticket makes work, from the user's perspective — not layer-by-layer implementation.
 
-## Acceptance criteria
+## 완료 조건
 
 - [ ] Criterion 1
 - [ ] Criterion 2
 
-## Blocked by
+## 선행 작업
 
 - A reference to each blocking ticket, or "None — can start immediately".
 
