@@ -8,6 +8,20 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
+## Intent and capability boundary
+
+Classify the requested action before beginning the loop:
+
+- **Remediation mode** applies only when the user explicitly requests a fix, repair, modification, or restoration (including an unambiguous equivalent). It permits persistent product and regression-test changes. Follow every phase below.
+- **Diagnosis-only mode** applies to diagnose, debug, investigate, and root-cause-only requests, and is the default for an ambiguous request. Do not infer remediation from a bug report, urgency, or a request to continue.
+
+Diagnosis-only mode stays inside the **capability boundary**: it permits read-only source, configuration, and history inspection plus read-only runtime observation, but no persistent product, test, configuration, or artifact changes.
+
+If diagnosis-only work needs temporary instrumentation, a repro file, or a failing test:
+
+1. Before writing, preview the exact changes to make in an isolated workspace: paths plus a diff or complete contents, their purpose, and a cleanup plan that names every artifact to remove.
+2. Ask for explicit approval and wait. A general diagnosis request, silence, or rejection is not approval.
+3. Only after approval, make those temporary writes in an **isolated workspace**, never the user's checkout. Remove every approved artifact before reporting; do not retain it as a product or test change.
 
 ## Phase 1 — Build a feedback loop
 
@@ -27,6 +41,8 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
 10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
+In diagnosis-only mode, use existing tests, scripts, commands, and read-only observation to build the loop. Do not create or modify a test, harness, trace, script, instrumentation, configuration, or product code unless the temporary-write approval above was obtained. Any command must avoid persistent product-state changes.
+
 
 Build the right feedback loop, and the bug is 90% fixed.
 
@@ -46,7 +62,7 @@ The goal is not a clean repro but a **higher reproduction rate**. Loop the trigg
 
 ### When you genuinely cannot build a loop
 
-Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do **not** proceed to hypothesise without a loop.
+Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) explicit approval after previewing the exact isolated-workspace temporary diagnostic changes and cleanup. Do **not** proceed to hypothesise without a loop.
 
 ### Completion criterion — a tight loop that goes red
 
@@ -97,15 +113,31 @@ Each probe must map to a specific prediction from Phase 3. **Change one variable
 
 Tool preference:
 
-1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
+1. **Debugger / REPL read-only inspection** if the env supports it. One breakpoint beats ten logs.
 2. **Targeted logs** at the boundaries that distinguish hypotheses.
 3. Never "log everything and grep".
+
+In diagnosis-only mode, start with debugger/REPL inspection and existing observable data. A targeted log or any other temporary write is permitted only after the upfront preview and approval, and must be removed from the isolated workspace before the report.
 
 **Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
 
 **Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
-## Phase 5 — Fix + regression test
+## Diagnosis-only exit
+
+After the cause is confirmed, stop here in diagnosis-only mode; do not enter the remediation phases. Report:
+
+- The confirmed cause, and why the evidence establishes it rather than merely suggesting a theory.
+- The minimal reproduction command and observed result, or the precise reproduction limitation, attempts made, and missing access or artifact.
+- The evidence collected: red-loop output, read-only debugger values, existing logs, source facts, or measurements.
+- The smallest proposed fix and why it addresses the cause. Propose it; do not implement it.
+- When approved temporary writes were used, confirmation that every artifact was removed before this report.
+
+If the evidence cannot confirm a cause or produce a red-capable command, report the limited diagnosis rather than promoting a theory to a confirmed cause or applying a fix.
+
+## Phase 5 — Remediation: fix + regression test
+
+Run this phase only in remediation mode. Diagnosis-only reports end above.
 
 Write the regression test **before the fix** — but only if there is a **correct seam** for it.
 
@@ -117,11 +149,13 @@ If a correct seam exists:
 
 1. Turn the minimised repro into a failing test at that seam.
 2. Watch it fail.
-3. Apply the fix.
+3. Apply the smallest fix that explains the confirmed cause; do not refactor adjacent code.
 4. Watch it pass.
 5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
 
-## Phase 6 — Cleanup + post-mortem
+## Phase 6 — Remediation cleanup + post-mortem
+
+Run this phase only in remediation mode. In diagnosis-only mode, the only cleanup is removal of approved temporary diagnostic artifacts before the report.
 
 Required before declaring done:
 

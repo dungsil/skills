@@ -40,7 +40,38 @@
       "assertions": [
         "The output uses the caller-supplied fixed point without asking the user for one.",
         "The output verifies the fixed point resolves and the diff is non-empty before spawning sub-agents.",
-        "The output uses the supplied ticket as the Spec axis source."
+        "The output uses the supplied ticket as the Spec axis source.",
+        "The invoked review is report-only and does not edit, comment on, relabel, change the status of, or close ticket #58."
+      ]
+    },
+    {
+      "id": "clean-pass-reports-only-without-tracker-writes",
+      "prompt": "main 이후 변경을 리뷰해줘. 원본 이슈 #58의 요구사항이 충족됐고 두 축 모두 발견 사항이 없다고 확인됐다.",
+      "expected_output": "## Standards와 ## Spec에 각각 발견 사항 없음(0건)을 보고하고, 이슈 #58의 본문·체크박스·댓글·라벨·상태는 바꾸지 않은 채 검토 결과만 보고한다.",
+      "assertions": [
+        "A clean pass reports zero findings in both Standards and Spec rather than performing a follow-up action.",
+        "The output leaves issue #58's body, acceptance checkboxes, comments, labels, status, and open/closed state unchanged.",
+        "The direct review does not imply or invoke a tracker, repository, or other external write."
+      ]
+    },
+    {
+      "id": "findings-report-only-without-tracker-writes",
+      "prompt": "main 이후 이슈 #58 관련 변경을 리뷰해줘. Standards와 Spec에서 발견 사항이 있으면 알려줘.",
+      "expected_output": "Standards와 Spec의 발견 사항을 분리해 보고하고, 발견 사항이 있어도 이슈 #58의 본문·댓글·라벨·상태를 바꾸거나 닫지 않는다.",
+      "assertions": [
+        "The output reports Standards and Spec findings separately without merging or reranking them.",
+        "Findings do not cause the review to edit issue #58, post a comment, change labels or status, or close or reopen work.",
+        "The direct review reports findings only and performs no direct or implied tracker write."
+      ]
+    },
+    {
+      "id": "no-spec-reports-limitation-without-tracker-writes",
+      "prompt": "HEAD~2 이후 이슈 #58 관련 변경을 리뷰해줘. 명세는 없어.",
+      "expected_output": "## Spec에 명세 없음으로 인한 검토 한계를 보고하고, 이슈 #58의 본문·체크박스·댓글·라벨·상태를 바꾸지 않는다.",
+      "assertions": [
+        "The output reports that the Spec axis is unavailable because no specification exists.",
+        "The no-spec limitation leaves issue #58's body, acceptance checkboxes, comments, labels, status, and open/closed state unchanged.",
+        "The direct review performs no direct or implied tracker, repository, or external write."
       ]
     }
   ]

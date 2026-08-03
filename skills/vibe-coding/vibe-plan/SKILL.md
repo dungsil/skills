@@ -108,7 +108,13 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the request — including whether it's already implemented. Wait for direction.
 
-3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims — check it out, run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
+3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. **For an external PR:**
+   - **Static review first.** Before any checkout or command execution, review the diff and relevant repository context. Assess every material PR claim as statically supported, contradicted, or unverified, and identify the runtime evidence needed for each unverified claim.
+   - **Propose, then wait.** Execute only when resolving a material unverified claim is necessary for the triage recommendation. First show the reason; the exact commands; expected side effects; and the sandbox guarantees: disposable, no secrets, no write credentials, and network denied by default. Then wait for separate explicit approval — an initial request to triage or test the PR is not approval.
+   - **Run only in a security sandbox.** After approval, execute untrusted code only in a disposable sandbox with those guarantees. A dedicated worktree provides checkout isolation only; it is not a security sandbox and does not by itself constitute the goal-specific integration workspace. It never meets this requirement.
+   - **Stop safely.** If a qualifying sandbox is unavailable or approval is missing/refused, do not checkout or execute anything. Finish the static review and name the unverified claims and verification limits.
+
+   Report what happened: confirmed (with code path or execution evidence), failed, statically supported but not runtime-verified, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
 4. **Grill (if needed).** If the request needs fleshing out, run **Stage 1 — Grill** on it now, then come back here to apply the outcome. Everything it resolves belongs in the brief or the triage notes.
 

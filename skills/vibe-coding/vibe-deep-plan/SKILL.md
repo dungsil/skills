@@ -87,12 +87,27 @@ The answer isn't part of the body — it's recorded on resolution (see [Work thr
 
 ## Ticket Types
 
-Every ticket is either **HITL** — human in the loop, worked *with* a human who speaks for themselves — or **AFK**, driven by the agent alone. A HITL ticket only resolves through that live exchange; the agent never stands in for the human's side of it (a grilling agent that answers its own questions has broken this).
+Every ticket is either **HITL** — human in the loop, worked *with* a human who speaks for themselves — or **AFK**, driven by the agent alone. AFK is limited to **read-only investigation**: it may inspect documentation, public or read-only APIs, and local resources, but it must not write files, publish artifacts or branches, modify the map or tickets, use credentials, or cause an **external side effect**. A HITL ticket only resolves through that live exchange; the agent never stands in for the human's side of it (a grilling agent that answers its own questions has broken this).
 
-- **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases to surface a fact a decision waits on. Resolved by a background **subagent** — see [RESEARCH.md](RESEARCH.md). Use when knowledge outside the current working directory is required.
+- **Research** (AFK): Reading documentation, third-party APIs, or local resources like knowledge bases to surface a fact a decision waits on. It returns source-cited, read-only findings to its caller, but never publishes findings or resolves a ticket — see [RESEARCH.md](RESEARCH.md). Use when knowledge outside the current working directory is required.
 - **Prototype** (HITL): Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to — an outline, a rough take, a stub, or UI/logic code. Resolved by building throwaway code — see [PROTOTYPE.md](PROTOTYPE.md) to pick the branch, then [PROTOTYPE-LOGIC.md](PROTOTYPE-LOGIC.md) for state/logic questions or [PROTOTYPE-UI.md](PROTOTYPE-UI.md) for "what should it look like". Links the prototype as an asset. Use when "how should it look" or "how should it behave" is the key question.
 - **Grilling** (HITL): Conversation via the /vibe-grilling and /vibe-modeling skills, one question at a time. The default case.
-- **Task** (HITL or AFK): Manual work that must happen before a *decision* can be made — nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that *does* rather than decides — and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
+- **Task** (HITL): Manual work that must happen before a *decision* can be made — nothing to decide, prototype, or research, but the discussion is blocked until it is done. Signing up for a service, provisioning access, or moving data are human-attended external side effects, never AFK work. Before approval, provide read-only findings and an exact, target-specific human checklist. Resolve only after authorized work is complete; record resulting facts needed by later tickets, but for credentials record only their type and safe-store reference.
+
+### Human-attended external side effects
+
+**Account creation, permission changes, data movement, and credential use** are separate categories of human-attended **external side effects**, always HITL regardless of ticket type. A map, plan, prior approval, or broad “go ahead” never grants blanket authority.
+
+Before requesting approval, complete only permitted read-only investigation and return its findings with a numbered, target-specific checklist the human can follow. Immediately before executing **each** category, preview:
+
+- the target;
+- the exact action;
+- the expected impact and scope; and
+- reversibility, including the rollback or recovery path.
+
+Ask for and receive a separate affirmative approval that names that category before its first action. Approval for one category never authorizes another; re-preview and ask again if the target, exact action, or scope changes. A refusal, ambiguity, or no response is no approval: leave the ticket open and blocked, do not post a resolution comment, close it, or update **Decisions so far**, and cause no external side effect.
+
+Never record credential values in maps, tickets, comments, resolution text, commands or output logs, or research artifacts. Retain only the credential type and its safe-store reference; credential use still requires its own just-in-time approval.
 
 ## Fog of war
 
@@ -117,7 +132,7 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 
 ## Invocation
 
-Two modes. Either way, **never resolve more than one ticket per session** — with the exception of research tickets.
+Two modes. A session resolves no more than one ticket; read-only research investigations may run in parallel, but their AFK subagents neither publish nor resolve tickets.
 
 ### Chart the map
 
@@ -127,7 +142,7 @@ User invokes with a loose idea.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. **Create the map** (label `상태:초안`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
-5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent to resolve it in parallel, following [RESEARCH.md](RESEARCH.md).
+5. **Fire the read-only research subagents.** For each `research` ticket you just created, spin up a subagent to return source-cited findings in parallel, following [RESEARCH.md](RESEARCH.md); it does not create artifacts or update the map or tickets.
 6. Stop — charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
@@ -136,8 +151,8 @@ User invokes with a map (URL or number). A ticket is **optional** — without on
 
 1. Load the **map** — the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
-3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. If in doubt, use `/vibe-grilling` and `/vibe-modeling`.
-4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
+3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. A research subagent may investigate only read-only. If the ticket would cause an external side effect, first return read-only findings and an exact human checklist, then follow [Human-attended external side effects](#human-attended-external-side-effects) for every category. If in doubt, use `/vibe-grilling` and `/vibe-modeling`.
+4. Record the resolution only when the ticket requires no external side effect or every required category was independently approved and completed: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far. If approval is refused or absent, leave the ticket open and blocked; do not record a resolution, close it, update the map, or cause an external side effect.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.

@@ -83,15 +83,15 @@ Present the two reports under `## Standards` and `## Spec` headings, verbatim or
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes — that's the reranking the separation exists to prevent.
 
-### 6. On pass, close out the issue
+### 6. Read-only review contract
 
-If both axes report no findings, and the project tracks work on an issue tracker (GitHub, GitLab, etc. — the workflow in `docs/agents/issue-tracker.md`):
+Direct reviews and reviews invoked by another workflow are **read-only**. Their only deliverable is the separate Standards and Spec report from step 5:
 
-1. Open the originating issue found in step 2.
-2. Check off every acceptance-criteria checkbox in the issue body that the change satisfies.
-3. Close the issue, with a short comment summarising the review result and the commits covered.
+- On a clean pass, report zero findings; a pass is not authority to land, update, or close work.
+- With findings, report the findings; with no spec, report that limitation.
+- Never edit issue or PR bodies or acceptance boxes, post comments, change labels or status, close or reopen work, or make any other tracker, repository, or external side effect.
 
-If there is no issue tracker, or no originating issue, skip this step and say so. If either axis has findings, leave the issue open and untouched.
+Any later persistent action belongs to an execution workflow after a concrete execution request and explicit approval immediately before the action. Refusal or no response leaves tracker state unchanged.
 
 ## Why two axes
 

@@ -1,6 +1,6 @@
 ---
 name: vibe-goal
-description: Drives a whole goal from request to reviewed, committed code — routes into planning, publishes tickets, dispatches one fresh sub-agent per ticket to implement and review it, then closes on a standards review plus a requirement quality gate. Use when the user wants a feature taken end to end, says "do this whole thing", or asks to run plan-through-review in one go.
+description: Drives a whole goal from request to reviewed, committed code — routes into planning, publishes tickets, dispatches one fresh sub-agent per ticket to implement and review it, integrates completed work in a dedicated workspace, then safely lands only a reviewed and gated result. Use when the user wants a feature taken end to end, says "do this whole thing", or asks to run plan-through-review in one go.
 metadata:
   disable-model-invocation: "true"
   argument-hint: "The goal — an idea, request, spec, or issue reference"
@@ -11,6 +11,12 @@ metadata:
 One run from a goal to reviewed, committed code. This skill **orchestrates**; it does not implement. Planning happens through `/vibe-plan` (or `/vibe-deep-plan` first, when the work is too big), each ticket is implemented by a **fresh sub-agent** running `/vibe-implement`, and the whole goal closes on a standards review plus a formal requirement quality gate.
 
 The issue tracker and triage label vocabulary should have been provided to you — run `/vibe-init` if `docs/agents/issue-tracker.md` is missing.
+
+## Landing and tracker state
+
+`/vibe-review` is read-only: it reports findings and never changes tracker state. A review pass, a sub-agent completion claim, or the user's general goal request does not authorize a tracker write. The parent spec issue is read-only: never include it in a tracker-change preview or modify it.
+
+The goal owns integration and final landing. It must not preview or change ticket tracker state while work exists only on ticket branches or in the **integration workspace**. Only after Stage 4 has authoritative evidence that the exact reviewed integration commit SHA is present on the original target branch may it show an exact preview of every checkbox, the complete comment, and each status or close change. Wait for separate, explicit approval immediately before writing; rejection or no response leaves the tracker unchanged.
 
 ## The orchestrator never writes production code
 
@@ -39,18 +45,28 @@ Two routes end the run early, and that's a success, not a failure:
 
 `/vibe-deep-plan` is a **multi-session** skill. If you route there, expect this run to end when the session fills up mid-map; hand off and resume. Don't try to force a whole decision map and its implementation into one window.
 
-## Stage 2 — Build the ledger
+## Stage 2 — Build the ledger and integration workspace
 
-When `/vibe-plan` has published its tickets, write the **ledger** — the one artifact you keep in context for the rest of the run. Refer to tickets by title, never by a bare number.
+When `/vibe-plan` has published its tickets, first record the original target branch or ref and its fixed point. Then create a clean, goal-specific integration branch and separate worktree rooted exactly at that fixed point: this is the **integration workspace**. Create it from the commit object without checking out, resetting, cleaning, stashing, staging, or otherwise altering the user's original checkout. Its tracked and untracked changes are user-owned, even when dirty. If a clean separate worktree cannot be created, stop and report it; never reuse the original checkout or a shared worktree.
+
+Write the **ledger** — the one artifact you keep in context for the rest of the run. Refer to tickets by title, never by a bare number.
 
 ```markdown
 ## Goal
 
 <one line — what "done" means for this run>
 
+## Original target
+
+<branch or ref selected for final landing; its user checkout remains untouched>
+
 ## Fixed point
 
 <the commit SHA at the start of the run, from `git rev-parse HEAD`>
+
+## Integration workspace
+
+<goal-specific integration branch>; <separate worktree path>; rooted at <fixed point>; clean
 
 ## Spec
 
@@ -58,45 +74,51 @@ When `/vibe-plan` has published its tickets, write the **ledger** — the one ar
 
 ## Tickets
 
-| Ticket | Blocked by | Status | Landed as |
-|---|---|---|---|
-| <title> (link) | — | pending | |
-| <title> (link) | <title> | pending | |
+| Ticket | Blocked by | Status | Ticket result | Integration evidence |
+|---|---|---|---|---|
+| <title> (link) | — | pending | | |
+| <title> (link) | <title> | pending | | |
 ```
 
-Status is one of `pending` → `running` → `landed` / `blocked` / `failed`.
+Status is `pending` → `running` → `integrated` → `landed`, or `blocked` / `failed`. `integrated` means the exact reviewed ticket SHA was merged and ticket-attributed verification passed in the integration workspace; it unblocks dependents. `landed` is recorded only after Stage 4 proves the reviewed integration result is present on the original target branch. Neither status authorizes a tracker write.
 
-Record the fixed point **before** the first ticket sub-agent starts. It is what the Stage 4 whole-goal review runs against.
+Record the fixed point and clean integration workspace before the first ticket sub-agent starts. The fixed point is what the Stage 4 whole-goal review runs against.
 
 Show the ledger to the user and confirm the execution order before dispatching anything.
 
-## Stage 3 — Work the frontier
+## Stage 3 — Work the frontier in the integration workspace
 
-The **frontier** is every ticket whose blockers are all `landed`. Run it in waves: dispatch the whole frontier, wait, verify, recompute, repeat.
+The **frontier** is every ticket whose blockers are all `integrated` or `landed`. Run it in waves: dispatch the whole frontier, wait for returns, verify them, integrate verified results one at a time, recompute, repeat.
 
 ### Dispatch
 
-One **fresh sub-agent per ticket**, all of a wave dispatched in a single batch so they run concurrently. Each sub-agent gets, and only gets:
+Record the current integration branch head as the base for a wave. One **fresh sub-agent per ticket**, all of a wave dispatched in a single batch so they run concurrently. Each sub-agent gets, and only gets:
 
 - The ticket reference and its full body (fetched from the tracker — don't make the sub-agent guess where it lives).
 - The spec link, for context it can read if it needs to.
-- The instruction: **run `/vibe-implement` on this ticket, and nothing else.** `/vibe-implement` already records its own fixed point, builds test-first, runs `/vibe-review`, and commits to the current branch — do not re-specify any of that.
+- The **caller-owned** invocation, including its assigned ticket branch and worktree plus the integration branch and exact base SHA.
+- The instruction: **run `/vibe-implement` in caller-owned mode on this ticket, and nothing else.**
 - The boundary: implement **only** this ticket. Out-of-scope problems it notices get reported back, not fixed.
+
+Every goal-dispatched implementer follows this **shared return contract**: in caller-owned mode, create or use only its assigned ticket branch and worktree from that integration base, commit only there, and return the ticket branch name, exact committed and reviewed SHA, verification evidence, and read-only `/vibe-review` verdict. It must never merge into the integration branch or original target, alter either checkout, clean or delete the caller-owned workspace, or modify tracker state. A missing branch, SHA, verification record, or review verdict is an incomplete return, not a completed ticket.
 
 Do not paste the conversation, the other tickets, or the plan history. A ticket that can't be understood from its own body is a planning defect — fix the ticket, don't compensate in the prompt.
 
 **Parallel waves need decided contracts.** Two tickets in the same wave may touch the same files; that's fine, but any interface they share must already be pinned in the spec or the tickets. If a wave's tickets would have to negotiate a contract between themselves, that's a signal the tickets were cut wrong — merge them, or serialise them with a blocking edge, before dispatching.
 
-### Verify each return
+### Verify and integrate each return
 
-`completed` from a sub-agent is a claim, not a fact. Before marking a ticket `landed`, check cheaply and independently:
+`completed` from a sub-agent is a claim, not a fact. A review pass is report evidence, never tracker authority. Before a returned result may enter the integration workspace, check cheaply and independently:
 
-- A commit exists for it (`git log <fixed-point>..HEAD --oneline`).
-- Its acceptance criteria are addressed — per the sub-agent's report and the `/vibe-review` verdict it ran.
+- The returned ticket branch and exact commit SHA exist, the reviewed SHA is the returned SHA, and the branch is based on the wave's recorded integration base.
+- Its acceptance criteria are addressed — per the sub-agent's verification evidence and read-only `/vibe-review` verdict.
 - The review findings, if any, are either fixed or explicitly accepted by the user.
 
-Then update the ledger and the ticket's status on the tracker.
+Integrate verified completed returns from a wave **sequentially, one ticket branch at a time** — never as a bulk or octopus merge. Before each branch, confirm the integration workspace is at its recorded expected head and clean. Unrelated dirt, an unexpected file, or a changed integration head is a safe stop: report it and do not clean, reset, stash, delete, or touch the user's original checkout.
 
+For one ticket at a time, merge only the returned branch that resolves to its exact reviewed SHA. If a conflict's intended resolution is not unambiguous from the ticket and review context, stop and report; never guess, force-continue, or stage everything. When the intended resolution is clear, resolve and stage **only** the explicit, intended conflict paths; never use whole-worktree staging or stage user, secret, or unexpected files. Then run that ticket's acceptance verification in the integration workspace and record the ticket title, returned branch and SHA, integration merge commit, commands or checks run, and result in the ledger. Only after that verification passes may the ticket become `integrated` and the next branch be merged. A merge or verification failure stops automatic integration before the next ticket and preserves the integration result for diagnosis.
+
+`integrated` is integration-branch evidence, not original-target landing proof. Do not preview or change tracker state during Stage 3.
 ### When a ticket fails
 
 Don't redispatch the same prompt at the same wall. Diagnose which of these it is:
@@ -108,18 +130,18 @@ Don't redispatch the same prompt at the same wall. Diagnose which of these it is
 
 Mark the ticket `failed` in the ledger with one line of reason. Tickets it blocks stay `pending`; the rest of the frontier keeps moving.
 
-## Stage 4 — Close the goal
+## Stage 4 — Review, gate, then safely land the integration result
 
-A goal is bigger than any one ticket, so its closing verdict is a **gate**, not a fast pass. Per-ticket `/vibe-review` runs already gave you a quick spec read on each slice; at the goal level you want a formal judgement on the goal's definition of done, so run `/rq` and let it **replace** the Spec axis here. But gate the **definition of done, not the whole spec** — the goal's committed acceptance criteria are the source obligations, not every user story the spec happened to list.
+When every ticket is `integrated` and none is `pending`, `running`, `blocked`, or `failed`, record the integration branch and its exact current head SHA as the review candidate. Confirm the integration workspace is clean; unexplained dirt or files stop the run and preserve that branch and SHA.
 
-When no ticket is `pending` or `running`:
-
-1. **Full suite once.** Typecheck, tests, and whatever the repo's checks are — run them at the goal level, not per ticket.
-2. **Standards axis.** Run `/vibe-review` against the Stage 2 fixed point. Per-ticket reviews each saw one slice; this one sees the seams between them, which is where the interesting findings are. Tell it the Spec axis is being handled by the gate, so it doesn't duplicate it.
-3. **Spec verdict.** Run `/rq` with the Stage 2 fixed point as the change boundary, scoped to the implementation domains (`CODE`, plus `MIGRATION` when the goal required one). The source requirement is the goal's **definition of done** — the acceptance criteria the run actually committed to (the spec's acceptance criteria, or the ledger's goal line when the spec has none). User stories beyond that stay traceability rows, out of scope; gating every story in a large spec duplicates what the per-ticket reviews already covered. The gate returns per-criterion status and an aggregated `PASS` / `WARNING` / `NEEDS_REVIEW` / `FAIL`.
+1. **Full suite once.** Typecheck, tests, and whatever the repo's checks are — run them in the integration workspace at the recorded candidate, not per ticket and not in the user's checkout.
+2. **Standards axis.** Run `/vibe-review` from the Stage 2 fixed point to the recorded integration branch and commit. Per-ticket reviews each saw one slice; this one sees the seams between them, which is where the interesting findings are. Tell it the Spec axis is being handled by the gate, so it doesn't duplicate it.
+3. **Spec verdict.** Run `/rq` with the Stage 2 fixed point as the change boundary and the recorded integration result as its head, scoped to the implementation domains (`CODE`, plus `MIGRATION` when the goal required one). The source requirement is the goal's **definition of done** — the acceptance criteria the run actually committed to (the spec's acceptance criteria, or the ledger's goal line when the spec has none). User stories beyond that stay traceability rows, out of scope; gating every story in a large spec duplicates what the per-ticket reviews already covered. The gate returns per-criterion status and an aggregated `PASS` / `WARNING` / `NEEDS_REVIEW` / `FAIL`.
    - Default to the gate's `LIGHT` tier. Take `HEAVY` only when the goal touched the domains that always warrant it — security, auth, permissions, persistence, transactions, external integrations — the same rule `vibe-review` escalates on.
    - Operation, deployment, and data obligations stay **separate gates**. They don't lower the implementation verdict, and you don't run them here unless the user asks.
-4. **Adjudicate.** Present the Standards findings and the gate report side by side, unmerged. Anything the gate marks `not satisfied` or `unknown`, and any Standards finding the user wants fixed, becomes a new ticket back through Stage 3 — never patched inline by you. Re-run the gate after those tickets land; the goal isn't closed on a `FAIL`.
-5. **Report.** The goal, the tickets that landed with their links, the commits, the gate's overall status, the Standards findings, and anything deliberately left undone.
+4. **Adjudicate.** Present the Standards findings and the gate report side by side, unmerged. Anything the gate marks `not satisfied` or `unknown`, and any Standards finding the user wants fixed, becomes a new ticket back through Stage 3 — never patched inline by you. Re-run the gate after those tickets integrate; the goal isn't closed on a `FAIL`.
+5. **Land only when safe.** Use a clean, independent landing context; never checkout, reset, clean, stash, or merge in the user's original checkout. Confirm the original target still has a documented safe path from its recorded fixed point to the exact reviewed integration commit. If target divergence, workspace dirt, an unexpected file, an unclear conflict, or missing landing proof makes that unsafe, do not land. Preserve the reviewed integration branch and SHA, report them, and leave tracker state untouched. A clearly intended landing conflict follows the same explicit-path-only staging rule as Stage 3.
+6. **Prove landing, then ask.** Only after authoritative evidence proves the exact reviewed integration commit SHA is present on the original target branch, record affected tickets as `landed`. Then show the exact checkbox changes, complete comment, and status or close change proposed for each ticket; exclude the parent spec issue. Wait for separate, explicit approval before applying only that preview. Rejection or no response leaves the tracker unchanged.
+7. **Report.** The goal, the tickets that landed with their links, the integration branch and reviewed commit, the final landing evidence, the gate's overall status, the Standards findings, and anything deliberately left undone.
 
-Do not close or modify the parent spec issue.
+Never close, modify, or include the parent spec issue in any tracker-change preview, even after landing proof and approval.
