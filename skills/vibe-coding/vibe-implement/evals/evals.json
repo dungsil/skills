@@ -4,21 +4,21 @@
     {
       "id": "tdd-review-then-commit",
       "prompt": "로그인 실패 시 사용자에게 원인을 표시하도록 이 티켓을 구현해줘.",
-      "expected_output": "합의 가능한 경계에서 TDD를 적용해 기능을 구현하고, 타입 검사·관련 단일 테스트·마지막 전체 테스트를 수행한 뒤 vibe-review를 거쳐 현재 브랜치에 커밋한다.",
+      "expected_output": "합의 가능한 경계에서 TDD를 적용해 기능을 구현하고, 타입 검사·관련 단일 테스트·마지막 전체 테스트를 수행한 뒤 vibe-review를 거쳐 격리된 작업 브랜치에 커밋하고 이슈 트래커 설정에 따라 처분한다.",
       "assertions": [
         "The implementation uses TDD where a pre-agreed seam makes it practical.",
         "The workflow runs typechecking and focused single-test files regularly, then runs the full test suite once at the end.",
-        "The workflow invokes vibe-review after completing the implementation and commits the completed work to the current branch."
+        "The workflow invokes vibe-review after completing the implementation, commits the completed work on the isolated task branch, and follows the configured tracker disposition without automatically merging it into the original branch."
       ]
     },
     {
       "id": "tickets-drive-complete-delivery",
       "prompt": "첨부한 티켓들에 있는 알림 설정 API 변경을 구현해줘.",
-      "expected_output": "티켓에 기술된 작업을 구현하며 테스트·타입 검사·최종 검토를 거쳐 결과를 현재 브랜치에 커밋한다.",
+      "expected_output": "티켓에 기술된 작업을 구현하며 테스트·타입 검사·최종 검토를 거쳐 격리된 작업 브랜치에 커밋한 뒤 이슈 트래커 설정에 따라 처분한다.",
       "assertions": [
         "The output implements the work described by the supplied tickets rather than merely summarizing them.",
         "The workflow applies TDD at suitable agreed seams and exercises the prescribed test and typecheck cadence.",
-        "The completed change is reviewed with vibe-review before it is committed on the current branch."
+        "The completed change is reviewed with vibe-review before it is committed on the isolated task branch and disposed according to the configured tracker."
       ]
     },
     {
@@ -81,7 +81,27 @@
         "The output records the current commit as the fixed point before making any change.",
         "The output invokes vibe-review with that recorded fixed point and the implemented spec or ticket.",
         "The output does not ask the user to supply a fixed point for the review.",
-        "The review runs before the work is committed to the current branch."
+        "The review runs before the work is committed on the isolated task branch for tracker-directed disposition."
+      ]
+    },
+    {
+      "id": "retains-task-branch-for-local-markdown",
+      "prompt": "docs/agents/issue-tracker.md가 Local Markdown으로 설정된 이 프로젝트의 티켓을 Git worktree에서 구현해줘.",
+      "expected_output": "격리된 작업 브랜치에서 구현·검토·커밋한 뒤, 원래 브랜치는 변경하거나 병합하지 않고 작업 브랜치를 유지한 다음에만 worktree를 제거하며 유지한 브랜치 이름을 보고한다.",
+      "assertions": [
+        "The reviewed work is committed on the isolated implementation branch.",
+        "For Local Markdown, the original branch remains unchanged, the implementation branch remains intact and unmerged, and the worktree is removed only after that branch is retained.",
+        "The output reports the retained implementation branch name."
+      ]
+    },
+    {
+      "id": "publishes-task-branch-for-hosted-tracker",
+      "prompt": "docs/agents/issue-tracker.md가 GitHub 또는 GitLab로 설정된 이 프로젝트의 티켓을 Git worktree에서 구현해줘.",
+      "expected_output": "격리된 작업 브랜치에서 구현·검토·커밋한 뒤 해당 브랜치를 push하고, GitHub면 원래 브랜치를 대상으로 PR을, GitLab이면 MR을 생성해 URL을 보고한다. 게시가 성공한 뒤에만 worktree를 제거하고 자동 병합하지 않는다.",
+      "assertions": [
+        "The reviewed work is committed and pushed from the isolated implementation branch, not the original branch.",
+        "The workflow creates the configured host's PR or MR from that branch targeting the original branch and reports its URL.",
+        "The worktree is removed only after the remote publication succeeds, and the workflow never auto-merges the change."
       ]
     }
   ]
