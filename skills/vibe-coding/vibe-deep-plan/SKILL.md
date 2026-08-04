@@ -79,7 +79,7 @@ Each ticket is a **child issue** of the map; the tracker's issue id is its ident
 
 Each ticket carries a `유형:` label — one of `유형:조사` (research), `유형:프로토타입` (prototype), `유형:인터뷰` (grilling), `유형:작업` (task) (see [Ticket Types](#ticket-types)).
 
-A session **claims** a ticket by assigning it to the dev driving the map, **first**, before any work, so concurrent sessions skip it. That assignee _is_ the claim: an open, unassigned ticket is unclaimed.
+Before any work, a session **claims** a ticket so concurrent sessions skip it. Use the configured tracker’s claim operation: hosted trackers assign the ticket to the driving dev; Local Markdown sets `Status: claimed` and never writes an `Assignee:` field. The claim is the tracker-specific unclaimed marker: an open local ticket without `Status: claimed` is unclaimed.
 
 Blocking uses the tracker's **native** dependency relationship — essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children — the edge of the known.
 

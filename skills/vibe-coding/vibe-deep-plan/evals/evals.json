@@ -15,12 +15,22 @@
     },
     {
       "id": "claim-resolve-and-index-one-ticket",
-      "prompt": "결정 티켓 지도에서 다음 가능한 티켓을 처리해줘. 아직 담당자가 지정되지 않았어.",
-      "expected_output": "지도를 먼저 읽고 프런티어의 티켓 하나만 선택해 작업 전 자신에게 할당한다. 기본적으로 한 세션에서 하나만 해소하며, 해결 내용은 티켓의 해결 댓글로 남기고 닫은 뒤 지도 Decisions so far에 티켓 이름 링크와 요약 포인터를 추가한다.",
+      "prompt": "GitHub 이슈 트래커를 사용하는 결정 티켓 지도에서 다음 가능한 티켓을 처리해줘. 아직 담당자가 지정되지 않았어.",
+      "expected_output": "지도를 먼저 읽고 프런티어의 티켓 하나만 선택해 작업 전 GitHub 이슈에 자신을 할당한다. 기본적으로 한 세션에서 하나만 해소하며, 해결 내용은 티켓의 해결 댓글로 남기고 닫은 뒤 지도 Decisions so far에 티켓 이름 링크와 요약 포인터를 추가한다.",
       "assertions": [
-        "The output claims the chosen ticket by assigning it before performing substantive ticket work.",
+        "The output claims the chosen hosted ticket by assigning it before performing substantive work.",
         "The output resolves no more than one ticket by default; charting research attachments are not resolutions, and only an explicit same-invocation request for named unblocked HITL tickets creates an exception.",
         "The output posts the answer as a resolution comment, closes the ticket, and appends a linked name-and-gist pointer to the map's Decisions so far."
+      ]
+    },
+    {
+      "id": "local-markdown-claims-use-status-only",
+      "prompt": "기존 로컬 Markdown 결정 지도에서 다음 프런티어 티켓을 처리해줘.",
+      "expected_output": "로컬 규칙에 따라 티켓 파일을 저장할 때 `Status: claimed`를 사용하고, `Assignee:` 줄이나 외부 트래커의 담당자 메타데이터는 기록하지 않는다.",
+      "assertions": [
+        "The output claims a local Markdown ticket by setting Status: claimed before substantive work.",
+        "The output does not add an Assignee field or hosted-tracker assignee metadata to a local Markdown ticket.",
+        "The output uses the local tracker file conventions instead of a hosted tracker assignment operation."
       ]
     },
     {

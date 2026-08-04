@@ -21,5 +21,5 @@ Issues and specs for this repo live as Markdown files in `.agents/plans/` and ar
 - **Child ticket**: `.agents/plans/<effort>/issues/NN-<slug>.md` with `Type:` and `Status:` lines
 - **Blocking**: `Blocked by: NN, NN`; a ticket is unblocked when each listed file is resolved
 - **Frontier**: open, unblocked, unclaimed files in numeric order
-- **Claim**: set `Status: claimed` before work
+- **Claim**: set `Status: claimed` and save before any work. Local Markdown has no `Assignee:` field; do not serialize hosted-tracker assignee metadata.
 - **Resolve**: append `## Answer`, set `Status: resolved`, then add a gist and link to the map's Decisions-so-far
