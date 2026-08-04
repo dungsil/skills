@@ -43,3 +43,11 @@ Used by `/vibe-deep-plan`. The **map** is a single issue with **child** issues a
 - **Frontier query**: list the map's open children (`gh issue list --state open`, scoped to the map's sub-issues / task list), drop any with an open blocker (`issue_dependencies_summary.blocked_by > 0`, or an open issue in the `Blocked by` line) or an assignee; first in map order wins.
 - **Claim**: `gh issue edit <n> --add-assignee @me` — the session's first write.
 - **Resolve**: `gh issue comment <n> --body "<answer>"`, then `gh issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+
+
+## Research-note persistence
+
+- The caller posts the complete, source-cited findings to the same research issue as one dedicated comment. Start it with `<!-- vibe-deep-plan research: <map-issue>/<ticket-issue> -->` so later sessions can find it by immutable issue identity.
+- If a comment exceeds GitHub's limit, use ordered comments (`Research record 1/N`, `2/N`, ...) or a repository-owned wiki, snippet, attachment, or equivalent durable artifact, then link that record from an issue comment. Never truncate findings or leave them only in a local file.
+- Record `Research record: <comment or artifact URL>` on the ticket. Hosted research has no `Branch`, `Commit`, or `Path` pointer and never creates or pushes a `research/...` branch.
+- During charting, keep the research issue open and do not add a map gist. If persistence fails, keep the issue claimed. Before rerunning, inspect the existing comments and linked artifact first.

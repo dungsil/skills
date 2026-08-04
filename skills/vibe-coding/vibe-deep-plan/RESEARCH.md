@@ -1,25 +1,61 @@
 # Research Tickets
 
-A `research` ticket delegates only **read-only investigation** to a background subagent. The subagent may inspect primary sources — official documentation, source code, specifications, first-party APIs, and local resources — but it must not write files, create a branch or artifact, update the map or a ticket, make a write-capable call, or use a credential.
+A research ticket has two actors: an **AFK investigation** that only reads and returns source-cited findings, and a caller that owns every write, persistence record, pointer, and resolution.
 
-Its job:
+## AFK investigation
 
-1. Investigate the ticket question against **primary sources**, following every substantive claim to the source that owns it.
-2. Return source-cited findings, known constraints, and remaining unknowns to the calling session; the subagent never persists a report itself.
-3. If the findings reveal account creation, permission changes, data movement, or credential use, classify each category and return the exact human checklist needed for it.
+- Investigate the ticket question using primary sources where available—official docs, source, specs, and public read-only APIs—and cite each substantive conclusion.
+- It may inspect local read-only resources and return conclusions, constraints, unknowns, and any safe human checklist needed for an external action.
+- It must not write files, branches, commits, artifacts, maps, tickets, or comments; use credentials; push or publish; or cause any external side effect. It never resolves a ticket or speaks for the human.
 
-## The caller owns persistence and resolution
+## Caller persistence
 
-The calling session — never the research subagent — owns attachments, ticket lifecycle, and tracker writes:
+The caller preserves the complete returned findings before the charting or work session exits. Persistence is tracker-specific.
 
-1. When charting launches research, temporarily claim each ticket before dispatch, wait for every launched investigation, and attach every returned result before exit. Release the temporary claim after a successful attachment; if work is still live or cannot return, leave the ticket open and claimed for an explicit handoff rather than losing or duplicating it.
-2. Attach the complete returned result to that same ticket as a clearly marked **non-resolution research update**: use a normal comment or note on a hosted tracker, or `## Comments` on the local tracker. Include conclusions, primary-source evidence, known constraints, and remaining unknowns. Split oversized hosted updates into ordered `Part 1/N` through `Part N/N` comments on the same ticket. The attachment does not close or resolve the ticket and never updates the map.
-3. When a session selects the ticket for resolution, read its existing comments and attachments before starting new research. Reuse findings that already answer the question; do not repeat an investigation merely because another session attached the result.
-4. Check whether the findings remain complete and current for their source, version, date, scope, and assumptions. Preserve older findings as history; mark contradicted or materially changed claims stale or superseded, then investigate and attach only the missing or changed evidence. A partial update may be attached, but it must not be presented as a resolution.
-5. Resolve only from a complete, current answer. On a hosted tracker, post a final resolution comment that identifies the complete attached findings; on the local tracker, record the final answer under `## Answer`. Then close the ticket and append only its linked title plus a one-line gist to the map's **Decisions so far**. Never copy the detailed findings into the map.
+### Local Markdown
 
-Do not create a separate research document, artifact, or branch merely to preserve findings. The only exception is when a research document is itself an explicit destination deliverable under its own ticket contract.
+The caller writes one canonical Markdown findings note using stable map and ticket keys:
 
-The investigation never performs an external side effect. Safe findings and checklists may be attached while the ticket remains open, but account creation, permission changes, data movement, and credential use still require the skill's human-attended approval rules. Refusal, ambiguity, or no response leaves the ticket open and blocked.
+```
+.agents/research/<map-key>/<ticket-key>.md
+```
 
-Never record a credential value in a map, ticket, comment, resolution text, command or output log, or research artifact. Retain only the credential type and safe-store reference.
+For Local Markdown, `<map-key>` is the `.agents/plans/<effort>/` directory name and `<ticket-key>` is the ticket filename stem. Keep the complete findings and source citations in this note. Do not put detailed findings in the local ticket comments; add only a path pointer:
+
+```
+Research: .agents/research/<map-key>/<ticket-key>.md
+```
+
+Keep the repository's `.agents/` ignore policy unchanged. Do not create, checkout, commit, or push a research-only branch. This note is the local handoff artifact, not a delivery change.
+
+### Hosted or other external issue tracker
+
+The caller stores the complete findings on the same research ticket, by default as one dedicated issue comment or note. Start the record with a stable marker so a later session can find it even when the title changes:
+
+```
+<!-- vibe-deep-plan research: <map-identity>/<ticket-identity> -->
+```
+
+If the provider's comment limit is too small, preserve the full result in ordered comments (`Research record 1/N`, `2/N`, and so on). If comments cannot hold it, use a tracker-native or repository-owned snippet, wiki page, attachment, or equivalent durable artifact and put its URL in a ticket comment. Never truncate the findings or leave them only in a local, unpushed file. Record the durable location as:
+
+```
+Research record: <comment, note, or artifact URL>
+```
+
+Hosted persistence has no `Branch`, `Commit`, or `Path` pointer, and it never creates a `research/...` branch. If no durable external surface is available, keep the ticket claimed and report the persistence failure instead of discarding or resolving the result.
+
+## Charting and reuse
+
+When charting starts AFK research, claim the ticket, wait for its result, persist it using the matching tracker rule above, and record the local path or hosted record URL. Release the claim only after both the findings record and its pointer are present.
+
+Charting leaves the ticket open: it does not resolve it or add a map gist. If either persistence step fails, keep the ticket claimed so the result is not lost.
+
+In the next session, inspect the canonical local note or hosted comment/artifact before researching again. If it belongs to this ticket, reuse it and repair a missing pointer when possible. Rerun read-only research only when the canonical record is unavailable, unusable, or belongs to another ticket.
+
+## Resolution and authority
+
+Once a decision is made, record `Decision: <decision>` and the local note path or hosted research-record URL in the final `## Answer` or resolution comment, close the ticket, and add only a one-line gist to the map. A research record or pointer is not itself a resolution.
+
+There is no research branch to push or publish. Any external comment or durable artifact must still follow the configured tracker workflow and approval rules.
+
+Never store credential values in findings, branches, tickets, maps, comments, commands, or logs. Record only a credential type and safe-store reference.

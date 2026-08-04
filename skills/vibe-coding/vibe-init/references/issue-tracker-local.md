@@ -8,7 +8,14 @@ Issues and specs (you may know a spec as a PRD) for this repo live as markdown f
 - The spec is `.agents/plans/<feature-slug>/spec.md`
 - Implementation issues are one file per ticket at `.agents/plans/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` — never a single combined tickets file
 - Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
-- Comments and conversation history append to the bottom of the file under a `## Comments` heading
+- Comments and conversation history append to the bottom of the file under a `## Comments` heading. Research-ticket comments contain only a pointer to the canonical note, never detailed findings.
+
+## Research-note persistence
+
+- The caller writes the complete, source-cited findings to `.agents/research/<effort>/<ticket-stem>.md`; `<effort>` is the map directory name and `<ticket-stem>` is the ticket filename without `.md`.
+- Keep `.agents/` ignored and unchanged. Do not create, checkout, commit, or push a research-only branch. The note is a local handoff artifact.
+- Add only `Research: .agents/research/<effort>/<ticket-stem>.md` to `## Comments` while charting, and repeat the path in the final `## Answer` with the decision.
+- Keep the research ticket open and omit the map gist during charting. If the note or pointer write fails, keep `Status: claimed` so the findings are not lost. Before rerunning research, inspect the canonical note first.
 
 ## When a skill says "publish to the issue tracker"
 

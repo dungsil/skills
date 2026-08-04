@@ -44,3 +44,10 @@ Used by `/vibe-deep-plan`. The **map** is a single issue with **child** issues a
 - **Frontier query**: `glab issue list -F json` scoped to the map's children, drop any with an open blocker — a native `blocked_by` link to an open issue (`glab api projects/:id/issues/:iid/links`), or an open issue in the `Blocked by` line — or an assignee; first in map order wins.
 - **Claim**: `glab issue update <n> --assignee @me` — the session's first write.
 - **Resolve**: `glab issue note <n> --message "<answer>"`, then `glab issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
+
+## Research-note persistence
+
+- The caller posts the complete, source-cited findings to the same research issue as one dedicated note. Start it with `<!-- vibe-deep-plan research: <map-issue>/<ticket-issue> -->` so later sessions can find it by immutable issue identity.
+- If a note exceeds the provider's limit, use ordered notes (`Research record 1/N`, `2/N`, ...) or a project wiki, snippet, attachment, or equivalent durable artifact, then link that record from an issue note. Never truncate findings or leave them only in a local file.
+- Record `Research record: <note or artifact URL>` on the ticket. Hosted research has no `Branch`, `Commit`, or `Path` pointer and never creates or pushes a `research/...` branch.
+- During charting, keep the research issue open and do not add a map gist. If persistence fails, keep the issue claimed. Before rerunning, inspect existing notes and linked artifacts first.
