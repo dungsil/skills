@@ -9,23 +9,24 @@ A prototype is **throwaway code that answers a question**. The question decides 
 Identify which question is being answered — from the user's prompt, the surrounding code, or by asking if the user is around:
 
 - **"Does this logic / state model feel right?"** → [PROTOTYPE-LOGIC.md](PROTOTYPE-LOGIC.md). Build a tiny interactive terminal app that pushes the state machine through cases that are hard to reason about on paper.
-- **"What should this look like?"** → [PROTOTYPE-UI.md](PROTOTYPE-UI.md). Generate several radically different UI variations on a single route, switchable via a URL search param and a floating bottom bar.
+- **"What should this look like?"** → [PROTOTYPE-UI.md](PROTOTYPE-UI.md). Generate several radically different UI variations on a prototype-local route/entrypoint under `.agents/prototype/<name>/`, switchable via a URL search param and a floating bottom bar.
 
 The two branches produce very different artifacts — getting this wrong wastes the whole prototype. If the question is genuinely ambiguous and the user isn't reachable, default to whichever branch better matches the surrounding code (a backend module → logic; a page or component → UI) and state the assumption at the top of the prototype.
 
 ## Rules that apply to both
 
-1. **Throwaway from day one, and clearly marked as such.** Locate the prototype code close to where it will actually be used (next to the module or page it's prototyping for) so context is obvious — but name it so a casual reader can see it's a prototype, not production. For throwaway UI routes, obey whatever routing convention the project already uses; don't invent a new top-level structure.
-2. **One command to run.** Whatever the project's existing task runner supports — `pnpm <name>`, `python <path>`, `bun <path>`, etc. The user must be able to start it without thinking.
-3. **No persistence by default.** State lives in memory. Persistence is the thing the prototype is _checking_, not something it should depend on. If the question explicitly involves a database, hit a scratch DB or a local file with a clear "PROTOTYPE — wipe me" name.
-4. **Skip the polish.** No tests, no error handling beyond what makes the prototype _runnable_, no abstractions. The point is to learn something fast.
-5. **Surface the state.** After every action (logic) or on every variant switch (UI), print or render the full relevant state so the user can see what changed.
-6. **Capture it when done.** Fold any validated decision into the real code, then capture the prototype itself as a **primary source**: commit it to a throwaway branch, out of main, and leave a context pointer to that branch on the implementation issue. Capture the answer too — the verdict and the question it settled — in the issue or a commit. The main branch keeps only the validated decision.
+1. **Isolate it before code.** Create `.agents/prototype/<name>/` before writing code. Keep every artifact there: source, dependency manifests/lockfiles, fixtures, scratch data, route config, and run instructions. Production source may be read only for context; it must never be imported.
+2. **No production impact.** Never modify or import production source/modules, edit root manifests, task runners, routes, configs, or shared components, or use live authentication or mutate live data. Use prototype-local dependencies and local copies or stand-ins.
+3. **One documented command to run.** Document one command inside `.agents/prototype/<name>/` that starts the prototype from that directory without relying on project-level changes.
+4. **No persistence by default.** State lives in memory. If the question explicitly involves persistence, use a clearly named, wipeable scratch DB or local file inside `.agents/prototype/<name>/`.
+5. **Skip the polish.** No tests, no error handling beyond what makes the prototype _runnable_, no abstractions. The point is to learn something fast.
+6. **Surface the state.** After every action (logic) or on every variant switch (UI), print or render the full relevant state so the user can see what changed.
+7. **Record, don't implement.** After the live HITL exchange validates a decision, capture the complete prototype directory as a **primary source** on a throwaway branch, out of main, and record the verdict. Do not implement it in production; that is a separate later ticket.
 
 ## Wiring it back to the map
 
 The prototype is an **asset**, not the answer. Link it from the ticket; never paste it into the body.
 
-- Commit it to a throwaway branch, out of main, and leave a context pointer to that branch on the ticket.
-- Post the verdict — which shape won and why — as the ticket's **resolution comment**, close the ticket, then append the one-line gist plus link to the map's **Decisions so far**.
+- Commit `.agents/prototype/<name>/` as a **primary source** to a throwaway branch, out of main, and leave a context pointer to that branch on the ticket.
+- Post the verdict — which shape won and why — as the ticket's **resolution comment**, then close the ticket and append the one-line gist plus link to the map's **Decisions so far**. Do not fold the prototype into production during this resolution; production implementation is a separate later ticket.
 - The map records the decision; the branch keeps the prototype as a primary source.

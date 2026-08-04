@@ -17,11 +17,11 @@ Classify the requested action before beginning the loop:
 
 Diagnosis-only mode stays inside the **capability boundary**: it permits read-only source, configuration, and history inspection plus read-only runtime observation, but no persistent product, test, configuration, or artifact changes.
 
-If diagnosis-only work needs temporary instrumentation, a repro file, or a failing test:
+If diagnosis-only work needs temporary instrumentation, a throwaway repro, prototype, or harness, or a failing test:
 
 1. Before writing, preview the exact changes to make in an isolated workspace: paths plus a diff or complete contents, their purpose, and a cleanup plan that names every artifact to remove.
 2. Ask for explicit approval and wait. A general diagnosis request, silence, or rejection is not approval.
-3. Only after approval, make those temporary writes in an **isolated workspace**, never the user's checkout. Remove every approved artifact before reporting; do not retain it as a product or test change.
+3. Only after approval, make those temporary writes in an **isolated workspace**, never the user's checkout. A throwaway repro, prototype, or harness—and all of its local source, dependency manifests/lockfiles, fixtures, scratch data, route configuration, run metadata, and run instructions—must live under `.agents/prototype/<name>/` inside that approved isolated workspace. It may inspect production source read-only for context, but must not import or modify production source or edit the project's root manifests, task runners, routes, configs, or shared components. This location rule applies only to prototype-like artifacts; ordinary permanent regression tests and generic debug scripts retain their existing locations. Remove every approved artifact before reporting; do not retain it as a product or test change.
 
 ## Phase 1 — Build a feedback loop
 
@@ -36,7 +36,7 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
 4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
 5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
-6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
+6. **Throwaway harness.** In diagnosis-only mode, treat this as a throwaway prototype: after the required approval, put it and all of its local source, dependency manifests/lockfiles, fixtures, scratch data, route configuration, run metadata, and run instructions under `.agents/prototype/<name>/` inside the approved isolated workspace; it may inspect production source read-only but must not import or modify it or edit the project's root manifests, task runners, routes, configs, or shared components. Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
 7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
 8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
@@ -155,14 +155,14 @@ If a correct seam exists:
 
 ## Phase 6 — Remediation cleanup + post-mortem
 
-Run this phase only in remediation mode. In diagnosis-only mode, the only cleanup is removal of approved temporary diagnostic artifacts before the report.
+Run this phase only in remediation mode. In diagnosis-only mode, the only cleanup is removal of every approved temporary diagnostic artifact, including any prototype under `.agents/prototype/<name>/`, before the report.
 
 Required before declaring done:
 
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or absence of seam is documented)
 - [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
-- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
+- [ ] Throwaway prototypes deleted, or retained only under `.agents/prototype/<name>/`
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
 
 **Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling) hand off to the `/vibe-refactor` skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.

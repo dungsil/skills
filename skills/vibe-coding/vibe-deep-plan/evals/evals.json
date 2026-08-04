@@ -185,27 +185,29 @@
     {
       "id": "logic-question-terminal-prototype",
       "prompt": "프로토타입 티켓을 해소해줘. 장바구니에서 쿠폰을 적용한 뒤 상품을 삭제하면 할인과 합계가 어떻게 바뀌어야 하는지 확신이 없어. 구현 전에 확인할 수 있는 프로토타입을 만들어줘.",
-      "expected_output": "상태 전이 질문을 명시한, 순수 장바구니 로직과 분리된 작은 대화형 터미널 프로토타입을 기존 런타임과 한 명령으로 실행 가능하게 만들고, 매 동작 뒤 전체 상태와 단축키를 다시 보여 준다.",
+      "expected_output": "상태 전이 질문을 명시하고, `.agents/prototype/<name>/` 안에만 순수 장바구니 로직과 분리된 작은 대화형 터미널 프로토타입을 만든다. 그 안의 로컬 의존성·실행 메타데이터·fixture/stand-in으로 한 명령 실행되고, 매 동작 뒤 전체 상태와 단축키를 다시 보여 준다. 프로덕션 소스·매니페스트·task runner·라우트·공유 컴포넌트는 바꾸지 않으며, 사람의 판결과 캡처한 프로토타입 자산을 티켓에 기록·링크하고 실제 구현은 별도 후속 티켓으로 남긴다.",
       "assertions": [
         "The output selects the logic/state branch rather than generating UI variations.",
-        "The prototype states the single cart-and-coupon question and uses only in-memory state, with no database or persistence dependency.",
+        "It states the single cart-and-coupon question, uses only in-memory state with no database or persistence dependency, and keeps all prototype source, dependency manifests or lockfiles, run metadata, fixtures, and scratch data under `.agents/prototype/<name>/`.",
         "The state-transition logic is a small pure reducer, state machine, or function surface separated from terminal I/O.",
-        "The terminal shell renders the complete relevant state initially and after every action, exposes keyboard or line-input actions, and has one documented project-native run command.",
-        "The output keeps the prototype deliberately throwaway: no production abstractions or tests are added.",
-        "The output links the prototype from the ticket as an asset, posts the verdict as the resolution comment, closes the ticket, and appends the gist to the map's Decisions so far."
+        "The terminal shell renders the complete relevant state initially and after every action, exposes keyboard or line-input actions, and has exactly one documented command to run the prototype locally from its own directory.",
+        "The prototype uses local dependencies and stand-ins only; it neither imports nor mutates production source, auth, or data, and it leaves root manifests, task runners, routes, and shared components unchanged.",
+        "After the HITL review, the output records the human verdict in the ticket resolution comment, closes the ticket, and appends its gist to the map's Decisions so far; the production implementation remains a separate later ticket.",
+        "The captured prototype is retained and linked from the ticket as a primary-source asset rather than shipped as production code."
       ]
     },
     {
       "id": "ui-variants-captured-not-shipped",
       "prompt": "프로토타입 티켓을 해소해줘. 설정 페이지의 알림 섹션이 어떤 구조여야 할지 보고 싶어. 기존 /settings 페이지에서 세 가지 안을 비교할 프로토타입을 만들고, 결론이 나면 처리 방법도 알려줘.",
-      "expected_output": "기존 /settings의 데이터 흐름을 유지한 채 ?variant=로 전환되는 구조적으로 다른 세 UI 안과 하단 전환 바를 만들며, 선택 결과는 기록하고 프로토타입 코드는 메인 브랜치에서 제거해 throwaway 브랜치에 보존한다.",
+      "expected_output": "기존 `/settings` 요청은 프로덕션 변경이 아니라 읽기 전용 맥락으로만 참고하고, `.agents/prototype/<name>/`의 독립 진입점으로 전환한다. 로컬 source·dependency/run metadata·fixture/stand-in·route config만으로 세 구조적으로 다른 UI 안과 하단 전환 바를 제공하며, 한 로컬 명령으로 실행한다. 사람의 판결과 캡처한 프로토타입 자산을 티켓에 기록·링크하고, 실제 프로덕션 구현은 별도 후속 티켓으로 남긴다.",
       "assertions": [
-        "The output selects the UI branch and hosts the variants on the existing settings page instead of inventing a new top-level route.",
-        "The output provides three structurally different variants selected by a shareable, reload-stable variant URL parameter while retaining the page's existing data fetching and auth.",
-        "The floating bottom switcher cycles forward and backward with wrapping, supports arrow keys without intercepting focused text inputs, and is hidden in production builds.",
-        "The output records which variant won and why, folds only the validated decision into real code, and removes the throwaway variants and switcher from main.",
-        "The full prototype is retained as a primary source on a throwaway branch with a context pointer, rather than being shipped as production code.",
-        "The output links the prototype from the ticket as an asset, posts the verdict as the resolution comment, closes the ticket, and appends the gist to the map's Decisions so far."
+        "The output selects the UI branch but explicitly redirects the request for existing `/settings` into a standalone entrypoint below `.agents/prototype/<name>/`; it does not mount variants into production `/settings` or invent production routes.",
+        "It provides three structurally different variants selected by a shareable, reload-stable `?variant=` parameter in that local prototype, using local fixtures or stand-ins instead of production imports, auth, data, or route configuration.",
+        "The floating bottom switcher exists only in the local prototype, cycles forward and backward with wrapping, supports arrow keys without intercepting focused text inputs, and does not require changing production build gating.",
+        "All prototype source, dependency manifests or lockfiles, run metadata, fixtures, scratch data, and route configuration remain under `.agents/prototype/<name>/`, with exactly one documented local run command.",
+        "The output leaves root manifests, task runners, production source, routes, and shared components unchanged; it neither adds a root task script nor modifies production build gating.",
+        "After the HITL review, the output records which variant won and why in the ticket resolution comment, closes the ticket, and appends its gist to the map's Decisions so far; the production implementation remains a separate later ticket.",
+        "The captured full prototype is retained and linked from the ticket as a primary-source asset, rather than being shipped as production code."
       ]
     }
   ]

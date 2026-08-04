@@ -1,14 +1,15 @@
 # UI Prototype
 
-Generate **several radically different UI variations** on a single route, switchable from a floating bottom bar. The user flips between variants in the browser, picks one (or steals bits from each), then throws the rest away.
+Generate **several radically different UI variations**, switchable from a floating bottom bar, inside a **standalone prototype app** under `.agents/prototype/<name>/`. The user flips between variants in the browser, picks one (or steals bits from each), then throws the rest away.
 
 If the question is about logic/state rather than what something looks like — wrong branch. Use [PROTOTYPE-LOGIC.md](PROTOTYPE-LOGIC.md).
 
 ## Contents
 
 - When this is the right shape
-- Two sub-shapes — adjustment to an existing page (preferred) vs a new page
-- Process — state the question, generate variants, wire them, build the switcher, hand over, capture
+- The prototype is a standalone app — always
+- Reproducing real context without importing it
+- Process — state the question, scaffold, copy context, generate variants, wire them, build the switcher, hand over, capture
 - Anti-patterns
 
 ## When this is the right shape
@@ -18,25 +19,40 @@ If the question is about logic/state rather than what something looks like — w
 - "Try a different layout for the settings screen."
 - Any time the user would otherwise spend a day picking between three vague mockups in their head.
 
-## Two sub-shapes — strongly prefer sub-shape A
+## The prototype is a standalone app — always
 
-A UI prototype is much easier to judge when it's **butting up against the rest of the app** — real header, real sidebar, real data, real density. A throwaway route on its own is a vacuum: every variant looks fine in isolation. Default to sub-shape A whenever there's a plausible existing page to host the variants. Only reach for sub-shape B if the prototype genuinely has no nearby home.
+There are no sub-shapes. Whether the question is about a brand-new surface or about a section of the existing `/settings` page, the variants live in a prototype-local app with its own entrypoint under `.agents/prototype/<name>/`. **Nothing is mounted on a production route.**
 
-### Sub-shape A — adjustment to an existing page (preferred)
+The old temptation is to render variants on the real page, because a variant judged in a vacuum always looks fine. That instinct is right and the mechanism is wrong: hosting on the real route buys fidelity by paying in production diff — the host page, its data layer, its shared components, and the build config all get edited for something destined for the bin. Isolation buys the same fidelity a different way: **copy the parts of the real context that change the judgement into the prototype**.
 
-The route already exists. Variants are rendered **on the same route**, gated by a `?variant=` URL search param. The existing data fetching, params, and auth all stay — only the rendering swaps. This is the default; pick it unless there's a specific reason not to.
+### Hard boundaries
 
-If the prototype is for something that doesn't yet have a page but *would naturally live inside one* (a new section of the dashboard, a new card on the settings screen, a new step in an existing flow) — that's still sub-shape A. Mount the variants inside the host page.
+- **Everything lives under `.agents/prototype/<name>/`** — variant sources, the switcher, fixtures, copied shell components, styles, the dependency manifest, and the run command.
+- **No imports from production source.** Not `@/components/…`, not `../../src/…`, not the real types, hooks, or API clients. If a variant needs the real sidebar, copy the file into the prototype directory and trim it down.
+- **No live auth, data, or mutations.** Fixtures and in-memory state only. An affordance that would write calls a local stub that logs what it would have done.
+- **No edits to production routes, shared components, build config, or manifests** — root `package.json`, lockfiles, `vite.config`, `next.config`, `tsconfig`, `Makefile`/`justfile`, CI config, route manifests. All of it stays untouched.
 
-### Sub-shape B — a new page (last resort)
+Run two scoped isolation checks rather than requiring a clean repository:
 
-Only use this when the thing being prototyped genuinely has no existing page to live inside — e.g. an entirely new top-level surface, or a flow that can't be embedded anywhere sensible.
+- **Production boundary** — compare `git status --short` captured before scaffolding with the same command afterward, ignoring unrelated pre-existing work. Confirm that no prototype-created production change appeared; any prototype-related change outside `.agents/prototype/<name>/` is a boundary violation.
+- **Prototype contents** — if `.agents/prototype/<name>/` is ignored, list its files with `git ls-files --others --ignored --exclude-standard .agents/prototype/<name>/`; otherwise verify the tracked/untracked prototype diff is confined to that path. In either case, confirm the variants, switcher, fixtures, manifest, and README landed under `.agents/prototype/<name>/`.
 
-Create a **throwaway route** following whatever routing convention the project already uses — don't invent a new top-level structure. Name it so it's obviously a prototype (e.g. include the word `prototype` in the path or filename). Same `?variant=` pattern.
+This is also why there's no production-build gate to write. The prototype has no path into a production bundle, so there's nothing to hide behind an environment check — the isolation *is* the guard.
 
-Before committing to sub-shape B, sanity-check: is there really no existing page this could be embedded in? An empty route hides design problems that a populated one would expose.
+PROTOTYPE.md's "obey the project's routing convention" applies **inside** the prototype app. Route the prototype however its own entrypoint routes; don't add to the project's route tree.
 
-In both sub-shapes the floating bottom bar is identical.
+## Reproducing real context without importing it
+
+Fidelity is the whole reason to care about context, so don't skip it — reproduce it locally. Copy only what changes the judgement:
+
+- **Shell** — the header, sidebar, and page chrome at their real dimensions, so each variant is judged in the space it will actually get. Either copy the real components in and trim them, or stub them as fixed-size blocks with the right labels and widths.
+- **Density** — real row counts, real string lengths, real worst cases: the 40-character workspace name, the empty state, the account with 47 notification toggles. A three-row happy-path fixture makes every layout look good and teaches nothing.
+- **Data shapes** — mirror the actual payload/props shape in a local fixture module, with the fields retyped inline. Copy the shape; never import the type.
+- **Styling system** — the project's real system (Tailwind config values, shadcn tokens, MUI theme, plain CSS variables) reproduced by copying the relevant tokens into the prototype. Approximate rather than import.
+
+Copy enough that the variants disagree in ways that matter, then stop. Rebuilding the app is not the goal.
+
+**Worked example — a section of an existing page.** For "what structure should the notification section of `/settings` have": the prototype app renders a *local copy* of the settings shell — same nav, same page header, same surrounding section stack — with only the notification section swapped per variant, fed by a fixture that mirrors the real preferences payload including its long labels and its empty group. The judgement is exactly as sharp as it would be on the real route. `/settings` itself is never opened.
 
 ## Process
 
@@ -44,44 +60,55 @@ In both sub-shapes the floating bottom bar is identical.
 
 Default to **3 variants**. More than 5 stops being radically different and starts being noise — cap there.
 
-Write down the plan in one line, in the prototype's location or a top-of-file comment:
+Write the plan in one line, at the top of the prototype's README:
 
-> "Three variants of the settings page, switchable via `?variant=`, on the existing `/settings` route."
+> "Three structurally different takes on the /settings notification section, in `.agents/prototype/settings-notifications/`, switchable via `?variant=`."
 
 This works whether the user is here to push back or not.
 
-### 2. Generate radically different variants
+### 2. Scaffold the prototype app
+
+- Create `.agents/prototype/<name>/` with its **own entrypoint** — whatever is cheapest in the project's framework: a small Vite app, a standalone framework app, or a single HTML file plus one script.
+- Reuse the project's framework and package manager so the variants look right, but declare any dependencies in the **prototype's own manifest**. Never add a dependency or a script to the root manifest.
+- **One command to run**, documented in the prototype's README and runnable from the prototype directory — e.g. `cd .agents/prototype/<name> && pnpm dev`, or `bun run index.tsx`. Run metadata stays prototype-local; the project's task runner is not touched.
+- Leave the repository's existing ignore policy unchanged; if `.agents/prototype/<name>/` is ignored, force-add that path only on the throwaway branch (Step 8).
+
+### 3. Copy in the context
+
+Build the local shell, fixtures, and style tokens described in [Reproducing real context](#reproducing-real-context-without-importing-it) before drafting variants. Doing it after means the variants get designed against a vacuum and then retrofitted.
+
+### 4. Generate radically different variants
 
 Draft each variant. Hold each one to:
 
-- The page's purpose and the data it has access to.
-- The project's component library / styling system (TailwindCSS, shadcn, MUI, plain CSS, whatever).
+- The surface's purpose and the fixture data it has access to.
+- The project's component library / styling system, as reproduced locally (TailwindCSS, shadcn, MUI, plain CSS, whatever).
 - A clear exported component name, e.g. `VariantA`, `VariantB`, `VariantC`.
 
 Variants must be **structurally different** — different layout, different information hierarchy, different primary affordance, not just different colours. Three slightly-tweaked card grids isn't a UI prototype, it's wallpaper. If two drafts come out too similar, redo one with explicit "do not use a card grid" guidance.
 
-### 3. Wire them together
+### 5. Wire them together
 
-Create a single switcher component on the route:
+A single switcher lives at the prototype app's entrypoint:
 
 ```tsx
 // pseudo-code — adapt to the project's framework
+import { fixture } from './fixtures';        // local fixture, never a real loader/query
+
 const variant = searchParams.get('variant') ?? 'A';
 return (
-  <>
-    {variant === 'A' && <VariantA {...data} />}
-    {variant === 'B' && <VariantB {...data} />}
-    {variant === 'C' && <VariantC {...data} />}
+  <PrototypeShell>                            {/* local copy of the real chrome */}
+    {variant === 'A' && <VariantA {...fixture} />}
+    {variant === 'B' && <VariantB {...fixture} />}
+    {variant === 'C' && <VariantC {...fixture} />}
     <PrototypeSwitcher variants={['A','B','C']} current={variant} />
-  </>
+  </PrototypeShell>
 );
 ```
 
-For sub-shape A (existing page): keep all the existing data fetching above the switcher; only the rendered subtree changes per variant.
+Data comes from the fixture module above the switcher; only the rendered subtree changes per variant.
 
-For sub-shape B (new page): the throwaway route under `/prototype/<name>` mounts the same switcher.
-
-### 4. Build the floating switcher
+### 6. Build the floating switcher
 
 A small fixed-position bar at the bottom-centre of the screen with three pieces:
 
@@ -91,29 +118,37 @@ A small fixed-position bar at the bottom-centre of the screen with three pieces:
 
 Behaviour:
 
-- Clicking an arrow updates the URL search param (use the framework's router — `router.replace` on Next, `navigate` on React Router, etc) so the variant is shareable and reload-stable.
+- Clicking an arrow updates the `?variant=` URL search param so the variant is **shareable and reload-stable**. Use whatever the prototype app has — the framework router (`router.replace`, `navigate`) or `history.replaceState` plus a re-render for a plain-HTML prototype.
 - Keyboard: `←` and `→` arrow keys also cycle. Don't intercept arrow keys when an `<input>`, `<textarea>`, or `[contenteditable]` is focused.
 - Visually distinct from the page (e.g. high-contrast pill, subtle shadow) so it's obviously not part of the design being evaluated.
-- Hidden in production builds — gate on `process.env.NODE_ENV !== 'production'` or an equivalent check, so a stray prototype merge can't ship the bar to users.
 
-Put the switcher in a single shared component so both sub-shapes can reuse it. Locate it wherever shared UI lives in the project.
+The switcher is a prototype-local component — it lives next to the variants under `.agents/prototype/<name>/`, never in the project's shared UI folder.
 
-### 5. Hand it over
+### 7. Hand it over
 
-Surface the URL (and the `?variant=` keys). The user will flip through whenever they get to it. The interesting feedback is usually **"I want the header from B with the sidebar from C"** — that's the actual design they want.
+Surface the run command, the URL, and the `?variant=` keys. This is the HITL half of the ticket: the user flips through whenever they get to it, and the ticket only resolves through that exchange — never pick a winner on their behalf.
 
-### 6. Capture the answer and clean up
+The interesting feedback is usually **"I want the header from B with the sidebar from C"** — that's the actual design they want. Add it as a further variant and hand it back.
 
-Once a variant has won, capture the answer — which variant and why — then capture the prototype the way the [PROTOTYPE.md](PROTOTYPE.md) describes. Fold the winner into the real code and move the rest onto the throwaway branch, not into main:
+### 8. Capture the verdict — implementation is a later ticket
 
-- **Sub-shape A** — fold the winner into the existing page; drop the losing variants and the switcher from main.
-- **Sub-shape B** — promote the winning variant to a real route; drop the throwaway route and the switcher from main.
+Once a variant has won, capture the answer — which variant, why, and any mix-and-match the user asked for — then capture the prototype the way [PROTOTYPE.md](PROTOTYPE.md) describes: the full set of variants and the switcher ride to a **throwaway branch** as the primary source; leave the repository's existing ignore policy unchanged, and force-add `.agents/prototype/<name>/` on that throwaway branch only when the path is ignored. Add a context pointer to that branch on the ticket. Post the verdict as the resolution comment, close the ticket, and append the one-line gist to the map's **Decisions so far**.
 
-The full set of variants is the primary source, so it lands on the throwaway branch, not the bin — variant components and the switcher left in the main branch rot fast and confuse the next reader.
+**Do not fold the winner into production code here.** This ticket resolves a *decision*; building it is separate work — a follow-up task ticket, or output of `/vibe-plan` once the map clears. So the verdict has to carry what that later work needs:
+
+- Which variant won, and the structural decisions inside it that matter (information hierarchy, primary affordance, layout).
+- Which bits were borrowed from losing variants.
+- What the production version must genuinely wire to — the real route, real components, real data source and auth — none of which the prototype touched.
+
+The main branch keeps only the recorded decision; no variant code, no switcher, no prototype directory.
 
 ## Anti-patterns
 
 - **Variants that differ only in colour or copy.** That's a tweak, not a prototype. Real variants disagree about structure.
-- **Sharing too much code between variants.** A shared `<Header>` is fine; a shared `<Layout>` defeats the point. Each variant should be free to throw out the layout.
-- **Wiring variants to real mutations.** Read-only prototypes are fine. If a variant needs to mutate, point it at a stub — the question is "what should this look like", not "does the backend work".
-- **Promoting the prototype directly to production.** The variant code was written under prototype constraints (no tests, minimal error handling). Rewrite it properly when you fold it in.
+- **Importing from production source "just for this one component".** One import couples the throwaway to the real tree and drags its providers, types, and config along. Copy the file into the prototype directory and trim it.
+- **Mounting variants on the real route**, or gating them behind a feature flag or an environment check in production code. The prototype has its own entrypoint; that's the point.
+- **Touching root manifests, build config, or the task runner** to make the prototype run. If it needs a dependency or a script, declare it in the prototype's own manifest.
+- **Thin fixtures.** Three tidy rows flatter every layout. Reproduce the real density and the ugly cases, or the prototype answers nothing.
+- **Sharing too much code between variants.** A shared shell is fine — that's the copied context. A shared `<Layout>` defeats the point: each variant must be free to throw out the layout.
+- **Wiring variants to real data, auth, or mutations.** Fixtures and logging stubs only. The question is "what should this look like", not "does the backend work".
+- **Promoting the prototype directly to production.** The variant code was written under prototype constraints (no tests, minimal error handling, fake data). The follow-up ticket rewrites it properly.
