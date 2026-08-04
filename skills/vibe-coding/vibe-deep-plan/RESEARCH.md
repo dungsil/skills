@@ -5,20 +5,21 @@ A `research` ticket delegates only **read-only investigation** to a background s
 Its job:
 
 1. Investigate the ticket question against **primary sources**, following every substantive claim to the source that owns it.
-2. Return source-cited findings, known constraints, and remaining unknowns to the calling session; do not persist a report.
+2. Return source-cited findings, known constraints, and remaining unknowns to the calling session; the subagent never persists a report itself.
 3. If the findings reveal account creation, permission changes, data movement, or credential use, classify each category and return the exact human checklist needed for it.
 
-## The caller resolves it
+## The caller owns persistence and resolution
 
-The calling session — never the research subagent — owns the ticket lifecycle and tracker writes:
+The calling session — never the research subagent — owns attachments, ticket lifecycle, and tracker writes:
 
-1. Claim the selected research ticket before starting its investigation.
-2. Check that the returned result answers the ticket as fully as available: key conclusions, primary-source evidence for each, known constraints, and remaining unknowns. Continue investigating instead of posting a partial answer.
-3. Preserve the complete result inside that ticket: use its resolution comment on a hosted tracker or `## Answer` on the local tracker. If one hosted-tracker comment cannot hold it, split it into clearly ordered consecutive comments such as `Part 1/N` through `Part N/N`; keep every part on the same ticket.
-4. After the complete answer or final part is posted, close the ticket immediately and append only its linked title plus a one-line gist to the map's **Decisions so far**. Never copy the detailed findings into the map.
+1. When charting launches research, temporarily claim each ticket before dispatch, wait for every launched investigation, and attach every returned result before exit. Release the temporary claim after a successful attachment; if work is still live or cannot return, leave the ticket open and claimed for an explicit handoff rather than losing or duplicating it.
+2. Attach the complete returned result to that same ticket as a clearly marked **non-resolution research update**: use a normal comment or note on a hosted tracker, or `## Comments` on the local tracker. Include conclusions, primary-source evidence, known constraints, and remaining unknowns. Split oversized hosted updates into ordered `Part 1/N` through `Part N/N` comments on the same ticket. The attachment does not close or resolve the ticket and never updates the map.
+3. When a session selects the ticket for resolution, read its existing comments and attachments before starting new research. Reuse findings that already answer the question; do not repeat an investigation merely because another session attached the result.
+4. Check whether the findings remain complete and current for their source, version, date, scope, and assumptions. Preserve older findings as history; mark contradicted or materially changed claims stale or superseded, then investigate and attach only the missing or changed evidence. A partial update may be attached, but it must not be presented as a resolution.
+5. Resolve only from a complete, current answer. On a hosted tracker, post a final resolution comment that identifies the complete attached findings; on the local tracker, record the final answer under `## Answer`. Then close the ticket and append only its linked title plus a one-line gist to the map's **Decisions so far**. Never copy the detailed findings into the map.
 
 Do not create a separate research document, artifact, or branch merely to preserve findings. The only exception is when a research document is itself an explicit destination deliverable under its own ticket contract.
 
-The investigation never performs an external side effect. If resolving the selected ticket requires account creation, permission changes, data movement, or credential use, the calling session must follow the skill's human-attended approval rules; refusal, ambiguity, or no response leaves the ticket open and blocked.
+The investigation never performs an external side effect. Safe findings and checklists may be attached while the ticket remains open, but account creation, permission changes, data movement, and credential use still require the skill's human-attended approval rules. Refusal, ambiguity, or no response leaves the ticket open and blocked.
 
 Never record a credential value in a map, ticket, comment, resolution text, command or output log, or research artifact. Retain only the credential type and safe-store reference.

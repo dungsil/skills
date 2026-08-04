@@ -83,7 +83,7 @@ A session **claims** a ticket by assigning it to the dev driving the map, **firs
 
 Blocking uses the tracker's **native** dependency relationship — essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children — the edge of the known.
 
-The question stays intact in the ticket body. Record its answer through the tracker's resolution operation (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
+The question stays intact in the ticket body. Non-resolution research findings may be attached through the tracker's comment mechanism; record the final answer only through its resolution operation (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
 
 ## Ticket Types
 
@@ -132,7 +132,7 @@ Ruling something out of scope is a scoping act, not a step on the route. When a 
 
 ## Invocation
 
-Two modes. A session claims and resolves no more than one ticket, including a research ticket.
+Two modes. By default, a work session claims and resolves no more than one ticket. Charting-time research attachments are handoff records, not resolutions, and do not count against that limit. An explicit user request may continue the same charting invocation into parallel work on multiple **named, unblocked HITL** tickets; only those named tickets join the exception, and every claim, human exchange, approval, resolution, and map update still follows its normal rule.
 
 ### Chart the map
 
@@ -142,16 +142,19 @@ User invokes with a loose idea.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
 3. **Create the map** (label `상태:초안`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
-5. Stop — charting is one session's work. Do not launch research subagents, publish findings, or resolve tickets while creating the map; a research investigation starts only after its ticket is selected in **Work through the map**.
+5. **Fire the read-only research subagents.** Temporarily claim each `research` ticket before dispatch, then run its AFK investigation in parallel under [RESEARCH.md](RESEARCH.md). The subagents return source-cited findings to the calling session and never write files, artifacts, branches, tickets, or the map.
+6. **Honor an explicit parallel-work request.** If the user asks to use the wait for an interview or another named unblocked HITL ticket, transition that ticket into **Work through the map** and claim it before work. Multiple named HITL lanes may be interleaved, but each asks one question at a time, waits for the user's own answer, and never answers on the user's behalf. Do not infer this exception from idle time or add unnamed tickets.
+7. **Persist every research return before exit.** Await every investigation launched in step 5. The calling session attaches each complete result to its research ticket as a non-resolution hosted comment/note or local `## Comments`, then releases the temporary claim. Do not close the ticket, add `## Answer`, post a resolution, or update **Decisions so far**. If a launched investigation cannot finish, leave its ticket open and claimed and hand it off explicitly.
+8. Stop only after every launched result is attached or explicitly handed off; charting itself resolves nothing unless the user invoked the step 6 exception.
 
 ### Work through the map
 
 User invokes with a map (URL or number). A ticket is **optional** — without one, you pick the next decision, not the user.
 
 1. Load the **map** — the low-res view, not every ticket body.
-2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
-3. Resolve it — **zoom as needed**: fetch the full body of any related or closed ticket on demand; invoke the skills the `## Notes` block names. A research ticket follows [RESEARCH.md](RESEARCH.md). If the ticket would cause an external side effect, first return read-only findings and an exact human checklist, then follow [Human-attended external side effects](#human-attended-external-side-effects) for every category. If in doubt, use `/vibe-grilling` and `/vibe-modeling`.
-4. Record the resolution only when the ticket requires no external side effect or every required category was independently approved and completed. Research follows [RESEARCH.md](RESEARCH.md); for other ticket types, post the answer as a resolution comment, close the issue, and append a context pointer to **Decisions so far**. If approval is refused or absent, leave the ticket open and blocked; do not record a resolution, close it, update the map, or cause an external side effect.
+2. Choose the ticket. If the user named one, use it; otherwise take the first frontier ticket in order. Read its claim state before changing it. Resume a claim owned by this session or transferred through an explicit handoff. Never infer staleness from age, silence, or attached findings, and never silently steal another owner's claim. Reclaim only when the user or current owner explicitly says the prior session is abandoned; immediately reread the ticket to confirm no newer owner or activity, then replace the claim once. An ownerless local `Status: claimed` is stale only under that same explicit direction. Otherwise choose another frontier ticket or leave it untouched.
+3. **Claim before substantive work**, then load the ticket's full body, comments, and attachments. For research, reuse complete current findings instead of rerunning the investigation. Check source, version, date, scope, and assumptions; preserve stale history, mark changed or contradicted claims superseded, and investigate only missing or changed evidence. Invoke the skills named in `## Notes`. If the ticket would cause an external side effect, first return read-only findings and an exact human checklist, then follow [Human-attended external side effects](#human-attended-external-side-effects) for every category. If in doubt, use `/vibe-grilling` and `/vibe-modeling`.
+4. Record the resolution only when the answer is complete and current and the ticket requires no external side effect, or every required category was independently approved and completed. A research attachment is not a resolution. Research follows [RESEARCH.md](RESEARCH.md); for other ticket types, post the answer as a resolution comment, close the issue, and append a context pointer to **Decisions so far**. If approval is refused or absent, leave the ticket open and blocked; do not record a resolution, close it, update the map, or cause an external side effect.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
