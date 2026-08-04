@@ -1,7 +1,7 @@
 interface:
   display_name: "Vibe Grilling"
-  short_description: "계획을 한 번에 한 질문씩 집요하게 검증"
-  default_prompt: "Use $vibe-grilling to stress-test my plan with a one-question-at-a-time interview."
+  short_description: "계획을 한 번에 한 질문씩 검토"
+  default_prompt: "Use $vibe-grilling to review my plan by asking one question at a time."
 
 policy:
   allow_implicit_invocation: true

@@ -1,60 +1,65 @@
-# CONTEXT.md Format
+# CONTEXT.md 형식 (Format)
 
-## Structure
-
-```md
-# {Context Name}
-
-{One or two sentence description of what this context is and why it exists.}
-
-## Language
-
-**Order**:
-{A one or two sentence description of the term}
-_Avoid_: Purchase, transaction
-
-**Invoice**:
-A request for payment sent to a customer after delivery.
-_Avoid_: Bill, payment request
-
-**Customer**:
-A person or organization that places orders.
-_Avoid_: Client, buyer, account
-```
-
-## Rules
-
-- **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
-- **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
-- **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
-- **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
-
-## Single vs multi-context repos
-
-**Single context (most repos):** One `CONTEXT.md` at the repo root.
-
-**Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
+## 구성 (Parts)
 
 ```md
-# Context Map
+# {컨텍스트 이름 (Context Name)}
 
-## Contexts
+{이 컨텍스트가 다루는 영역과 필요한 이유를 한두 문장으로 쓴다.}
 
-- [Ordering](./src/ordering/CONTEXT.md) — receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md) — generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md) — manages warehouse picking and shipping
+## 용어 (Terms)
 
-## Relationships
+**주문 (Order)**:
+고객이 살 물건과 수량을 정한 요청이다.
+_피할 표현 (Avoid)_: 구매, 거래
 
-- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
-- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
-- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
+**청구서 (Bill)**:
+상품을 보낸 뒤 고객에게 보내는 결제 요청이다.
+_피할 표현 (Avoid)_: 명세서, 결제 요청
+
+**고객 (Customer)**:
+주문을 하는 개인 또는 조직이다.
+_피할 표현 (Avoid)_: 손님, 구매자, 계정
 ```
 
-The skill infers which structure applies:
+## 규칙 (Rules)
 
-- If `CONTEXT-MAP.md` exists, read it to find contexts
-- If only a root `CONTEXT.md` exists, single context
-- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
+- 모든 정규 용어는 `한국어 (English)` 순서로 쓴다. 정의는 한국어로 쓴다.
+- 한국어 용어, 정의, 질문, 설명, 기록에는 CEFR B1 이하 어휘를 반드시 쓴다. CEFR A1–A2 기준은 영어 이름에만 적용하며 한국어에는 적용하지 않는다.
+- 일반 영어 이름에는 CEFR A1–A2 일상 단어를 반드시 쓴다. 한국에서 해당 도메인 이름으로 분명히 쓰는 영어 전문용어만 예외다. 익숙하지 않거나 지나치게 기술적인 영어는 쉬운 영어로 바꾼다.
+- 질문, 설명, 기록에는 짧고 문자 그대로의 문장을 쓴다. 관용구, 은유, 문화 의존 표현을 쓰지 않는다.
+- 하나의 개념에 여러 이름이 있으면 정규 용어 하나를 정하고 나머지는 `_피할 표현 (Avoid)_` 아래에 적는다.
+- 정의는 한두 문장으로 쓴다. 용어가 무엇인지 적고, 용어가 하는 일은 적지 않는다.
+- `CONTEXT.md`에는 이 컨텍스트의 용어와 정의만 적는다. 구현 내용, 명세, 현재 작업 메모, 설계 결정은 적지 않는다.
+- 이 컨텍스트에만 있는 용어만 포함한다. 시간 제한, 오류 유형, 유틸리티 패턴 같은 일반 프로그래밍 개념은 많이 쓰여도 넣지 않는다. 추가 전에는 이 컨텍스트 전용 개념인지 확인한다.
+- 관련 용어가 여럿이면 하위 제목으로 나눈다. 하나의 영역이면 하위 제목이 없는 목록을 쓴다.
 
-When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+## 하나 또는 여러 컨텍스트
+
+**하나의 컨텍스트 (One Context):** 대부분의 저장소는 저장소 루트에 `CONTEXT.md` 하나를 둔다.
+
+**여러 컨텍스트 (Many Contexts):** 저장소 루트의 `CONTEXT-MAP.md`에 각 컨텍스트, 위치, 관계를 적는다.
+
+```md
+# 컨텍스트 지도 (Context Map)
+
+## 컨텍스트 (Contexts)
+
+- [주문 (Order)](./src/ordering/CONTEXT.md) — 고객 주문을 받고 상태를 관리한다.
+- [청구 (Bill)](./src/billing/CONTEXT.md) — 청구서를 만들고 결제를 처리한다.
+- [배송 (Delivery)](./src/fulfillment/CONTEXT.md) — 물건을 고르고 보낸다.
+
+## 관계 (Links)
+
+- **주문 (Order) → 배송 (Delivery)**: 주문 (Order)은 새 주문 정보를 배송 (Delivery)에 보낸다. 배송 (Delivery)은 물건을 고르고 발송을 시작한다.
+- **배송 (Delivery) → 청구 (Bill)**: 배송 (Delivery)은 발송 정보를 청구 (Bill)에 보낸다. 청구 (Bill)은 청구서를 만든다.
+- **주문 (Order) ↔ 청구 (Bill)**: 고객 번호 (Customer ID)와 금액 (Money)을 함께 쓴다.
+```
+
+스킬은 다음 기준으로 구조를 고른다:
+
+- `CONTEXT-MAP.md`가 있으면 이를 읽어 컨텍스트를 찾는다.
+- 저장소 루트에 `CONTEXT.md`만 있으면 하나의 컨텍스트를 쓴다.
+- 둘 다 없으면 첫 용어를 합의할 때 루트 `CONTEXT.md`를 만든다. 그전에는 만들지 않는다.
+
+여러 컨텍스트가 있으면 현재 주제의 컨텍스트를 정한다. 분명하지 않으면 사용자에게 묻는다.

@@ -1,15 +1,15 @@
 ---
 name: vibe-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Define a project's domain terms and record important architecture decisions. Use when the user wants to define domain terms, record an architecture decision, or when another skill must update the domain model.
 ---
 
 # Vibe Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Use this skill when the domain model changes. Read the glossary before changing terms. Use concrete cases for unclear relationships. Record agreed terms immediately. Propose an ADR only for a decision that meets the ADR conditions. Do not use this skill only to read `CONTEXT.md`.
 
 ## File structure
 
-Most repos have a single context:
+Most repositories have one context:
 
 ```
 /
@@ -21,7 +21,7 @@ Most repos have a single context:
 └── src/
 ```
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+If a root `CONTEXT-MAP.md` exists, the repository has multiple contexts. The map lists each context and its location:
 
 ```
 /
@@ -37,38 +37,47 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 │       └── docs/adr/
 ```
 
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create a file only when it has content. If `CONTEXT.md` is absent, create it after the first term is agreed. If `docs/adr/` is absent, create it only when the first ADR is needed.
 
 ## During the session
 
-### Challenge against the glossary
+### Use direct language
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+- Use short, literal sentences in every question, explanation, and record. Do not use idioms, metaphors, or culture-dependent expressions.
+- In `CONTEXT.md`, write every canonical term as `한국어 (English)`. Write Korean first. Write definitions in Korean.
+- Use CEFR B1 or lower vocabulary for Korean terms, definitions, questions, explanations, and records.
+- The CEFR A1–A2 rule applies only to English names. Do not apply it to Korean.
+- For every general English name, use an everyday CEFR A1–A2 word. This is required.
+- Use an English technical term only when it is clearly established as that domain name in Korea. This is the only exception to the English name rule.
 
-### Sharpen fuzzy language
+### Compare with the glossary
 
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+When a user uses a term or meaning that conflicts with `CONTEXT.md`, state the conflict immediately. Ask: "`CONTEXT.md` defines `취소 (Cancel)` as X. Do you mean X or Y?"
 
-### Discuss concrete scenarios
+### Make unclear language precise
 
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+When a user uses a term with more than one meaning, propose one precise canonical term. Ask: "Do you mean `고객 (Customer)` or `사용자 (User)`? They are different concepts."
 
-### Cross-reference with code
+### Use concrete cases
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+When domain relationships are discussed, use concrete cases. Check the boundary between concepts and relevant edge cases. Ask the user to state which concept includes each case.
 
-### Update CONTEXT.md inline
+### Compare with code
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md).
+When the user states how something works, compare the statement with the code. If they differ, state the difference: "The code cancels the whole `주문 (Order)`. You said part of an order can be cancelled. Which behavior is correct?"
 
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+### Update CONTEXT.md immediately
 
-### Offer ADRs sparingly
+When a term is agreed, update `CONTEXT.md` immediately. Do not delay the record. Use the format in [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md).
 
-Only offer to create an ADR when all three are true:
+`CONTEXT.md` contains only glossary terms. Exclude implementation details, specifications, notes on current work, and design decisions.
 
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
+### Propose ADRs only when required
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](ADR-FORMAT.md).
+Do not create an ADR automatically. Propose an ADR only when all three conditions are true:
+
+1. **Hard to reverse** — changing the decision later has a meaningful cost.
+2. **Reason not clear from code** — a future reader cannot determine the reason from the code.
+3. **Actual comparison of alternatives** — real options were compared and one was chosen for specific reasons.
+
+If one condition is absent, do not propose an ADR. Use the format in [ADR-FORMAT.md](ADR-FORMAT.md).
