@@ -1,8 +1,8 @@
 ---
 name: vibe-goal
 description: Drives a whole goal from request to reviewed, committed code — routes into planning, publishes tickets, dispatches one fresh sub-agent per ticket to implement and review it, integrates completed work in a dedicated workspace, then safely lands only a reviewed and gated result. Use when the user wants a feature taken end to end, says "do this whole thing", or asks to run plan-through-review in one go.
+disable-model-invocation: true
 metadata:
-  disable-model-invocation: "true"
   argument-hint: "The goal — an idea, request, spec, or issue reference"
 ---
 
@@ -145,3 +145,7 @@ When every ticket is `integrated` and none is `pending`, `running`, `blocked`, o
 7. **Report.** The goal, the tickets that landed with their links, the integration branch and reviewed commit, the final landing evidence, the gate's overall status, the Standards findings, and anything deliberately left undone.
 
 Never close, modify, or include the parent spec issue in any tracker-change preview, even after landing proof and approval.
+
+## End of run — reclaim goal worktrees
+
+After all ticket sub-agents have returned and the final report is complete, reclaim only the integration and ticket worktrees created by `/vibe-goal` for this run. Before removal, verify and record that each corresponding branch and required commit is retained. `git worktree remove <path>` is allowed for this cleanup; never delete those branches or commits. Do not remove a user-owned or unrelated worktree, and do not clean, reset, stash, or otherwise alter one. If the run stops on a blocker or retention/landing cannot be verified, preserve the relevant worktrees and report them instead.

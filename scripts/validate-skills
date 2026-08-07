@@ -1,0 +1,200 @@
+#!/usr/bin/env bun
+
+import { readdir, readFile } from "node:fs/promises";
+import { basename, dirname, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const skillsDirectory = resolve(repositoryRoot, "skills");
+const frontmatterPattern = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+const topLevelKeys = new Set([
+  "name",
+  "description",
+  "license",
+  "compatibility",
+  "metadata",
+  "allowed-tools",
+  "sources",
+  "requires",
+]);
+const extensionSkillPaths = new Set([
+  "vibe-coding/vibe-deep-plan/SKILL.md",
+  "vibe-coding/vibe-goal/SKILL.md",
+  "vibe-coding/vibe-handoff/SKILL.md",
+  "vibe-coding/vibe-implement/SKILL.md",
+  "vibe-coding/vibe-init/SKILL.md",
+  "vibe-coding/vibe-plan/SKILL.md",
+  "vibe-coding/vibe-refactor/SKILL.md",
+]);
+
+function relativeSkillPath(filePath) {
+  return relative(skillsDirectory, filePath).replaceAll("\\", "/");
+}
+
+async function collectSkillFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const filePath = resolve(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await collectSkillFiles(filePath)));
+    } else if (entry.isFile() && entry.name === "SKILL.md") {
+      files.push(filePath);
+    }
+  }
+
+  return files;
+}
+
+function isQuoted(value) {
+  return (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  );
+}
+
+function isYamlString(value) {
+  if (isQuoted(value)) return true;
+  if (value.length === 0) return false;
+  return !/^(?:true|false|null|~|-?\d+(?:\.\d+)?)$/i.test(value);
+}
+
+function parseFrontmatter(content, filePath) {
+  const match = content.match(frontmatterPattern);
+  if (!match) {
+    throw new Error(`${filePath}: missing YAML frontmatter`);
+  }
+
+  const lines = match[1].split(/\r?\n/);
+  const fields = new Map();
+  let metadata = null;
+  let currentKey = null;
+
+  for (const line of lines) {
+    if (line.trim() === "") continue;
+
+    const topLevelMatch = line.match(/^([A-Za-z][A-Za-z0-9_-]*):(?:\s*(.*))?$/);
+    if (topLevelMatch) {
+      const [, key, rawValue = ""] = topLevelMatch;
+      if (fields.has(key)) {
+        throw new Error(`${filePath}: duplicate frontmatter key "${key}"`);
+      }
+      fields.set(key, rawValue);
+      currentKey = key;
+      if (key === "metadata") {
+        if (rawValue !== "") {
+          throw new Error(`${filePath}: metadata must be a mapping`);
+        }
+        metadata = new Map();
+      }
+      continue;
+    }
+
+    const metadataMatch = line.match(/^ {2}([A-Za-z][A-Za-z0-9_-]*):(?:\s*(.*))?$/);
+    if (metadataMatch && currentKey === "metadata" && metadata) {
+      const [, key, rawValue = ""] = metadataMatch;
+      if (metadata.has(key)) {
+        throw new Error(`${filePath}: duplicate metadata key "${key}"`);
+      }
+      if (!isYamlString(rawValue)) {
+        throw new Error(`${filePath}: metadata.${key} must be a string`);
+      }
+      metadata.set(key, rawValue);
+      continue;
+    }
+
+    throw new Error(`${filePath}: invalid frontmatter line "${line}"`);
+  }
+
+  return { fields, metadata, body: content.slice(match[0].length) };
+}
+
+function validateExtensionFlag(fields, metadata, filePath, skillPath) {
+  const hasFlag = fields.has("disable-model-invocation");
+  if (!extensionSkillPaths.has(skillPath)) {
+    if (hasFlag) {
+      throw new Error(`${filePath}: disable-model-invocation is allowed only for the configured extension skills`);
+    }
+    return;
+  }
+
+  if (fields.get("disable-model-invocation") !== "true") {
+    throw new Error(
+      `${filePath}: expected top-level boolean "disable-model-invocation: true"`,
+    );
+  }
+  if (metadata?.has("disable-model-invocation")) {
+    throw new Error(`${filePath}: disable-model-invocation must not be nested under metadata`);
+  }
+}
+
+function validateSkill(content, filePath) {
+  const skillPath = relativeSkillPath(filePath);
+  const { fields, metadata } = parseFrontmatter(content, filePath);
+  const name = fields.get("name");
+  const description = fields.get("description");
+  const skillDirectory = basename(dirname(filePath));
+
+  validateExtensionFlag(fields, metadata, filePath, skillPath);
+
+  for (const [key, value] of fields) {
+    if (key === "disable-model-invocation" && !extensionSkillPaths.has(skillPath)) {
+      throw new Error(`${filePath}: non-spec top-level key "${key}"`);
+    }
+    if (!topLevelKeys.has(key) && key !== "disable-model-invocation") {
+      throw new Error(`${filePath}: non-spec top-level key "${key}"`);
+    }
+    if (key !== "metadata" && key !== "sources" && key !== "requires" && value === "") {
+      throw new Error(`${filePath}: frontmatter field "${key}" must not be empty`);
+    }
+  }
+
+  if (!name) throw new Error(`${filePath}: missing required field "name"`);
+  if (name.length > 64) throw new Error(`${filePath}: name exceeds 64 characters`);
+  if (name !== skillDirectory) {
+    throw new Error(`${filePath}: name "${name}" must match directory "${skillDirectory}"`);
+  }
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
+    throw new Error(`${filePath}: name must use lowercase letters, numbers, and hyphens`);
+  }
+  if (!description) throw new Error(`${filePath}: missing required field "description"`);
+  if (description.length > 1024) {
+    throw new Error(`${filePath}: description exceeds 1024 characters`);
+  }
+
+  if (metadata) {
+    for (const [key, value] of metadata) {
+      if (!isYamlString(value)) {
+        throw new Error(`${filePath}: metadata.${key} must be a string`);
+      }
+    }
+  }
+
+  const lineCount = content.split(/\r?\n/).length;
+  if (lineCount > 500) {
+    throw new Error(`${filePath}: exceeds 500 lines (${lineCount})`);
+  }
+}
+
+async function main() {
+  const files = await collectSkillFiles(skillsDirectory);
+  const skillPaths = new Set(files.map(relativeSkillPath));
+
+  for (const expectedPath of extensionSkillPaths) {
+    if (!skillPaths.has(expectedPath)) {
+      throw new Error(`Missing extension skill: ${expectedPath}`);
+    }
+  }
+
+  for (const filePath of files) {
+    validateSkill(await readFile(filePath, "utf8"), filePath);
+  }
+
+  console.log(`✅ Validated ${files.length} skill files — all passed`);
+}
+
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

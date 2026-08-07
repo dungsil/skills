@@ -1,8 +1,8 @@
 ---
 name: vibe-handoff
 description: Compacts the current conversation into a handoff document another agent can pick up. Use when the context window is filling up, or the user asks to hand off, pause, or continue the work in a fresh session.
+disable-model-invocation: true
 metadata:
-  disable-model-invocation: "true"
   argument-hint: "What will the next session be used for?"
 ---
 

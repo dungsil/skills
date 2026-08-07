@@ -10,8 +10,7 @@ PLEASE STRICTLY FOLLOW THE BEST PRACTICES FOR SKILL: https://platform.claude.com
 
 ## Validation
 
-- After creating or changing any skill under `skills/`, run `bun run lint`.
-- The validation uses TanStack Intent and must pass before considering the skill update complete.
+- After creating or changing any skill under `skills/`, run `bun run lint` and ensure it passes before considering the skill update complete.
 
 ## Agent skills
 

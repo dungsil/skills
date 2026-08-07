@@ -1,8 +1,7 @@
 ---
 name: vibe-refactor
 description: Scans a codebase for deepening opportunities, presents them as a visual HTML report, then grills through whichever one the user picks. Use when the user wants an architecture review, asks to refactor or improve code structure, or reports that code is hard to test or navigate.
-metadata:
-  disable-model-invocation: "true"
+disable-model-invocation: true
 ---
 
 # Improve Codebase Architecture

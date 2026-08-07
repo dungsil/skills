@@ -1,8 +1,7 @@
 ---
 name: vibe-plan
 description: Takes work from intake to published tickets — triages an incoming request, grills it into shape while recording glossary and ADRs, synthesises a spec, then splits it into tracer-bullet tickets with blocking edges on the configured tracker. Use when the user wants to triage an issue or external PR, plan a feature, write a spec or PRD, or break work into tickets.
-metadata:
-  disable-model-invocation: "true"
+disable-model-invocation: true
 ---
 
 # Planning Work

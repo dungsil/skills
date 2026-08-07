@@ -1,8 +1,7 @@
 ---
 name: vibe-deep-plan
 description: Charts a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on the repo's issue tracker, then resolves them one at a time until the way to the destination is clear. Use when the work is too big to plan in one session, or when the user asks to chart, extend, or work through a decision map.
-metadata:
-  disable-model-invocation: "true"
+disable-model-invocation: true
 ---
 
 # Charting a Decision Map

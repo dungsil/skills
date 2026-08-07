@@ -1,8 +1,7 @@
 ---
 name: vibe-init
 description: Configures this repo for the vibe-coding skills — its issue tracker, triage label vocabulary, and domain doc layout — recorded in AGENTS.md. Use once before first use of the other vibe-coding skills, or when the user wants to switch issue tracker, relabel triage states, or asks why docs/agents/issue-tracker.md is missing.
-metadata:
-  disable-model-invocation: "true"
+disable-model-invocation: true
 ---
 
 # Vibe Init

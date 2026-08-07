@@ -1,8 +1,7 @@
 ---
 name: vibe-implement
 description: Implements a piece of work from a spec or set of tickets, test-first at pre-agreed seams, then reviews and commits it. Use when the user asks to implement, build, or ship a spec, ticket, or plan that is already agreed.
-metadata:
-  disable-model-invocation: "true"
+disable-model-invocation: true
 ---
 
 # Implementing Work
@@ -22,7 +21,7 @@ Before touching anything, record the current commit (`git rev-parse HEAD`) — t
 
 ## Workspace isolation
 
-In caller-owned mode, use only the ticket branch and worktree supplied by the caller; never create or use an integration workspace. If no caller-supplied ticket worktree is in use and the project uses git with at least one commit (`git rev-parse HEAD` succeeds), isolate the work in a dedicated worktree instead of editing the main checkout:
+First classify the requested change. A single-file change or other trivial change is below the isolation threshold and stays in place; do not create a dedicated worktree for it. In caller-owned mode, use only the ticket branch and worktree supplied by the caller; never create or use an integration workspace. For a larger change, if no caller-supplied ticket worktree is in use and the project uses git with at least one commit (`git rev-parse HEAD` succeeds), isolate the work in a dedicated worktree instead of editing the main checkout:
 
 1. Name the branch `vibe/{number}-{function}` — `{number}` is the next sequential number among existing `vibe/*` branches (start at `1`), `{function}` is a short kebab-case slug of the feature (e.g. `vibe/3-user-auth`).
 2. Create it: `git worktree add .agents/worktrees/{number}-{function} -b vibe/{number}-{function}` (branch off the fixed point). Make sure `.agents/worktrees/` is git-ignored.
