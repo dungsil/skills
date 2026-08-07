@@ -96,32 +96,47 @@
     {
       "id": "retains-task-branch-for-local-markdown",
       "prompt": "docs/agents/issue-tracker.md가 Local Markdown으로 설정된 이 프로젝트의 티켓을 Git worktree에서 구현해줘.",
-      "expected_output": "격리된 작업 브랜치에서 구현·검토·커밋한 뒤, 원래 브랜치는 변경하거나 병합하지 않고 작업 브랜치를 유지한 다음에만 worktree를 제거하며 유지한 브랜치 이름을 보고한다.",
+      "expected_output": "격리된 작업 브랜치 하나에서만 구현·검토·커밋하고, 원래 브랜치를 병합하지 않아 이력을 선형으로 유지한 채 그 브랜치를 유지한 다음에만 worktree를 제거하며, 남은 vibe/* 브랜치나 worktree 없이 유지한 브랜치 이름을 보고한다.",
       "assertions": [
-        "The reviewed work is committed on the isolated implementation branch.",
-        "For Local Markdown, the original branch remains unchanged, the implementation branch remains intact and unmerged, and the worktree is removed only after that branch is retained.",
-        "The output reports the retained implementation branch name."
+        "The reviewed work is committed on a single isolated implementation branch, and the run creates no second branch and no second worktree.",
+        "The implementation branch stays linear on the fixed point with no merge commit from the original branch, which itself remains unchanged.",
+        "For Local Markdown, the implementation branch remains intact and unmerged, and the worktree is removed only after that branch is retained.",
+        "The output reports the retained implementation branch name and leaves no other vibe/* branch or worktree behind from the run."
       ]
     },
     {
       "id": "publishes-task-branch-for-hosted-tracker",
       "prompt": "docs/agents/issue-tracker.md가 GitHub 또는 GitLab로 설정된 이 프로젝트의 티켓을 Git worktree에서 구현해줘.",
-      "expected_output": "격리된 작업 브랜치에서 구현·검토·커밋한 뒤 해당 브랜치를 push하고, GitHub면 원래 브랜치를 대상으로 PR을, GitLab이면 MR을 생성해 URL을 보고한다. 게시가 성공한 뒤에만 worktree를 제거하고 자동 병합하지 않는다.",
+      "expected_output": "격리된 작업 브랜치 하나에서 구현·검토·커밋한 뒤 그 브랜치를 push하고, GitHub면 원래 브랜치를 대상으로 PR을, GitLab이면 MR을 생성해 URL을 보고한다. 이력은 병합 커밋 없이 선형이며, 게시가 성공한 뒤에만 worktree를 제거하고 다른 브랜치나 worktree를 남기지 않으며 자동 병합하지 않는다.",
       "assertions": [
-        "The reviewed work is committed and pushed from the isolated implementation branch, not the original branch.",
+        "The reviewed work is committed and pushed from one isolated implementation branch, not the original branch, and the run creates no additional branch or worktree.",
+        "The published branch is linear on the fixed point — rebased onto the target if the target moved — with no merge commit from the original branch.",
         "The workflow creates the configured host's PR or MR from that branch targeting the original branch and reports its URL.",
-        "The worktree is removed only after the remote publication succeeds, and the workflow never auto-merges the change."
+        "The worktree is removed only after the remote publication succeeds, leaving exactly one surviving branch and no leftover worktree, and the workflow never auto-merges the change."
       ]
     },
     {
       "id": "caller-owned-mode-returns-commit-only-result",
       "prompt": "vibe-goal이 caller-owned 모드로 호출한 티켓 구현을 끝내고 리뷰도 통과했어. 이제 결과를 넘겨줘.",
-      "expected_output": "호출자가 통합과 반영을 소유하므로 티켓 브랜치에만 커밋하고, 병합·반영·작업공간 정리·트래커 변경 없이 브랜치 이름, 정확한 SHA, 검증 근거, 읽기 전용 vibe-review verdict/report를 호출자에게 반환한다.",
+      "expected_output": "호출자가 통합과 반영을 소유하므로 공급받은 base 위에서 선형을 유지한 티켓 브랜치 하나에만 커밋하고 추가 브랜치나 worktree를 만들지 않으며, 병합·반영·작업공간 정리·트래커 변경 없이 브랜치 이름, 정확한 SHA, 검증 근거, 읽기 전용 vibe-review verdict/report를 호출자에게 반환한다.",
       "assertions": [
-        "The workflow records caller-owned mode at invocation and commits only the ticket branch.",
+        "The workflow records caller-owned mode at invocation and commits only the supplied ticket branch, creating no extra branch or worktree.",
+        "The ticket branch stays linear on the caller-supplied base, with no merge of the integration branch or the target into it.",
         "The return includes the branch name, exact commit SHA, verification evidence, and a read-only vibe-review verdict and report.",
-        "The output never merges or lands into an integration workspace or original target, cleans or deletes the caller-owned worktree, or changes tracker state.",
-        "The output treats vibe-review as read-only evidence rather than tracker-write authority."
+        "The output never merges or lands into an integration workspace or original target, never publishes or treats the ticket branch as a durable artifact, and never cleans or deletes the caller-owned branch or worktree, leaving that deletion to the caller after integration.",
+        "The output never changes tracker state and treats vibe-review as read-only evidence rather than tracker-write authority."
+      ]
+    },
+    {
+      "id": "keeps-branch-linear-when-base-moves",
+      "prompt": "구현하는 동안 대상 브랜치(또는 caller가 준 base)가 새 커밋으로 앞서 나갔어. 작업 브랜치를 어떻게 마무리할지 알려줘.",
+      "expected_output": "움직인 base를 작업 브랜치에 병합하지 않고, 독립 모드면 대상 위로 rebase해 선형 이력을 유지하며 caller-owned 모드면 base가 움직였다는 사실을 호출자에게 보고한다. 어느 쪽이든 브랜치 하나만 남기고 남는 worktree 없이 끝낸다.",
+      "assertions": [
+        "The output never merges the moved target, original branch, or integration branch into the work branch and produces no merge commit.",
+        "In standalone mode the work branch is rebased onto the current target head so its history stays linear on the fixed point.",
+        "In caller-owned mode the workflow reports the moved base to the caller instead of rebasing or merging on its own.",
+        "The run still ends with exactly one branch and creates no additional branch or worktree.",
+        "In standalone mode the worktree is removed only after retention or publication succeeds, leaving no stray worktree."
       ]
     },
     {
