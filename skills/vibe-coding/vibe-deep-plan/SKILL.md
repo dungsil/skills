@@ -17,7 +17,7 @@ This skill is **planning** by default: each ticket resolves a decision, and the 
 
 ### When the map clears, hand off — don't build
 
-The map is done when no open tickets remain and **Not yet specified** is empty. That is the moment to leave: run `/vibe-plan`, entering at its **spec** stage. The map's Destination and Decisions-so-far are exactly its input — every decision is already made, so there is nothing left to interview.
+The map is done when no open tickets remain and **Not yet specified** is empty. Hand off to `/vibe-plan` at its **spec** stage. For Local Markdown, pass the cleared `map.md` path; `/vibe-plan` reuses its parent `.agents/plans/<effort>/` directory, writes `spec.md` there in Stage 2, and writes implementation tickets under that same directory's `issues/` in Stage 3. For GitHub, GitLab, or another hosted tracker, pass the map URL or number; `/vibe-plan` reads the map and every linked closed ticket. First it loads each linked decision's question and final answer: for Local Markdown this is `## Question` and `## Answer`, while hosted trackers use the issue question/body and final resolution comment or note. It follows raw research, comments, attachments, or prototype artifacts only when the final answer references them or the spec needs their evidence. The map is an index, not a store: its Destination and Decisions-so-far plus those linked decisions are the handoff input, so there is nothing left to interview.
 
 Going straight to `/vibe-implement` instead skips that synthesis and throws the linked detail away. Take that shortcut only when the effort turned out genuinely small — one ticket's worth of work.
 
@@ -27,15 +27,15 @@ That's a different exit: the ticket isn't resolved, you've just run out of room.
 
 ## Refer by name
 
-Every map and ticket is an issue, so it has a **name** — its title. In everything the human reads — narration, the map's Decisions-so-far — refer to it by that name, never by a bare id, number, or slug. A wall of `#42, #43, #44` is illegible; names read at a glance. The id and URL don't vanish — a name wraps its link — but they ride *inside* the name, never stand in for it.
+Every map and ticket has a **name**. On hosted trackers, the name is the issue title; in Local Markdown, the map is `map.md` and the decision record's filename/path is its identity. In everything the human reads — narration and the map's Decisions-so-far — refer to that name, never by a bare id, number, or slug. A hosted id or URL and a local path remain available inside the name or link.
 
 ## The Map
 
-The map is a single issue on this repo's issue tracker, labelled `상태:초안` — the canonical artifact. Its tickets are child issues of the map.
+On hosted trackers, the map is a single issue labelled `상태:초안`, and its tickets are child issues. In Local Markdown, the canonical map is `.agents/plans/<effort>/map.md`, and its tickets are type-specific decision records under `research/`, `interviews/`, `prototypes/`, or `tasks/`.
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
-`상태:초안` and the triage states are the same axis, so they are **mutually exclusive**. A map is an index of an in-flight effort, not a request awaiting evaluation — it never carries `상태:분류필요` or any other triage state, and it is never triaged. The same holds for its decision tickets: they carry a `유형:` label and nothing from the `상태:` axis, because a question the map already owns has nothing left to triage. Only when the map clears and `/vibe-plan` publishes implementation tickets do the triage states apply again.
+`상태:초안` and the hosted triage states are the same axis, so they are **mutually exclusive**. Hosted maps and their decision issues never carry triage states. Local maps have no triage label; Local Markdown decision records use the separate `Status: open` → `claimed` → `open`/`resolved` lifecycle. Only when the map clears and `/vibe-plan` publishes implementation tickets do the triage states apply again.
 
 **Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** The issue tracker should have been provided to you — run `/vibe-init` if not. Consult the tracker doc's "Wayfinding operations" section for how _this_ repo expresses them. If no tracker has been provided, default to the local-markdown tracker.
 
@@ -69,7 +69,7 @@ The whole map at low resolution, loaded once per session. Open tickets are **not
 
 ### Tickets
 
-Each ticket is a **child issue** of the map; the tracker's issue id is its identity. Its body is the question, sized to one 100K token agent session:
+Each ticket is a child decision item of the map. Hosted trackers represent it as a child issue with a tracker id; Local Markdown stores it as a type-specific decision record whose path is its identity. Its body is the question, sized to one 100K token agent session:
 
 ```markdown
 ## Question
@@ -77,14 +77,14 @@ Each ticket is a **child issue** of the map; the tracker's issue id is its ident
 <the decision or investigation this ticket resolves>
 ```
 
-Each ticket carries a `유형:` label — one of `유형:조사` (research), `유형:프로토타입` (prototype), `유형:인터뷰` (grilling), `유형:작업` (task) (see [Ticket Types](#ticket-types)).
+Hosted tickets carry one `유형:` label — `유형:조사`, `유형:프로토타입`, `유형:인터뷰`, or `유형:작업`. Local Markdown records carry the matching `Type:` line (see [Ticket Types](#ticket-types)).
 
-Before any work, a session **claims** a ticket so concurrent sessions skip it. Use the configured tracker’s claim operation: hosted trackers assign the ticket to the driving dev; Local Markdown sets `Status: claimed` and never writes an `Assignee:` field. The claim is the tracker-specific unclaimed marker: an open local ticket without `Status: claimed` is unclaimed.
+Before any work, a session **claims** a ticket so concurrent sessions skip it. Use the configured tracker’s claim operation: hosted trackers assign the ticket to the driving dev; Local Markdown starts unclaimed records with `Status: open`, changes them to `Status: claimed` before work, and returns them to `Status: open` after successful charting persistence. A final answer changes the local record to `Status: resolved`; unfinished handoff or failed persistence stays `claimed`. Local Markdown never writes an `Assignee:` field.
 
 Blocking uses the tracker's **native** dependency relationship — essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children — the edge of the known.
 
 The question stays intact in the ticket body; research persistence follows [RESEARCH.md](RESEARCH.md).
-Research persistence is tracker-specific: Local Markdown writes the complete note under `.agents/research/<map-key>/<ticket-key>.md`; hosted trackers keep the complete findings in the ticket's comment or note, or in a linked durable snippet, wiki page, attachment, or equivalent. No tracker creates a research-only branch.
+Research persistence is tracker-specific: Local Markdown keeps each research ticket and its complete findings in `.agents/plans/<effort>/research/<ticket-stem>.md`; interview, prototype, and task records live under `.agents/plans/<effort>/interviews/<ticket-stem>.md`, `.agents/plans/<effort>/prototypes/<ticket-stem>.md`, and `.agents/plans/<effort>/tasks/<ticket-stem>.md`. `.agents/plans/<effort>/issues/` is reserved for implementation tickets published by `/vibe-plan`. Hosted trackers keep the complete findings in the ticket's comment or note, or in a linked durable snippet, wiki page, attachment, or equivalent. No tracker creates a research-only branch.
 
 ## Ticket Types
 
@@ -106,7 +106,7 @@ Before requesting approval, complete only permitted read-only investigation and 
 - the expected impact and scope; and
 - reversibility, including the rollback or recovery path.
 
-Ask for and receive a separate affirmative approval that names that category before its first action. Approval for one category never authorizes another; re-preview and ask again if the target, exact action, or scope changes. A refusal, ambiguity, or no response is no approval: leave the ticket open and blocked, do not post a resolution comment, close it, or update **Decisions so far**, and cause no external side effect.
+Ask for and receive a separate affirmative approval that names that category before its first action. Approval for one category never authorizes another; re-preview and ask again if the target, exact action, or scope changes. A refusal, ambiguity, or no response is no approval: for Local Markdown, keep the record at `Status: claimed` so it stays out of the frontier; for hosted trackers, keep the issue open, assigned, and blocked; do not append `## Answer`, post a resolution comment or note, set `Status: resolved`, close the issue, update **Decisions so far**, or cause any external side effect.
 
 Never record credential values in maps, tickets, comments, resolution text, commands or output logs, or research artifacts. Retain only the credential type and its safe-store reference; credential use still requires its own just-in-time approval.
 
@@ -141,20 +141,20 @@ User invokes with a loose idea.
 
 1. **Name the destination.** Run a `/vibe-grilling` and `/vibe-modeling` session to pin down what this map is finding its way to — the spec, decision, or change. The destination fixes the scope, so it's settled first.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** — the way to the destination is already clear, the whole journey small enough for one session — you don't need a map. Stop and ask the user how they'd like to proceed.
-3. **Create the map** (label `상태:초안`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
-4. **Create the tickets you can specify now** as child issues of the map — then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
+3. **Create the map**: hosted trackers create the map issue with `상태:초안`; Local Markdown writes `.agents/plans/<effort>/map.md` without a hosted triage label. Destination and Notes are filled in, Decisions-so-far is empty, and the fog is sketched into **Not yet specified**.
+4. **Create the tickets you can specify now** as child tickets of the map — hosted trackers wire child issues in a second pass because they need ids before they can reference each other; Local Markdown writes the type-specific records in the matching `research/`, `interviews/`, `prototypes/`, or `tasks/` directory. Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog — the **Not yet specified** section.
 5. **Fire the read-only research subagents.** Temporarily claim each `research` ticket before dispatch, launch AFK investigations in parallel, wait for every return, and have the caller persist each result under [RESEARCH.md](RESEARCH.md) before exit.
 6. **Honor an explicit parallel-work request.** If the user asks to use the wait for an interview or another named unblocked HITL ticket, transition that ticket into **Work through the map** and claim it before work. Multiple named HITL lanes may be interleaved, but each asks one question at a time, waits for the user's own answer, and never answers on the user's behalf. Do not infer this exception from idle time or add unnamed tickets.
-7. **Finish charting.** Do not resolve research tickets while charting; any research ticket without a persisted result stays open and claimed for explicit handoff.
+7. **Finish charting.** Do not resolve research tickets while charting; after successful persistence, a hosted research issue remains open with the session claim released, while a Local Markdown research record is `Status: open`. Any ticket without a persisted result stays claimed for explicit handoff.
 
 ### Work through the map
 
-User invokes with a map (URL or number). A ticket is **optional** — without one, you pick the next decision, not the user.
+User invokes with a map path, URL, or number. A ticket is **optional** — without one, you pick the next decision, not the user.
 
 1. Load the **map** — the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it; otherwise take the first frontier ticket in order. Read its claim state before changing it. Resume a claim owned by this session or transferred through an explicit handoff. Never infer staleness from age, silence, or attached findings, and never silently steal another owner's claim. Reclaim only when the user or current owner explicitly says the prior session is abandoned; immediately reread the ticket to confirm no newer owner or activity, then replace the claim once. An ownerless local `Status: claimed` is stale only under that same explicit direction. Otherwise choose another frontier ticket or leave it untouched.
 3. **Claim before substantive work**, then load the ticket's full body, comments, and attachments. For research, inspect the canonical local note or hosted comment/artifact before rerunning; if it is missing or unusable, inspect every configured durable location first under [RESEARCH.md](RESEARCH.md). Invoke the skills named in `## Notes`. If the ticket would cause an external side effect, first return read-only findings and an exact human checklist, then follow [Human-attended external side effects](#human-attended-external-side-effects) for every category. If in doubt, use `/vibe-grilling` and `/vibe-modeling`.
-4. Record the resolution only when the answer is complete and the ticket requires no external side effect, or every required category was independently approved and completed. A research record or pointer is not a resolution. For research, follow [RESEARCH.md](RESEARCH.md): resolve with the decision and the local note path or hosted research-record URL, then close the ticket and append only its linked title and one-line gist to **Decisions so far**. For other ticket types, post the answer as a resolution comment, close the issue, and append a context pointer to **Decisions so far**. If approval is refused or absent, leave the ticket open and blocked; do not record a resolution, close it, update the map, or cause an external side effect.
+4. Record the resolution only when the answer is complete and the ticket requires no external side effect, or every required category was independently approved and completed. A research record or pointer is not a resolution. For research, follow [RESEARCH.md](RESEARCH.md): Local Markdown appends `## Answer` and sets `Status: resolved`; hosted trackers post the final resolution comment or note and close the issue. For other ticket types, Local Markdown appends `## Answer` and sets `Status: resolved`; hosted trackers post the answer comment and close the issue. Then append only the linked record or ticket title and one-line gist to **Decisions so far**. If approval is refused, ambiguous, or absent, for Local Markdown keep the record at `Status: claimed` so it stays out of the frontier; for hosted trackers keep the issue open, assigned, and blocked; do not append `## Answer`, post a resolution comment or note, set `Status: resolved`, close the issue, update **Decisions so far**, or cause any external side effect.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals a ticket — this one or another — sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.

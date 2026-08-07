@@ -86,6 +86,28 @@
       ]
     },
     {
+      "id": "cleared-local-map-reuses-effort-directory",
+      "prompt": "`.agents/plans/order-migration/map.md`의 모든 decision record가 resolved이고 Not yet specified도 비었어. 이 map을 vibe-plan으로 넘겨 spec과 구현 티켓을 만들어줘.",
+      "expected_output": "cleared Local Markdown map의 parent `.agents/plans/order-migration/`을 canonical output root로 재사용한다. Stage 2 전에 `map.md`의 Destination과 Decisions-so-far를 읽고, 모든 resolved `research/`, `interviews/`, `prototypes/`, `tasks/` 링크를 따라 각 record의 `## Question`과 최종 `## Answer`를 먼저 읽는다. `## Research`, comments, prototype artifact는 Answer가 참조하거나 spec에 근거가 필요할 때만 추가로 읽어 결정 내용을 합성한다. 그 뒤 같은 디렉터리의 `spec.md`를 작성하고, Stage 3에서는 같은 디렉터리의 `issues/`에 구현 티켓을 만든다. 새 feature 디렉터리를 만들지 않고 Stage 3에서 기존 spec을 다시 쓰지 않는다.",
+      "assertions": [
+        "The output recognises `.agents/plans/order-migration/map.md` as a cleared Local Markdown decision map and reuses its parent effort directory.",
+        "Stage 2 writes `.agents/plans/order-migration/spec.md` instead of deriving a new feature-slug directory.",
+        "Stage 3 writes implementation tickets under `.agents/plans/order-migration/issues/` and does not rewrite the existing spec.",
+        "The output does not create a second `.agents/plans/<feature-slug>/` root for the same map, and it does not synthesize the spec from the map gist without reading the linked records.",
+        "The output first reads the Question and final Answer of every linked local research, interview, prototype, and task record at its actual relative `.md` path, then follows raw Research, comments, or prototype artifacts only when the Answer references them or the spec needs their evidence."
+      ]
+    },
+    {
+      "id": "cleared-hosted-map-reads-linked-answers",
+      "prompt": "GitHub map issue #120의 모든 child decision ticket이 닫혔어. `/vibe-plan` spec 단계로 넘겨 구현 계획을 만들어줘.",
+      "expected_output": "map issue #120과 모든 linked closed decision ticket의 issue question/body와 최종 resolution comment/note를 먼저 읽은 뒤 그 내용을 합성해 spec을 작성한다. raw research, comments, attachments, prototype artifact는 최종 resolution이 참조하거나 spec에 근거가 필요할 때만 추가로 읽는다. map의 한 줄 gist만으로 spec을 만들지 않고 hosted map의 URL 또는 번호를 handoff identity로 유지한다.",
+      "assertions": [
+        "The output reads the hosted map and the issue question/body plus final resolution comment or note of every linked closed decision ticket before synthesising the spec.",
+        "The output follows raw research, comments, attachments, or prototype artifacts only when the final resolution comment or note references them or the spec needs their evidence.",
+        "The output uses the full linked decision answers rather than relying on the map's one-line Decisions-so-far gist alone and does not re-interview resolved decisions."
+      ]
+    },
+    {
       "id": "vertical-slices-with-blocking-edges",
       "prompt": "승인된 주문 추적 스펙을 티켓으로 발행해줘. 공유 이벤트 계약을 먼저 정해야 알림과 대시보드 작업을 할 수 있어.",
       "expected_output": "각 티켓을 독립 검증 가능한 세로 슬라이스로 나누고 실제로 시작을 막는 선행 티켓만 차단 간선으로 선언한 뒤, 사용자 승인을 받고 의존성 순서로 트래커에 게시한다.",

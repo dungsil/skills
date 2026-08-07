@@ -14,19 +14,15 @@ The caller preserves the complete returned findings before the charting or work 
 
 ### Local Markdown
 
-The caller writes one canonical Markdown findings note using stable map and ticket keys:
+The research ticket and its canonical findings record are one file:
 
 ```
-.agents/research/<map-key>/<ticket-key>.md
+.agents/plans/<effort>/research/<ticket-stem>.md
 ```
 
-For Local Markdown, `<map-key>` is the `.agents/plans/<effort>/` directory name and `<ticket-key>` is the ticket filename stem. Keep the complete findings and source citations in this note. Do not put detailed findings in the local ticket comments; add only a path pointer:
+The file carries the ticket's `Type: 조사`, `Status`, question, and complete source-cited findings under `## Research`. Append the final decision under `## Answer`. Human-led interview records use the separate `.agents/plans/<effort>/interviews/<ticket-stem>.md` directory.
 
-```
-Research: .agents/research/<map-key>/<ticket-key>.md
-```
-
-Keep the repository's `.agents/` ignore policy unchanged. Do not create, checkout, commit, or push a research-only branch. This note is the local handoff artifact, not a delivery change.
+Do not create a separate `.agents/research/` note or pointer comment for Local Markdown. Keep `.agents/` ignored and unchanged. Do not create, checkout, commit, or push a research-only branch; this record is the local handoff artifact, not a delivery change.
 
 ### Hosted or other external issue tracker
 
@@ -46,15 +42,15 @@ Hosted persistence has no `Branch`, `Commit`, or `Path` pointer, and it never cr
 
 ## Charting and reuse
 
-When charting starts AFK research, claim the ticket, wait for its result, persist it using the matching tracker rule above, and record the local path or hosted record URL. Release the claim only after both the findings record and its pointer are present.
+When charting starts AFK research, use the configured tracker’s claim operation. For Local Markdown, set the record to `Status: claimed` before dispatch, wait for the result, and persist it using the local rule above; after the record is written, set it back to `Status: open`. For hosted trackers, assign or claim the issue before dispatch, wait for the result, persist it using the hosted rule above, and release only this session’s assignment or claim after the record and pointer are present. If persistence fails or the session hands off unfinished work, keep the Local Markdown record `Status: claimed` or keep the hosted issue assigned and open, and report the persistence failure.
 
-Charting leaves the ticket open: it does not resolve it or add a map gist. If either persistence step fails, keep the ticket claimed so the result is not lost.
+Charting leaves the ticket open: for Local Markdown, a successfully persisted research record is `Status: open`; for hosted trackers, the issue remains open after its claim is released. Charting does not add a map gist. If persistence fails, keep the Local Markdown record `Status: claimed` or keep the hosted issue assigned and open so the result is not lost.
 
-In the next session, inspect the canonical local note or hosted comment/artifact before researching again. If it belongs to this ticket, reuse it and repair a missing pointer when possible. Rerun read-only research only when the canonical record is unavailable, unusable, or belongs to another ticket.
+In the next session, inspect the canonical local research record or hosted comment/artifact before researching again. If it belongs to this ticket, reuse it and repair a missing hosted pointer when possible. Rerun read-only research only when the canonical record is unavailable, unusable, or belongs to another ticket.
 
 ## Resolution and authority
 
-Once a decision is made, record `Decision: <decision>` and the local note path or hosted research-record URL in the final `## Answer` or resolution comment, close the ticket, and add only a one-line gist to the map. A research record or pointer is not itself a resolution.
+Once a decision is made, record `Decision: <decision>` and finish the tracker-specific resolution. For Local Markdown, add the canonical research-record path in the final `## Answer`, then set the record to `Status: resolved`. For hosted trackers, add the hosted research-record URL in the resolution comment or note, then close the issue when the tracker has a close operation. Finally, add only a one-line gist to the map. A research record or pointer is not itself a resolution.
 
 There is no research branch to push or publish. Any external comment or durable artifact must still follow the configured tracker workflow and approval rules.
 

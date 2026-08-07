@@ -4,13 +4,23 @@
     {
       "id": "chart-map-destination-before-wiring",
       "prompt": "새 결제 플랫폼으로 이전해야 하는데 범위가 너무 커. 결정 티켓 지도를 만들어줘.",
-      "expected_output": "먼저 목적지를 합의한 뒤, 지금 명확한 결정은 자식 티켓으로 만들고 다음 단계에서 차단 관계를 연결한다. 조사 티켓은 임시 점유 후 AFK 읽기 전용 조사를 병렬로 실행하고 결과를 기다린다. 호출 세션은 로컬 트래커면 각 티켓의 `.agents/research/...md`에 전체 findings를 쓰고, 외부 이슈 트래커면 해당 이슈의 comment/note 또는 링크된 durable snippet·wiki·attachment에 보존한다. 연구 전용 branch는 만들지 않는다. 차팅은 조사 티켓을 해소하거나 지도 gist를 추가하지 않으며, 외부 기록 실패 시 결과를 버리지 않는다.",
+      "expected_output": "먼저 목적지를 합의한 뒤, 지금 명확한 결정은 자식 티켓으로 만들고 다음 단계에서 차단 관계를 연결한다. 조사 티켓은 임시 점유 후 AFK 읽기 전용 조사를 병렬로 실행하고 결과를 기다린다. 호출 세션은 로컬 트래커면 각 티켓의 `.agents/plans/<effort>/research/...md`에 전체 findings를 쓰고, 외부 이슈 트래커면 해당 이슈의 comment/note 또는 링크된 durable snippet·wiki·attachment에 보존한다. 연구 전용 branch는 만들지 않는다. 차팅은 조사 티켓을 해소하거나 지도 gist를 추가하지 않으며, 외부 기록 실패 시 결과를 버리지 않는다.",
       "assertions": [
         "The output settles the destination, creates every currently specifiable ticket, then adds native blocking dependencies in a second pass.",
         "The output temporarily claims research tickets, runs their AFK investigations in parallel, and waits for every result; AFK researchers only return cited findings and cause no writes, ticket or map updates, credential use, pushes, publications, or other external side effects.",
-        "Only the calling session writes one complete Markdown findings file under `.agents/research/` for Local Markdown; for hosted trackers it posts the complete findings to the same issue comment or note, or to a linked durable artifact.",
-        "The local ticket records a `.agents/research/...md` path and the hosted ticket records a research comment, note, or artifact URL; detailed findings stay in that canonical record and no Branch, Commit, or Path pointer is used.",
+        "Only the calling session writes one complete Markdown findings file under `.agents/plans/<effort>/research/` for Local Markdown; for hosted trackers it posts the complete findings to the same issue comment or note, or to a linked durable artifact.",
+        "The local research record itself is the canonical findings file at `.agents/plans/<effort>/research/...md`; hosted tickets record a research comment, note, or artifact URL. Detailed findings stay in that canonical record and no Branch, Commit, or Path pointer is used.",
         "Before charting exits, it persists the findings and local path or hosted record URL, leaves research tickets open without a resolution or map gist, and never creates or pushes a research-only branch."
+      ]
+    },
+    {
+      "id": "hosted-research-release-claim-after-charting",
+      "prompt": "GitHub 또는 GitLab map의 research issue에 전체 findings와 record pointer를 저장했어. charting은 끝났지만 issue는 열어 둬야 해.",
+      "expected_output": "전체 findings와 pointer를 성공적으로 저장한 뒤 GitHub는 `gh issue edit <n> --remove-assignee @me`, GitLab은 `glab issue update <n> --assignee=-@me`(필요하면 실제 username으로 `@me`를 대체)로 현재 세션의 claim만 해제한다. issue는 열어 두고 map gist는 추가하지 않는다. 저장 실패나 미완료 handoff면 assignee를 유지한다.",
+      "assertions": [
+        "For GitHub, the output removes the session assignee with `gh issue edit <n> --remove-assignee @me` only after complete findings and the record pointer are persisted.",
+        "For GitLab, the output removes only the session's assignee with `glab issue update <n> --assignee=-@me` (or the actual username), without removing other assignees, and does so only after complete findings and the record pointer are persisted.",
+        "The output leaves the research issue open without a map gist after successful charting persistence and keeps the claim when persistence fails or work is handed off unfinished."
       ]
     },
     {
@@ -46,6 +56,17 @@
       ]
     },
     {
+      "id": "local-deep-plan-records-avoid-implementation-issues",
+      "prompt": "로컬 Markdown에서 deep-plan이 조사·인터뷰·프로토타입·작업 결정 티켓을 만들고, 지도가 끝난 뒤 vibe-plan이 구현 티켓을 만들어줘.",
+      "expected_output": "deep-plan은 `.agents/plans/<feature>/research/`, `interviews/`, `prototypes/`, `tasks/`에 유형별 결정 record를 만들고 `issues/`에는 만들지 않는다. 지도가 끝난 뒤 vibe-plan만 `.agents/plans/<feature>/issues/`에 구현 ticket을 만든다.",
+      "assertions": [
+        "The output stores Local Markdown deep-plan research, interview, prototype, and task records in their matching type-specific directories under `.agents/plans/<feature>/`, not under `issues/`.",
+        "The output treats `.agents/plans/<feature>/issues/` as the implementation-ticket directory owned by `/vibe-plan`.",
+        "The local deep-plan frontier scans research, interviews, prototypes, and tasks together; every blocking reference and record link uses the canonical relative `.md` file path including its type directory, never a bare numeric id.",
+        "The output initializes each local deep-plan record with `Status: open`, changes it to `Status: claimed` before work, returns it to `Status: open` after successful charting persistence, and uses `Status: resolved` only for a final answer."
+      ]
+    },
+    {
       "id": "separate-fog-from-sharp-ticket",
       "prompt": "지도에는 ‘결제 제공자를 어떤 기준으로 고를지 결정’과 ‘나중에 운영 관련 고려사항을 살펴보기’가 떠올랐어. 둘 다 지금 티켓으로 만들까?",
       "expected_output": "지금 정확히 질문할 수 있는 제공자 선정 기준 결정은 티켓으로 만들고, 아직 구체 질문으로 표현할 수 없는 운영 고려사항은 Not yet specified의 안개로 남긴다. 답을 아직 모르는지는 분류 기준이 아니다.",
@@ -58,23 +79,23 @@
     {
       "id": "primary-sources-background-research",
       "prompt": "이 맵의 research 티켓 #7이 OpenAI Responses API의 background mode 동작과 제한을 묻고 있어. 기존 댓글에는 조사 결과가 없어. 이 티켓을 선택해 처리해줘.",
-      "expected_output": "티켓을 점유하고 기존 research comment/note 또는 연결 artifact를 먼저 확인한 뒤, 읽기 전용 조사 서브에이전트가 OpenAI 공식 문서 같은 1차 출처를 조사해 결과를 호출 세션에 돌려준다. 호출 세션은 로컬 트래커면 findings를 `.agents/research/...md`에 쓰고, 외부 트래커면 같은 이슈의 comment/note 또는 링크된 durable artifact에 전체 결과를 보존한다. 티켓에는 해당 경로 또는 record URL을 남긴다. 재사용 가능한 findings가 있으면 재조사하지 않는다. 해결할 때는 결정과 record를 남기고 티켓을 닫으며 지도에는 링크된 티켓 제목과 한 줄 gist만 추가한다.",
+      "expected_output": "티켓을 점유하고 기존 research comment/note 또는 연결 artifact를 먼저 확인한 뒤, 읽기 전용 조사 서브에이전트가 OpenAI 공식 문서 같은 1차 출처를 조사해 결과를 호출 세션에 돌려준다. 호출 세션은 로컬 트래커면 findings를 `.agents/plans/<effort>/research/...md`에 쓰고, 외부 트래커면 같은 이슈의 comment/note 또는 링크된 durable artifact에 전체 결과를 보존한다. 티켓에는 해당 경로 또는 record URL을 남긴다. 재사용 가능한 findings가 있으면 재조사하지 않는다. 해결할 때는 결정과 record를 남기고 티켓을 닫으며 지도에는 링크된 티켓 제목과 한 줄 gist만 추가한다.",
       "assertions": [
         "The output claims the selected research ticket and checks any canonical local note or hosted research comment/artifact before launching new research.",
         "The findings rely on primary sources owned by the API provider, such as official documentation or first-party API references.",
         "The research subagent returns source-cited findings and remaining unknowns to its caller without writing files, updating a ticket or map, using credentials, pushing, publishing, or causing an external side effect.",
-        "Only the calling session persists the full findings: Local Markdown uses one `.agents/research/` note, while hosted trackers use the same issue's comment/note or a linked durable artifact; it records the path or URL and never creates or pushes a research branch.",
+        "Only the calling session persists the full findings: Local Markdown uses one `.agents/plans/<effort>/research/` note, while hosted trackers use the same issue's comment/note or a linked durable artifact; it records the path or URL and never creates or pushes a research branch.",
         "The output closes the ticket only with the decision and durable research-record path or URL, then adds only a linked ticket title and one-line gist to the map."
       ]
     },
     {
       "id": "source-code-and-spec-evidence",
       "prompt": "research 티켓 #9는 SQLite WAL 모드에서 체크포인트가 언제 필요한지 묻는 티켓이야. 블로그 요약 말고 공식 문서·소스·명세를 근거로 이 티켓을 처리해줘.",
-      "expected_output": "기존 local note 또는 hosted record를 먼저 확인한 뒤 읽기 전용 조사 서브에이전트가 SQLite 공식 문서·소스·명세 같은 1차 출처를 읽고 근거, 제약, 미확인 사항을 호출 세션에 돌려준다. 호출 세션은 로컬이면 findings를 `.agents/research/...md`에 쓰고, 외부 이슈 트래커면 해당 issue comment/note 또는 링크된 snippet·wiki·attachment에 전체 결과를 보존한다. 재사용 가능한 findings면 재조사하지 않는다. 해결 댓글 또는 로컬 ## Answer에는 결정과 기록 위치를 남기고 티켓을 닫으며 지도에는 링크된 티켓 제목과 한 줄 gist만 남긴다. 연구 전용 branch는 만들지 않는다.",
+      "expected_output": "기존 local note 또는 hosted record를 먼저 확인한 뒤 읽기 전용 조사 서브에이전트가 SQLite 공식 문서·소스·명세 같은 1차 출처를 읽고 근거, 제약, 미확인 사항을 호출 세션에 돌려준다. 호출 세션은 로컬이면 findings를 `.agents/plans/<effort>/research/...md`에 쓰고, 외부 이슈 트래커면 해당 issue comment/note 또는 링크된 snippet·wiki·attachment에 전체 결과를 보존한다. 재사용 가능한 findings면 재조사하지 않는다. 해결 댓글 또는 로컬 ## Answer에는 결정과 기록 위치를 남기고 티켓을 닫으며 지도에는 링크된 티켓 제목과 한 줄 gist만 남긴다. 연구 전용 branch는 만들지 않는다.",
       "assertions": [
         "The output rejects secondary blog posts as the evidentiary basis when authoritative SQLite material is available.",
         "The findings distinguish checkpoint claims and attach a primary-source citation to each substantive claim.",
-        "Only the calling session persists the full findings in one `.agents/research/` Markdown note for Local Markdown or in the same hosted issue's comment/note or linked durable artifact, records its path or URL, and never creates a research-only branch.",
+        "Only the calling session persists the full findings in one `.agents/plans/<effort>/research/` Markdown note for Local Markdown or in the same hosted issue's comment/note or linked durable artifact, records its path or URL, and never creates or pushes a research-only branch.",
         "The output reuses an available canonical record before rerunning, resolves with the decision and that record's path or URL, and adds only a linked ticket title and one-line gist to the map.",
         "The output does not push or publish a research branch because no research branch is created."
       ]
@@ -82,9 +103,9 @@
     {
       "id": "existing-research-location",
       "prompt": "이 리포는 docs/research/에 조사 메모를 둬. WebAuthn user verification 요구사항을 묻는 research 티켓 #4를 처리해줘.",
-      "expected_output": "기존 `docs/research/` 관례가 있어도 조사 서브에이전트는 WebAuthn 표준과 벤더 공식 문서를 읽어 결과만 호출 세션에 돌려준다. 호출 세션은 로컬 트래커면 findings를 `.agents/research/...md`에 쓰고, 외부 트래커면 같은 이슈의 comment/note 또는 링크된 durable artifact에 보존한다. 먼저 canonical record를 확인해 재사용하고, 사용할 수 없을 때만 재조사한다. 해결 댓글 또는 로컬 ## Answer에는 결정과 기록 위치를 남기고 티켓을 닫는다. 연구 전용 branch나 `.gitignore` 변경은 없다.",
+      "expected_output": "기존 `docs/research/` 관례가 있어도 조사 서브에이전트는 WebAuthn 표준과 벤더 공식 문서를 읽어 결과만 호출 세션에 돌려준다. 호출 세션은 로컬 트래커면 findings를 `.agents/plans/<effort>/research/...md`에 쓰고, 외부 트래커면 같은 이슈의 comment/note 또는 링크된 durable artifact에 보존한다. 먼저 canonical record를 확인해 재사용하고, 사용할 수 없을 때만 재조사한다. 해결 댓글 또는 로컬 ## Answer에는 결정과 기록 위치를 남기고 티켓을 닫는다. 연구 전용 branch나 `.gitignore` 변경은 없다.",
       "assertions": [
-        "The output uses one `.agents/research/` findings file rather than `docs/research/` for Local Markdown, leaves `.gitignore` unchanged, and creates no research-only branch; hosted trackers keep the record on the issue or in a linked durable artifact.",
+        "The output uses one `.agents/plans/<effort>/research/` findings file rather than `docs/research/` for Local Markdown, leaves `.gitignore` unchanged, and creates no research-only branch; hosted trackers keep the record on the issue or in a linked durable artifact.",
         "The findings trace user-verification claims to the WebAuthn specification or first-party browser documentation.",
         "The research subagent returns citations and remaining unknowns to its caller without writing files, changing the ticket or map, using credentials, or causing an external side effect.",
         "The caller checks the canonical local note or hosted comment/artifact before rerunning research, then records its path or Research record URL.",
@@ -94,9 +115,9 @@
     {
       "id": "oversized-research-answer-stays-in-ticket",
       "prompt": "research 티켓 조사 결과가 트래커의 댓글 한 개 길이 제한을 넘었어. 전체 결과를 보존하면서 티켓을 끝내줘.",
-      "expected_output": "전체 조사 결과를 줄이거나 버리지 않고, 로컬 트래커면 호출 세션이 findings 전부를 `.agents/research/...md`에 기록한다. 외부 트래커면 결과를 같은 이슈의 ordered comments로 보존하고, 댓글 제한을 넘으면 tracker-native snippet·wiki·attachment 같은 durable artifact를 만들어 링크한다. 티켓에는 기록 위치를 남기고 research ticket은 charting 중 열어 둔다. 해결할 때는 결정과 record URL 또는 경로를 남기며 연구 전용 branch는 만들지 않는다.",
+      "expected_output": "전체 조사 결과를 줄이거나 버리지 않고, 로컬 트래커면 호출 세션이 findings 전부를 `.agents/plans/<effort>/research/...md`에 기록한다. 외부 트래커면 결과를 같은 이슈의 ordered comments로 보존하고, 댓글 제한을 넘으면 tracker-native snippet·wiki·attachment 같은 durable artifact를 만들어 링크한다. 티켓에는 기록 위치를 남기고 research ticket은 charting 중 열어 둔다. 해결할 때는 결정과 record URL 또는 경로를 남기며 연구 전용 branch는 만들지 않는다.",
       "assertions": [
-        "The output preserves complete oversized research findings in the canonical local `.agents/research/` note or in ordered hosted issue comments or a linked durable snippet, wiki, attachment, or equivalent instead of truncating or discarding them.",
+        "The output preserves complete oversized research findings in the canonical local `.agents/plans/<effort>/research/` note or in ordered hosted issue comments or a linked durable snippet, wiki, attachment, or equivalent instead of truncating or discarding them.",
         "The ticket records the local note path or hosted Research record URL; detailed findings stay in that durable record rather than being reduced to a map gist.",
         "Only the calling session persists the findings and it creates no research-only branch or push; if no durable surface exists, it keeps the ticket claimed and reports the failure.",
         "The output closes the ticket with the decision and canonical research-record path or URL, then adds only the linked ticket title and one-line gist to the map."
@@ -104,13 +125,13 @@
     },
     {
       "id": "reuse-attached-findings-after-explicit-stale-recovery",
-      "prompt": "이전 로컬 세션은 종료되어 이 research 티켓의 Status: claimed가 stale이라고 확인할게. ## Comments에는 canonical findings의 `Research: .agents/research/research-results/01-self-contained-research-ticket.md` pointer만 있고, 같은 작업공간에는 그 경로에 일치하는 출처 포함 22KB 조사 결과가 있어. 이 티켓을 끝내줘.",
-      "expected_output": "사용자의 명시적 stale 확인 뒤 티켓을 다시 읽어 새 활동이 없는지 확인하고 점유를 인계한다. canonical `.agents/research/...md` path를 먼저 확인한다. 사용할 수 있는 local findings면 재조사 없이 재사용해 로컬 ## Answer에 결정과 path를 기록하고 티켓과 지도를 갱신한다. 파일이 없거나 다른 티켓의 결과이면 tracker text만으로 해소하지 않고 필요한 읽기 전용 조사를 다시 실행해 호출 세션이 새 `.agents/research/...md` note를 쓴다. 연구 전용 branch나 push는 없다.",
+      "prompt": "이전 로컬 세션은 종료되어 이 research 티켓의 Status: claimed가 stale이라고 확인할게. canonical research record는 `.agents/plans/research-results/research/01-self-contained-research-ticket.md`에 있고, 같은 작업공간에 출처 포함 22KB 조사 결과가 있어. 이 티켓을 끝내줘.",
+      "expected_output": "사용자의 명시적 stale 확인 뒤 티켓을 다시 읽어 새 활동이 없는지 확인하고 점유를 인계한다. canonical `.agents/plans/research-results/research/01-self-contained-research-ticket.md`를 먼저 확인한다. 사용할 수 있는 local findings면 재조사 없이 재사용해 로컬 ## Answer에 결정과 path를 기록하고 티켓과 지도를 갱신한다. 파일이 없거나 다른 티켓의 결과이면 tracker text만으로 해소하지 않고 필요한 읽기 전용 조사를 다시 실행해 호출 세션이 새 `.agents/plans/<effort>/research/...md` note를 쓴다. 연구 전용 branch나 push는 없다.",
       "assertions": [
         "The output treats the local claim as stale only because the user explicitly confirmed the prior session was abandoned, and rereads before replacing the claim.",
-        "Before rerunning research, the output inspects the canonical local note named by the pointer and does not resolve from tracker text alone.",
+        "Before rerunning research, the output inspects the canonical local research record and does not resolve from tracker text alone.",
         "When the canonical findings are available for this ticket, the output reuses them and does not rerun the research.",
-        "When a rerun is necessary, only the caller writes one `.agents/research/` findings file and does not create or push a research-only branch.",
+        "When a rerun is necessary, only the caller writes one `.agents/plans/<effort>/research/` findings file and does not create or push a research-only branch.",
         "The final local ## Answer contains the decision and canonical note path, closes the ticket, and appends only the linked ticket title and one-line gist to the map."
       ]
     },
@@ -127,12 +148,12 @@
     {
       "id": "explicit-parallel-hitl-while-research-runs",
       "prompt": "지도 차팅에서 research 티켓 조사가 도는 동안, 내가 이름을 지정한 두 개의 unblocked 인터뷰 티켓도 병렬로 진행하자.",
-      "expected_output": "명시적으로 지정된 두 인터뷰 티켓만 예외로 Work through the map으로 전환해 각각 점유하고, 독립 대화를 교차 진행하되 매번 질문 하나를 하고 사용자의 답을 기다린다. 조사 서브에이전트는 계속 읽기 전용으로 실행되며, 차팅 세션은 모든 조사 결과를 기다린 뒤 로컬 트래커에는 각 `.agents/research/...md` note를 쓰고 외부 트래커에는 각 issue comment/note 또는 linked durable artifact에 전체 결과를 보존한다. 기록 위치를 남기되 조사 티켓은 해소하지 않고 종료한다. 연구 전용 branch나 map gist는 만들지 않는다.",
+      "expected_output": "명시적으로 지정된 두 인터뷰 티켓만 예외로 Work through the map으로 전환해 각각 점유하고, 독립 대화를 교차 진행하되 매번 질문 하나를 하고 사용자의 답을 기다린다. 조사 서브에이전트는 계속 읽기 전용으로 실행되며, 차팅 세션은 모든 조사 결과를 기다린 뒤 로컬 트래커에는 각 `.agents/plans/<effort>/research/...md` note를 쓰고 외부 트래커에는 각 issue comment/note 또는 linked durable artifact에 전체 결과를 보존한다. 기록 위치를 남기되 조사 티켓은 해소하지 않고 종료한다. 연구 전용 branch나 map gist는 만들지 않는다.",
       "assertions": [
         "The output applies the explicit same-invocation exception only to the named, unblocked HITL tickets and does not add automatically discovered tickets.",
         "Each interview lane asks one question at a time, waits for the user's own answer, and never answers on the user's behalf.",
         "Every named ticket is claimed before work, and external-side-effect approvals remain independent when applicable.",
-        "The research subagents remain read-only; the caller waits for their findings, persists one complete local `.agents/research/` note per local research ticket or one complete hosted issue comment/note or linked durable artifact per hosted ticket, records the path or URL, keeps research tickets open during charting, and creates no research-only branch or map gist."
+        "The research subagents remain read-only; the caller waits for their findings, persists one complete local `.agents/plans/<effort>/research/...md` note per local research ticket or one complete hosted issue comment/note or linked durable artifact per hosted ticket, records the path or URL, keeps research tickets open during charting, and creates no research-only branch or map gist."
       ]
     },
     {
@@ -171,10 +192,10 @@
     {
       "id": "declined-or-silent-approval-keeps-ticket-blocked",
       "prompt": "데이터 이동 승인은 거절하고, 그 뒤 자격증명 사용 승인에는 답하지 않을게. 그래도 이 task 티켓을 끝내줘.",
-      "expected_output": "거절과 무응답을 모두 승인 없음으로 처리해 티켓을 열린 차단 상태로 남긴다. 외부 변경이나 티켓 해소·닫기·지도 갱신은 하지 않고, 가능한 읽기 전용 조사 결과와 사람이 나중에 실행할 정확한 체크리스트만 제공한다.",
+      "expected_output": "거절과 무응답을 모두 승인 없음으로 처리한다. Local Markdown이면 ticket을 `Status: claimed`와 blocked 상태로 유지하고, hosted tracker면 issue를 assigned/open/blocked 상태로 유지한다. 외부 변경이나 ticket 해소·닫기·지도 갱신은 하지 않고, 가능한 읽기 전용 조사 결과와 사람이 나중에 실행할 정확한 체크리스트만 제공한다.",
       "assertions": [
         "The output treats both a declined approval and no response as no approval.",
-        "The output leaves the ticket open and blocked without a resolution comment, closure, or map update.",
+        "The output keeps a Local Markdown ticket `Status: claimed` and blocked, or a hosted issue open, assigned, and blocked, without a resolution comment, closure, or map update.",
         "The output causes no external side effect while approval is declined or absent.",
         "The output still provides read-only findings and an exact human checklist."
       ]
@@ -192,11 +213,11 @@
     {
       "id": "cleared-map-hands-off-to-spec-stage",
       "prompt": "이 지도의 티켓이 다 닫혔고 Not yet specified도 비었어. 이제 구현 시작해줘.",
-      "expected_output": "지도가 완료됐음을 확인하고 직접 구현하지 않으며, Destination과 Decisions-so-far를 입력으로 /vibe-plan의 spec 단계로 넘긴다.",
+      "expected_output": "지도가 완료됐음을 확인하고 직접 구현하지 않으며, map path·URL·number를 그대로 `/vibe-plan`의 spec 단계로 넘긴다. `/vibe-plan`은 map의 Destination과 Decisions-so-far를 읽고, Local Markdown이면 각 linked record의 `## Question`과 `## Answer`, hosted tracker면 각 linked ticket의 question/body와 final resolution comment/note를 먼저 읽은 뒤 spec을 합성한다. raw findings·comments·attachments·prototype artifact는 Answer가 참조하거나 spec에 근거가 필요할 때만 추가로 읽는다.",
       "assertions": [
         "The output recognises the map as complete because no open tickets remain and Not yet specified is empty.",
         "The output hands off to /vibe-plan at its spec stage instead of writing implementation code itself.",
-        "The output names the map's Destination and Decisions-so-far as the input for that synthesis.",
+        "The output hands off the map's path, URL, or number and follows every resolved linked decision: Local Markdown reads each record's `## Question` and `## Answer`, while hosted trackers read each ticket's question/body and final resolution comment or note before synthesis.",
         "The output does not skip straight to /vibe-implement unless the remaining effort is one ticket's worth of work."
       ]
     },
