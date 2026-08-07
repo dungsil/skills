@@ -22,7 +22,7 @@ The research ticket and its canonical findings record are one file:
 
 The file carries the ticket's `Type: 조사`, `Status`, question, and complete source-cited findings under `## Research`. Append the final decision under `## Answer`. Human-led interview records use the separate `.agents/plans/<effort>/interviews/<ticket-stem>.md` directory.
 
-Do not create a separate `.agents/research/` note or pointer comment for Local Markdown. Keep `.agents/` ignored and unchanged. Do not create, checkout, commit, or push a research-only branch; this record is the local handoff artifact, not a delivery change.
+Do not create a separate `.agents/research/` note or pointer comment for Local Markdown. Leave the repository's ignore policy unchanged. Do not create, checkout, commit, or push a research-only branch; this record is the local handoff artifact, not a delivery change.
 
 ### Hosted or other external issue tracker
 

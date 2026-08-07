@@ -83,7 +83,7 @@ Edit `AGENTS.md` if it exists; create it if it doesn't. Never edit `CLAUDE.md` �
 
 If an `## Agent skills` block already exists in `AGENTS.md`, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
 
-**`.gitignore`** — if the repo uses git, ensure `.agents/` is ignored: when `.gitignore` doesn't already cover it, append a `.agents/` entry (create the file if needed). If the issue tracker is **local markdown**, ask the user whether `.agents/plans/` should be tracked; if they want it tracked, add a `!.agents/plans/` negation (or ignore only `.agents/worktrees/`) — otherwise keep the default and ignore all of `.agents/`.
+**`.gitignore`** — if the repo uses git, ensure the agent scratch paths are ignored: append `.agents/worktrees/` and `.agents/prototype/` when `.gitignore` doesn't already cover them (create the file if needed). For a **local markdown** tracker, `.agents/plans/` must be **tracked** — the skills commit a ticket's checklist inside its implementation commit, which is impossible for an ignored file — so ignore only the scratch paths. A broad `.agents/` entry cannot be un-ignored by a later negation, so replace it with `.agents/*` plus `!.agents/plans/`. For any other tracker, ignoring all of `.agents/` is fine.
 
 The block:
 

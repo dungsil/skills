@@ -17,10 +17,17 @@ Issues and specs for this repo live as Markdown files in `.agents/plans/`.
 - Deep-plan records start with `Status: open`; claiming changes it to `Status: claimed`; releasing a completed charting handoff changes it back to `Status: open`; only a final answer changes it to `Status: resolved`. An unfinished handoff or failed persistence stays `claimed`.
 - Comments and conversation history append under a `## Comments` heading. Research findings stay in the research record, not in an implementation issue.
 
+## Version control and completion updates
+
+- `.agents/plans/` is tracked in git; the scratch paths (`.agents/worktrees/`, `.agents/prototype/`) stay ignored. Ticket files are therefore **branch content** — a ticket's checklist state is whatever the branch you are reading says it is.
+- An implementation ticket's acceptance checkboxes and completion comment are checked off **on the feature branch that implements it**, shipping with implementation code in one commit. Never a tracker-only commit, and never a commit on the target branch ahead of the code: merging is a human decision, and the merge must carry code and checklist together or neither. Intermediate red→green commits are fine — put the ticket edits in the still-uncommitted implementation commit, or amend the unpublished branch tip when the code is already committed.
+- The completion comment names the branch, the reviewed commit SHA, and the verification evidence.
+- `상태:` is not a completion field. It records triage routing and stays unchanged when work completes; all boxes checked in merged history is the completion record.
+
 ## Research-note persistence
 
 - For Local Markdown, the research ticket and canonical findings record are the same `.agents/plans/<effort>/research/<ticket-stem>.md` file. Keep complete source-cited findings under `## Research` and the final decision under `## Answer`.
-- Keep `.agents/` ignored and unchanged. Do not create, checkout, commit, or push a research-only branch; the record is a local handoff artifact.
+- Leave the repository's ignore policy unchanged. Do not create, checkout, commit, or push a research-only branch; the record is a handoff artifact on the current branch, not a delivery change.
 - Set a research record to `Status: claimed` before starting investigation. After complete findings are written, set it back to `Status: open` during charting; if persistence fails or the session hands off unfinished work, keep it `claimed`. Set it to `Status: resolved` only with the final decision under `## Answer`. Before rerunning research, inspect the canonical record first.
 
 ## Publishing and fetching

@@ -105,6 +105,29 @@
       ]
     },
     {
+      "id": "local-markdown-checklist-rides-implementation-commit",
+      "prompt": "docs/agents/issue-tracker.md가 Local Markdown이고 `.agents/plans/`는 git에 추적돼. 이 티켓을 구현하고 완료 체크리스트도 반영해줘.",
+      "expected_output": "티켓 파일의 인수 체크박스와 완료 코멘트(브랜치·reviewed SHA·검증 근거)를 작업 브랜치 worktree에서 갱신하고 구현을 담는 그 커밋에 함께 넣는다. 트래커 전용 커밋을 따로 만들지 않고 원본·대상 브랜치에는 어떤 커밋도 올리지 않으며, 반영 증거나 별도 승인 미리보기를 요구하지 않는다. 병합 판단은 사용자에게 남기고 `상태:` 값은 건드리지 않는다.",
+      "assertions": [
+        "The ticket file's acceptance checkboxes and completion comment are updated inside the work branch's worktree, not in the user's original checkout.",
+        "Those ticket-file edits ship with implementation code in one commit rather than a tracker-only commit; when the code is already committed, the workflow amends the unpublished branch tip and reports the amended SHA.",
+        "No commit touching the ticket file is placed on the original or target branch ahead of the code.",
+        "For the version-controlled local Markdown ticket the workflow requires neither landing proof nor a tracker-change approval preview, and leaves the merge decision to the user.",
+        "The completion comment records the branch name, reviewed commit SHA, and verification evidence, while the 상태: triage value stays unchanged."
+      ]
+    },
+    {
+      "id": "reports-checklist-when-local-ticket-file-is-ignored",
+      "prompt": "Local Markdown 트래커인데 `.gitignore`가 `.agents/`를 통째로 무시하고 있어. 티켓 구현을 마무리해줘.",
+      "expected_output": "구현 커밋은 코드만으로 만들고, 무시된 티켓 파일은 커밋에 실을 수 없으므로 적용하려던 체크박스 변경을 정확히 보고한 뒤 `.agents/plans/`를 추적해야 체크리스트가 브랜치와 함께 이동한다고 알린다. 사용자 승인 없이 ignore 정책을 바꾸지 않고, 대상 브랜치에 트래커 커밋을 올리지도 않는다.",
+      "assertions": [
+        "The output commits the reviewed code alone and does not silently commit or fabricate a tracker update for the ignored ticket file.",
+        "The output reports the exact checkbox changes it would have made.",
+        "The output states that `.agents/plans/` must be tracked before the checklist can travel with the branch and treats that ignore-policy change as a /vibe-init decision needing the user.",
+        "The output places no tracker commit on the original or target branch."
+      ]
+    },
+    {
       "id": "publishes-task-branch-for-hosted-tracker",
       "prompt": "docs/agents/issue-tracker.md가 GitHub 또는 GitLab로 설정된 이 프로젝트의 티켓을 Git worktree에서 구현해줘.",
       "expected_output": "격리된 작업 브랜치 하나에서 구현·검토·커밋한 뒤 그 브랜치를 push하고, GitHub면 원래 브랜치를 대상으로 PR을, GitLab이면 MR을 생성해 URL을 보고한다. 이력은 병합 커밋 없이 선형이며, 게시가 성공한 뒤에만 worktree를 제거하고 다른 브랜치나 worktree를 남기지 않으며 자동 병합하지 않는다.",
@@ -124,7 +147,7 @@
         "The ticket branch stays linear on the caller-supplied base, with no merge of the integration branch or the target into it.",
         "The return includes the branch name, exact commit SHA, verification evidence, and a read-only vibe-review verdict and report.",
         "The output never merges or lands into an integration workspace or original target, never publishes or treats the ticket branch as a durable artifact, and never cleans or deletes the caller-owned branch or worktree, leaving that deletion to the caller after integration.",
-        "The output never changes tracker state and treats vibe-review as read-only evidence rather than tracker-write authority."
+        "The output never changes hosted tracker state and treats vibe-review as read-only evidence rather than tracker-write authority; a version-controlled local Markdown ticket file stays inside that same ticket commit."
       ]
     },
     {
@@ -141,12 +164,12 @@
     },
     {
       "id": "resumed-standalone-post-landing-preview-requires-proof-and-approval",
-      "prompt": "독립 모드에서 티켓을 구현·검토·커밋하고 게시했다. 별도의 반영 절차가 정확한 reviewed SHA가 대상 브랜치에 포함됐다는 증거를 제공한 뒤 재개된 흐름에서 이슈 체크박스를 완료 처리하고 닫아줘.",
-      "expected_output": "독립 모드는 caller-owned 모드와 달리 커밋된 작업 브랜치를 Local Markdown에서는 유지하고 GitHub/GitLab에서는 PR/MR로 게시하지만 자동 병합하지 않는다. 재개된 흐름은 독립적으로 증명된 정확한 SHA의 대상 브랜치 포함 근거 뒤에만 체크 항목·전체 댓글·상태/종료 변경을 정확히 미리 보여주고 별도의 명시적 승인을 기다린다.",
+      "prompt": "독립 모드에서 GitHub 이슈 트래커 티켓을 구현·검토·커밋하고 PR로 게시했다. 별도의 반영 절차가 정확한 reviewed SHA가 대상 브랜치에 포함됐다는 증거를 제공한 뒤 재개된 흐름에서 이슈 체크박스를 완료 처리하고 닫아줘.",
+      "expected_output": "독립 모드는 caller-owned 모드와 달리 커밋된 작업 브랜치를 Local Markdown에서는 유지하고 GitHub/GitLab에서는 PR/MR로 게시하지만 자동 병합하지 않는다. 호스티드 트래커는 상태가 외부에 있으므로, 재개된 흐름은 독립적으로 증명된 정확한 SHA의 대상 브랜치 포함 근거 뒤에만 체크 항목·전체 댓글·상태/종료 변경을 정확히 미리 보여주고 별도의 명시적 승인을 기다린다.",
       "assertions": [
         "The output distinguishes standalone ownership from caller-owned mode: caller-owned work returns commit-only evidence, while standalone work retains its branch for Local Markdown or publishes a PR or MR for a hosted tracker.",
         "The standalone workflow never automatically merges or lands the reviewed commit; the resumed flow treats landing as an independently completed action rather than performing it.",
-        "The output requires authoritative proof that the exact reviewed commit SHA is already present on the designated target branch before proposing tracker changes.",
+        "The output scopes the landing-proof gate to the hosted tracker and requires authoritative proof that the exact reviewed commit SHA is already present on the designated target branch before proposing tracker changes.",
         "The preview identifies every checkbox change, the complete proposed comment, and each status or close action.",
         "The output requires separate explicit approval of that exact preview; review success, publication, the implementation request, rejection, or no response do not authorize a write.",
         "The output excludes the parent spec issue from proposed tracker changes."
@@ -154,7 +177,7 @@
     },
     {
       "id": "leaves-tracker-unchanged-after-declined-or-unanswered-preview",
-      "prompt": "대상 브랜치 반영 증거가 있는 두 티켓의 트래커 변경 미리보기를 보여줬어. 첫 번째는 사용자가 거절했고, 두 번째는 승인 요청에 답하지 않았어.",
+      "prompt": "호스티드 트래커에서 대상 브랜치 반영 증거가 있는 두 티켓의 트래커 변경 미리보기를 보여줬어. 첫 번째는 사용자가 거절했고, 두 번째는 승인 요청에 답하지 않았어.",
       "expected_output": "거절된 첫 번째와 응답이 없는 두 번째 모두 체크박스·댓글·상태를 바꾸지 않고 트래커를 그대로 둔다.",
       "assertions": [
         "The output applies no tracker mutation after an explicit rejection.",

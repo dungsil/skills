@@ -53,7 +53,7 @@
         "The output dispatches all unblocked tickets in a single concurrent batch rather than serialising them.",
         "Each sub-agent prompt contains the ticket body, the spec link, the exact integration base, and its assigned ticket branch and worktree.",
         "Each sub-agent is explicitly invoked in caller-owned vibe-implement mode and told to work and commit only in its assigned ticket branch/worktree.",
-        "Each sub-agent is told to return its committed branch and exact reviewed SHA with verification evidence and a read-only review verdict, without merging, landing, cleaning the caller-owned workspace, or mutating tracker state.",
+        "Each sub-agent is told to return its committed branch and exact reviewed SHA with verification evidence and a read-only review verdict, without merging, landing, cleaning the caller-owned workspace, or mutating hosted tracker state.",
         "The output does not paste conversation history, other tickets, or plan history into the sub-agent prompts.",
         "The blocked ticket is withheld until its blocker is integrated and verified in the integration workspace."
       ]
@@ -67,7 +67,7 @@
         "The verification checks the returned branch and exact reviewed SHA, its integration base, the ticket's acceptance criteria, and the read-only review verdict.",
         "The output keeps an incomplete or unverified return out of the integration workspace.",
         "The output records a ticket as integrated only after its one-at-a-time integration and ticket-attributed verification pass.",
-        "The output does not mark the ticket landed, preview tracker changes, or mutate tracker state before proof that the reviewed integration result is on the original target branch."
+        "The output does not mark the ticket landed, preview hosted tracker changes, or mutate hosted tracker state before proof that the reviewed integration result is on the original target branch."
       ]
     },
     {
@@ -117,13 +117,24 @@
     },
     {
       "id": "requires-post-landing-preview-and-explicit-approval",
-      "prompt": "integration branch는 리뷰와 게이트를 통과했지만 아직 원본 대상 브랜치에 반영됐다는 증거가 없어. 지금 티켓 체크박스와 상태를 바꿔줘.",
-      "expected_output": "검토·게이트 통과나 integration 결과만으로는 tracker 미리보기나 변경을 하지 않는다. 정확한 reviewed integration SHA가 원본 대상 브랜치에 있다는 권위 있는 반영 증거가 나온 뒤에만 모든 체크박스·전체 댓글·상태 또는 종료 변경의 정확한 미리보기를 보여주고, 별도의 명시적 승인을 기다린다.",
+      "prompt": "호스티드 트래커를 쓰는데 integration branch는 리뷰와 게이트를 통과했지만 아직 원본 대상 브랜치에 반영됐다는 증거가 없어. 지금 티켓 체크박스와 상태를 바꿔줘.",
+      "expected_output": "검토·게이트 통과나 integration 결과만으로는 tracker 미리보기나 변경을 하지 않는다. 호스티드 트래커 상태는 외부에 있으므로, 정확한 reviewed integration SHA가 원본 대상 브랜치에 있다는 권위 있는 반영 증거가 나온 뒤에만 모든 체크박스·전체 댓글·상태 또는 종료 변경의 정확한 미리보기를 보여주고, 별도의 명시적 승인을 기다린다.",
       "assertions": [
-        "The output does not treat review success, gate success, ticket integration, or a completion claim as authority to preview or change tracker state.",
-        "The output requires authoritative proof that the exact reviewed integration commit SHA is present on the original target branch before any tracker preview.",
+        "The output does not treat review success, gate success, ticket integration, or a completion claim as authority to preview or change hosted tracker state.",
+        "The output requires authoritative proof that the exact reviewed integration commit SHA is present on the original target branch before any hosted tracker preview.",
         "After that proof, the output presents every checkbox, the complete comment, and each status-or-close change exactly before requesting separate explicit approval.",
         "The parent spec issue is excluded from the preview and remains unchanged."
+      ]
+    },
+    {
+      "id": "local-markdown-checklists-land-with-ticket-commits",
+      "prompt": "이 프로젝트는 Local Markdown 트래커고 `.agents/plans/`는 추적돼. 모든 티켓이 integration workspace에 통합됐어. 반영까지 마무리하고 티켓 체크리스트도 정리해줘.",
+      "expected_output": "각 티켓의 체크박스와 완료 코멘트는 해당 티켓 구현 커밋에 이미 담겨 replay·landing으로 코드와 함께 이동하므로, 오케스트레이터는 티켓 파일을 직접 수정하지 않고 대상 브랜치에 트래커 전용 커밋을 추가하지 않는다. 반영 증거 뒤에는 원장 상태만 landed로 기록하고 별도 승인 미리보기는 요구하지 않는다.",
+      "assertions": [
+        "The output treats each version-controlled local Markdown ticket file as branch content already carried by that ticket's implementation commit.",
+        "The orchestrator does not edit any ticket file itself and adds no tracker-only commit on the target branch.",
+        "After landing proof the output records the tickets as landed in the ledger without requesting a tracker-change approval preview.",
+        "The output still refuses to treat integration alone as landing and requires authoritative proof that the reviewed integration SHA is on the original target branch."
       ]
     },
     {
@@ -183,7 +194,7 @@
     },
     {
       "id": "leaves-tracker-unchanged-after-declined-or-unanswered-landing-preview",
-      "prompt": "정확한 reviewed integration SHA가 원본 대상 브랜치에 반영됐다는 증거를 확인한 뒤 두 티켓의 트래커 변경안을 보여줬어. 첫 번째는 사용자가 거절했고 두 번째는 승인 요청에 답하지 않았어.",
+      "prompt": "호스티드 트래커에서 정확한 reviewed integration SHA가 원본 대상 브랜치에 반영됐다는 증거를 확인한 뒤 두 티켓의 트래커 변경안을 보여줬어. 첫 번째는 사용자가 거절했고 두 번째는 승인 요청에 답하지 않았어.",
       "expected_output": "두 티켓 모두 원장에는 최종 반영 근거를 남길 수 있지만, 거절이나 무응답을 승인으로 보지 않아 체크박스·댓글·상태·종료를 전혀 바꾸지 않는다.",
       "assertions": [
         "The output applies no tracker change for the explicitly declined preview.",
