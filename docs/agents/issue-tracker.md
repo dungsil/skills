@@ -20,9 +20,7 @@ Issues and specs for this repo live as Markdown files in `.agents/plans/`.
 ## Version control and completion updates
 
 - `.agents/plans/` is tracked in git; the scratch paths (`.agents/worktrees/`, `.agents/prototype/`) stay ignored. Ticket files are therefore **branch content** — a ticket's checklist state is whatever the branch you are reading says it is.
-- An implementation ticket's acceptance checkboxes and completion comment are checked off **on the feature branch that implements it**, shipping with implementation code in one commit. Never a tracker-only commit, and never a commit on the target branch ahead of the code: merging is a human decision, and the merge must carry code and checklist together or neither. Intermediate red→green commits are fine — put the ticket edits in the still-uncommitted implementation commit, or amend the unpublished branch tip when the code is already committed.
-- The completion comment names the branch, the reviewed commit SHA, and the verification evidence.
-- `상태:` is not a completion field. It records triage routing and stays unchanged when work completes; all boxes checked in merged history is the completion record.
+- An implementation ticket's acceptance checkboxes are flipped to `[X]` **on the feature branch that implements it**, in the **same commit as the implementation** — never a separate tracker commit, and never a commit on the target branch ahead of the code. Merging is a human decision, and the merge carries code and checklist together or neither. The `상태:` line is left unchanged.
 
 ## Research-note persistence
 

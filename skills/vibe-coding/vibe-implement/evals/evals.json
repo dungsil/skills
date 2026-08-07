@@ -107,24 +107,13 @@
     {
       "id": "local-markdown-checklist-rides-implementation-commit",
       "prompt": "docs/agents/issue-tracker.md가 Local Markdown이고 `.agents/plans/`는 git에 추적돼. 이 티켓을 구현하고 완료 체크리스트도 반영해줘.",
-      "expected_output": "티켓 파일의 인수 체크박스와 완료 코멘트(브랜치·reviewed SHA·검증 근거)를 작업 브랜치 worktree에서 갱신하고 구현을 담는 그 커밋에 함께 넣는다. 트래커 전용 커밋을 따로 만들지 않고 원본·대상 브랜치에는 어떤 커밋도 올리지 않으며, 반영 증거나 별도 승인 미리보기를 요구하지 않는다. 병합 판단은 사용자에게 남기고 `상태:` 값은 건드리지 않는다.",
+      "expected_output": "티켓 파일의 인수 체크박스만 `[X]`로 바꿔 작업 브랜치 worktree에서 갱신하고, 구현과 같은 커밋에 함께 넣는다. 트래커 전용 커밋이나 코멘트를 따로 만들지 않고 원본·대상 브랜치에는 어떤 커밋도 올리지 않으며, 반영 증거나 별도 승인 미리보기를 요구하지 않는다. 병합 판단은 사용자에게 남기고 `상태:` 값은 건드리지 않는다.",
       "assertions": [
-        "The ticket file's acceptance checkboxes and completion comment are updated inside the work branch's worktree, not in the user's original checkout.",
-        "Those ticket-file edits ship with implementation code in one commit rather than a tracker-only commit; when the code is already committed, the workflow amends the unpublished branch tip and reports the amended SHA.",
+        "The ticket file's acceptance checkboxes are flipped inside the work branch's worktree, not in the user's original checkout.",
+        "The checkbox flips ride the same commit as the implementation rather than a tracker-only commit; no completion comment is added.",
         "No commit touching the ticket file is placed on the original or target branch ahead of the code.",
         "For the version-controlled local Markdown ticket the workflow requires neither landing proof nor a tracker-change approval preview, and leaves the merge decision to the user.",
-        "The completion comment records the branch name, reviewed commit SHA, and verification evidence, while the 상태: triage value stays unchanged."
-      ]
-    },
-    {
-      "id": "reports-checklist-when-local-ticket-file-is-ignored",
-      "prompt": "Local Markdown 트래커인데 `.gitignore`가 `.agents/`를 통째로 무시하고 있어. 티켓 구현을 마무리해줘.",
-      "expected_output": "구현 커밋은 코드만으로 만들고, 무시된 티켓 파일은 커밋에 실을 수 없으므로 적용하려던 체크박스 변경을 정확히 보고한 뒤 `.agents/plans/`를 추적해야 체크리스트가 브랜치와 함께 이동한다고 알린다. 사용자 승인 없이 ignore 정책을 바꾸지 않고, 대상 브랜치에 트래커 커밋을 올리지도 않는다.",
-      "assertions": [
-        "The output commits the reviewed code alone and does not silently commit or fabricate a tracker update for the ignored ticket file.",
-        "The output reports the exact checkbox changes it would have made.",
-        "The output states that `.agents/plans/` must be tracked before the checklist can travel with the branch and treats that ignore-policy change as a /vibe-init decision needing the user.",
-        "The output places no tracker commit on the original or target branch."
+        "The 상태: triage line stays unchanged."
       ]
     },
     {

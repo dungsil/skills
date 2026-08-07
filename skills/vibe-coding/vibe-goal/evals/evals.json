@@ -129,7 +129,7 @@
     {
       "id": "local-markdown-checklists-land-with-ticket-commits",
       "prompt": "이 프로젝트는 Local Markdown 트래커고 `.agents/plans/`는 추적돼. 모든 티켓이 integration workspace에 통합됐어. 반영까지 마무리하고 티켓 체크리스트도 정리해줘.",
-      "expected_output": "각 티켓의 체크박스와 완료 코멘트는 해당 티켓 구현 커밋에 이미 담겨 replay·landing으로 코드와 함께 이동하므로, 오케스트레이터는 티켓 파일을 직접 수정하지 않고 대상 브랜치에 트래커 전용 커밋을 추가하지 않는다. 반영 증거 뒤에는 원장 상태만 landed로 기록하고 별도 승인 미리보기는 요구하지 않는다.",
+      "expected_output": "각 티켓의 체크박스는 해당 티켓 구현 커밋에 이미 담겨 replay·landing으로 코드와 함께 이동하므로, 오케스트레이터는 티켓 파일을 직접 수정하지 않고 대상 브랜치에 트래커 전용 커밋을 추가하지 않는다. 반영 증거 뒤에는 원장 상태만 landed로 기록하고 별도 승인 미리보기는 요구하지 않는다.",
       "assertions": [
         "The output treats each version-controlled local Markdown ticket file as branch content already carried by that ticket's implementation commit.",
         "The orchestrator does not edit any ticket file itself and adds no tracker-only commit on the target branch.",
