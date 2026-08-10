@@ -47,7 +47,7 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
    - Other gates require primary evidence for their domain: test source/results for `TEST`, execution records for `OPERATION`, release records for `DEPLOYMENT`, observed state for `DATA`, and recorded human observation for `MANUAL`.
 7. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
 8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent source requirement in parallel, resolve every disagreement, update the draft, and recalculate status.
-9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). A shorter report must preserve the same gate, scope, separate-gate, and independent-review facts.
+9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). Save the full Markdown report to `.agents/reports/rq/<issue-number-or-name>.md`: use the issue number when it is known; otherwise use a short kebab-case name based on the requirement. Create the parent directories when absent. If creating the directory or saving the report fails, set the overall status to `ERROR`; do not present the report as successfully saved. State that the report was not saved, name the risk, and recommend checking the path and write permission before retrying. The final chat message must not repeat the full report: for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status.
 
 ## Optional Post-report Adversarial Verification
 
@@ -58,7 +58,7 @@ Do not run adversarial verification as part of the initial gate report. Run it o
 - `품질 게이트 적대 검증`
 - `\$rq adversarial`
 
-Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). Return an adversarial-verification addendum unless the user asks for a revised full report.
+Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). For an addendum request, append the adversarial-verification addendum to the end of the existing `.agents/reports/rq/<issue-number-or-name>.md` report; do not remove its body or create another file. For a revised full report request, update that same report path with the new full report. If saving fails, use the `ERROR` path above. After saving, the final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and do not repeat the full addendum.
 
 ## Status Aggregation
 
