@@ -14,6 +14,7 @@ pnpm dlx skills add dungsil/skills -g
 | 스킬 명                    | 설명                 |
 |----------------------------|----------------------|
 | [rq] | 요구사항 품질 게이트 |
+| [opencode-models] | Tailscale provider 모델 자동 탐지·등록 (opencode 설정) |
 
 ## Vibe
 
@@ -115,6 +116,7 @@ bun run validate:skills
 
 <!-- 링크 -->
 [rq]: skills/rq
+[opencode-models]: skills/opencode-models
 [java-code-design]: skills/java/java-code-design
 [writing-java-tests]: skills/java/writing-java-tests
 [writing-javadoc]: skills/java/writing-javadoc

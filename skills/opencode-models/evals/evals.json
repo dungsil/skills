@@ -1,0 +1,58 @@
+{
+  "skill_name": "opencode-models",
+  "evals": [
+    {
+      "id": "discover-new-model",
+      "prompt": "Tailscale 엔드포인트에 새 모델 gemini-4.0-flash가 올라왔어. opencode 설정에 등록해줘.",
+      "expected_output": "엔드포인트에서 실제 모델 목록을 조회하고, 설정의 기존 모델과 diff한 뒤, Google 공식 가격 페이지에서 해당 모델의 가격/컨텍스트를 조사해 cost와 limit을 채워 등록한다.",
+      "assertions": [
+        "The output discovers the model list from the actual endpoint rather than assuming it.",
+        "The output researches official vendor pricing and does not fabricate prices.",
+        "The output registers the model with name, cost, and limit metadata in the correct config path.",
+        "The output validates the resulting JSONC parses correctly.",
+        "The output tells the user to restart opencode for changes to take effect."
+      ]
+    },
+    {
+      "id": "no-pricing-model",
+      "prompt": "gpt-6.0-mini가 엔드포인트에 있는데 공개 API 가격이 아직 없대. 어떻게 등록할까?",
+      "expected_output": "공식 가격이 확인되지 않으면 name만 등록하고 주석으로 사유를 남기며, 가격을 지어내지 않는다.",
+      "assertions": [
+        "The output does not fabricate a price for the model.",
+        "The output registers the model with name only plus an explanatory comment.",
+        "The output explicitly reports that official pricing was not found.",
+        "The output asks for user confirmation when the vendor cannot be determined."
+      ]
+    },
+    {
+      "id": "openai-fast-tier-default",
+      "prompt": "새 OpenAI 모델 gpt-5.7-alpha를 등록할 건데 기본 서비스 티어는 fast로 해줘.",
+      "expected_output": "options에 service_tier: \"fast\"(snake_case)를 넣고, fast 티어 가격(보통 표준 2배)으로 cost를 채운다.",
+      "assertions": [
+        "The output uses snake_case service_tier, not camelCase serviceTier.",
+        "The output applies fast-tier pricing for the model.",
+        "The output explains that @ai-sdk/openai-compatible forwards option keys verbatim."
+      ]
+    },
+    {
+      "id": "unpublished-max-output",
+      "prompt": "grok-5.0을 등록하려는데 max output 토큰 수가 공식 문서에 없어. 어떻게 할까?",
+      "expected_output": "limit을 생략하고 나머지 메타데이터는 채운다. 임의의 max output 값을 지어내지 않는다.",
+      "assertions": [
+        "The output omits the limit object rather than inventing a max output value.",
+        "The output still registers cost, reasoning, and tool_call metadata.",
+        "The output notes that the schema requires both context and output in limit."
+      ]
+    },
+    {
+      "id": "registry-sync-diff",
+      "prompt": "설정에 등록된 모델 중 엔드포인트에서 더 이상 서빙되지 않는 게 있어.",
+      "expected_output": "미서빙 모델을 조용히 삭제하지 않고 제거 후보로 플래그를 달아 사용자에게 확인받는다.",
+      "assertions": [
+        "The output flags removed models for user confirmation instead of silently deleting them.",
+        "The output keeps unrelated config fields and $schema unchanged.",
+        "The output reports a summary of added, updated, and flagged models."
+      ]
+    }
+  ]
+}
