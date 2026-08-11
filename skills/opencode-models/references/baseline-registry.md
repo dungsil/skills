@@ -45,6 +45,23 @@
 | `deepseek-v4-flash` | Deepseek V4 Flash | 0.14 | 0.28 | 0.0028 | 1,000,000 | 384,000 | |
 | `deepseek-v4-pro` | Deepseek V4 Pro | 0.435 | 0.87 | 0.003625 | 1,000,000 | 384,000 | |
 
+## 등록된 variants (effort, 공식 API 기준, 2026-08-11)
+
+모든 모델 entry의 `variants`는 `{ reasoningEffort: "<level>" }` 형태 (openai-compatible 표준 camelCase 키).
+
+| Model ID | Variants |
+|---|---|
+| `opus-5`, `sonnet-5`, `fable-5` | low, medium, high, xhigh, max |
+| `haiku-4.5` | (없음 — 공식 effort 수준 미지원, budget_tokens만) |
+| `gpt-5.6-sol/terra/luna` | low, medium, high, xhigh, max |
+| `gpt-5.3-codex-spark` | low, medium, high, xhigh |
+| `composer-2.5`, `grok-4.5` | low, medium, high |
+| `gemini-3.1-pro-preview` | low, medium, high |
+| `gemini-3.6-flash`, `gemini-3.5-flash-lite` | minimal, low, medium, high |
+| `glm-5.2` | low, medium, high, xhigh, max |
+| `kimi-k3`, `kimi-k3-fast` | low, high, max |
+| `deepseek-v4-flash`, `deepseek-v4-pro` | low, high, max |
+
 ## 알려진 함정
 
 - `service_tier` (snake_case)만 OpenAI가 수용 — `serviceTier`는 400/무시. `@ai-sdk/openai-compatible`은 options 키를 그대로 request body에 전달.
@@ -52,3 +69,6 @@
 - Anthropic Sonnet 5: docs 표는 $3/$15 (9/1~)로 표기하나 2026-08-10 뉴스 수정으로 $2/$10 영구 확정 — 뉴스가 최신 공식 입장.
 - max output 미공개 모델(grok 계열)은 `limit` 전체 생략 (스키마가 context+output 둘 다 요구).
 - Composer 2.5는 Cursor 전용 모델이라는 제3자 정보가 있으나, 사용자 확인으로 grok-build-0.1 값 사용 중.
+- variants 키는 `reasoningEffort` (camelCase) — `service_tier`와 달리 snake_case 아님. openai-compatible SDK가 직렬화 담당.
+- opencode가 reasoning 모델에 low/medium/high (+deepseek-v4는 max) 자동 생성 → config 명시 variant가 오버라이드. `disabled: true`로 제거 가능.
+- Kimi/DeepSeek는 `medium`이 공식 목록에 없음 → low/high/max만 등록 (중간값 지어내지 말 것).

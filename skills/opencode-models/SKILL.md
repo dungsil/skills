@@ -1,6 +1,6 @@
 ---
 name: opencode-models
-description: Discovers new models available on the Tailscale OpenAI-compatible provider endpoint, researches their official API specs and pricing, and registers or updates them in the opencode global config (provider.tailscale.models) with cost, limit, reasoning, tool_call, and attachment metadata. Adds service_tier "fast" with fast-tier pricing for OpenAI models. Use when new models appear on the Tailscale endpoint, when asked to register or update opencode model metadata, or when model pricing in the opencode config needs to be refreshed.
+description: Discovers new models available on the Tailscale OpenAI-compatible provider endpoint, researches their official API specs and pricing, and registers or updates them in the opencode global config (provider.tailscale.models) with cost, limit, reasoning, tool_call, attachment metadata, and reasoning-effort variants. Adds service_tier "fast" with fast-tier pricing for OpenAI models, and registers official reasoning-effort levels as model variants. Use when new models appear on the Tailscale endpoint, when asked to register or update opencode model metadata or pricing, or when reasoning-effort variants need to be registered or refreshed.
 ---
 
 # opencode Models Registrar
@@ -55,6 +55,49 @@ Per opencode's config schema (`https://opencode.ai/config.json`), a model entry 
 3. **Unpublished max output** (e.g. Grok models): omit `limit` entirely rather than inventing a value.
 4. **Long-context tiering**: if a vendor prices prompts ≥200K tokens higher (Gemini, Grok, GPT-5.6 family), record the standard sub-200K rate in `cost` and add a comment with the higher tier.
 5. **Unverifiable vendor mapping**: if the model ID's vendor cannot be determined, ask the user before researching.
+
+## Effort Variants Registration
+
+Every registered model that supports reasoning gets **reasoning-effort variants** based on the vendor's official API levels. This lets the user pick an effort level per model (via `agent.variant`, `command.variant`, or the TUI).
+
+### Config shape
+
+`provider.tailscale.models.<model>.variants` is an object keyed by variant name; each value is an AI SDK provider-options object:
+
+```jsonc
+"variants": {
+  "low":    { "reasoningEffort": "low" },
+  "medium": { "reasoningEffort": "medium" },
+  "high":   { "reasoningEffort": "high" },
+  "xhigh":  { "reasoningEffort": "xhigh" },
+  "max":    { "reasoningEffort": "max" }
+}
+```
+
+### How variants behave in opencode
+
+- **Key naming**: use camelCase `reasoningEffort` for `@ai-sdk/openai-compatible` — the AI SDK serializes it to `reasoning_effort` on the wire. (Contrast: `service_tier` in `options` must be snake_case because it is spread verbatim.)
+- **Merge order** (last wins): base defaults < `model.options` < `agent.options` < **variant**.
+- **Auto-generation**: opencode already auto-generates `low`/`medium`/`high` (plus `max` for `deepseek-v4*`) for reasoning models on openai-compatible providers. Config-defined variants with the same name override them; `{ "name": { "disabled": true } }` removes one; new names are added.
+- **Reference**: `agent.variant` / `command.variant` only apply when the model actually exposes that variant name — otherwise it silently falls back to default.
+- **Models without official effort levels** (e.g. Claude Haiku, which only supports extended-thinking `budget_tokens`): register no variants and leave a `//` comment.
+
+### Official effort levels (verified 2026-08-11)
+
+| Family | Parameter (wire) | Official levels | Notes |
+|---|---|---|---|
+| OpenAI GPT-5.6 family | `reasoning_effort` | low, medium, high, xhigh, max | default medium; `none`/`minimal` exist but are disable-like |
+| OpenAI gpt-5.3-codex | `reasoning_effort` | low, medium, high, xhigh | Responses API only |
+| Anthropic Opus/Sonnet/Fable 5 | `output_config.effort` | low, medium, high, xhigh, max | adaptive thinking, default high; via openai-compatible use `reasoningEffort` |
+| Anthropic Haiku 4.5 | — | none | extended-thinking budget only, no effort levels |
+| xAI Grok 4.5 / grok-build | `reasoning_effort` | low, medium, high | default high, cannot disable |
+| Gemini 3.1 Pro | `thinking_level` | low, medium, high | cannot disable |
+| Gemini 3.6 Flash / 3.5 Flash Lite | `thinking_level` | minimal, low, medium, high | default medium / minimal |
+| GLM 5.2 | `reasoning_effort` | low, medium, high, xhigh, max | default max |
+| Kimi K3 / K3 Fast | `reasoning_effort` | low, high, max | always reasons, default max |
+| DeepSeek V4 Flash / Pro | `reasoning_effort` | low, high, max | default high |
+
+Register levels from this table using `reasoningEffort` as the option key. When a vendor's levels are a strict subset (e.g. Kimi/DeepSeek lack `medium`), register only the official values — do not invent intermediate levels.
 
 ## Vendor Pricing Sources (official only)
 

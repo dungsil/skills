@@ -53,6 +53,27 @@
         "The output keeps unrelated config fields and $schema unchanged.",
         "The output reports a summary of added, updated, and flagged models."
       ]
+    },
+    {
+      "id": "register-effort-variants",
+      "prompt": "새로 등록한 kimi-k4 모델에 reasoning effort variants도 달아줘.",
+      "expected_output": "공식 API 문서에서 kimi-k4의 reasoning effort 수준을 조사하고, variants 객체에 official 수준만 등록한다.",
+      "assertions": [
+        "The output researches official reasoning effort levels rather than assuming low/medium/high.",
+        "The output registers only officially supported effort values.",
+        "The output uses camelCase reasoningEffort as the variant option key.",
+        "The output does not invent intermediate effort levels not in the official docs."
+      ]
+    },
+    {
+      "id": "no-effort-model",
+      "prompt": "claude-haiku-5를 등록할 건데 이 모델은 effort 레벨이 없다고 하더라.",
+      "expected_output": "variants를 등록하지 않고 이유를 주석으로 남긴다. 임의의 effort 값을 만들지 않는다.",
+      "assertions": [
+        "The output verifies the model has no official effort levels.",
+        "The output omits variants for that model with an explanatory comment.",
+        "The output still registers the model's other metadata normally."
+      ]
     }
   ]
 }
