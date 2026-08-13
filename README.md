@@ -27,6 +27,7 @@ pnpm dlx skills add dungsil/skills -g
 | [vibe-implement] | [2단계] 스펙/티켓 기반 구현                 | [mattpocock/skills] - implement, tdd, resolving-merge-conflicts (MIT)    |
 | [vibe-review]    | [개선] 코드 리뷰                            | [mattpocock/skills] - code-review (MIT)                                  |
 | [vibe-refactor]  | [개선] 아키텍처 개선 후보 HTML 리포트       | [mattpocock/skills] - improve-codebase-architecture (MIT)                |
+| [vibe-next-plan] | [독립] 방향성 조사 후 인계                  | [shadcn] - improve (next 변형) (MIT)                                      |
 | [vibe-handoff]   | [내부] 대화를 인수인계 문서로 압축          | [mattpocock/skills] - handoff (MIT)                                      |
 | [vibe-debug]     | [내부] 하드 버그/성능 회귀 진단 루프        | [mattpocock/skills] - diagnosing-bugs (MIT)                              |
 | [vibe-modeling]  | [내부] 도메인 모델/ADR 구축                 | [mattpocock/skills] - domain-modeling (MIT)                              |
@@ -68,6 +69,7 @@ vibe-implement ─▶ vibe-review ─▶ 커밋
 |-----------------|---------------------------------------------------------------------------------------------------------------|
 | [vibe-debug]    | 뭔가 깨졌을 때. 재현 루프를 먼저 만들고 회귀 테스트로 마감한다. 원인이 구조 문제면 `vibe-refactor`로 인계한다 |
 | [vibe-refactor] | 코드베이스 상태 점검. 개선 후보를 골라 합의까지 진행하고, 실제 구현은 `vibe-implement`가 맡는다               |
+| [vibe-next-plan] | 다음에 뭘 만들지 모를 때. 코드베이스에서 증거 기반 방향성 4–6개를 조사·제시한 뒤 `vibe-plan` 또는 `vibe-deep-plan`에 인계한다 |
 | [vibe-handoff]  | 세션이 꽉 찼을 때. 대화를 인수인계 문서로 압축해 새 세션에서 이어간다                                         |
 
 #### 공유용 스킬
@@ -106,7 +108,7 @@ bun install
 bun run validate:skills
 ```
 
-`bun run lint`와 `bun run validate:skills`는 `scripts/validate-skills`가 지정된 7개 스킬의 최상위 `disable-model-invocation: true`를 검사하고, 모든 스킬의 Agent Skills frontmatter를 독립적으로 검증합니다. 외부 검증 패키지에 의존하지 않습니다.
+`bun run lint`와 `bun run validate:skills`는 `scripts/validate-skills`가 지정된 8개 스킬의 최상위 `disable-model-invocation: true`를 검사하고, 모든 스킬의 Agent Skills frontmatter를 독립적으로 검증합니다. 외부 검증 패키지에 의존하지 않습니다.
 
 각 스킬의 `evals/evals.json`은 스킬 의도를 검토하기 위한 평가 케이스와 기대 출력 기준입니다. 스킬 동작을 바꾸는 경우 관련 eval의 `prompt`, `expected_output`, `assertions`를 함께 갱신하고, 실패 사례는 해당 assertion이 어떤 계약을 지키지 못했는지 드러나게 작성합니다.
 
@@ -132,6 +134,7 @@ bun run validate:skills
 [vibe-deep-plan]: skills/vibe-coding/vibe-deep-plan
 [vibe-review]: skills/vibe-coding/vibe-review
 [vibe-debug]: skills/vibe-coding/vibe-debug
+[vibe-next-plan]: skills/vibe-coding/vibe-next-plan
 [vibe-modeling]: skills/vibe-coding/vibe-modeling
 [vibe-grilling]: skills/vibe-coding/vibe-grilling
 [mattpocock/skills]: https://github.com/mattpocock/skills/

@@ -25,6 +25,7 @@ const extensionSkillPaths = new Set([
   "vibe-coding/vibe-init/SKILL.md",
   "vibe-coding/vibe-plan/SKILL.md",
   "vibe-coding/vibe-refactor/SKILL.md",
+  "vibe-coding/vibe-next-plan/SKILL.md",
 ]);
 
 function relativeSkillPath(filePath) {

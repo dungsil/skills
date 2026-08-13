@@ -1,0 +1,7 @@
+interface:
+  display_name: "Vibe Next Plan"
+  short_description: "코드베이스 방향성 조사 후 다음에 만들 기능을 탐색"
+  default_prompt: "Use $vibe-next-plan to survey the codebase for grounded direction on what to build next."
+
+policy:
+  allow_implicit_invocation: false

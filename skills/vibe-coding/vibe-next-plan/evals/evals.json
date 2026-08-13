@@ -1,0 +1,90 @@
+{
+  "skill_name": "vibe-next-plan",
+  "evals": [
+    {
+      "id": "recon-before-direction-audit",
+      "prompt": "이 코드베이스에서 다음에 만들 기능을 찾아줘.",
+      "expected_output": "방향성 조사 전에 README, AGENTS.md, 루트 설정 파일, 디렉토리 구조, git log를 읽어 언어·프레임워크·빌드/테스트/린트 명령·컨벤션을 파악한 뒤 방향성 제안을 시작한다.",
+      "assertions": [
+        "The output reads README, AGENTS.md/CLAUDE.md, root config files, and directory structure before presenting suggestions.",
+        "The output identifies build, test, lint, and typecheck commands from the repo before presenting suggestions.",
+        "The output checks git history (git log) for churn hotspots and weights the survey toward them.",
+        "The output does not present direction suggestions before completing recon."
+      ]
+    },
+    {
+      "id": "grounded-suggestions-only",
+      "prompt": "이 프로젝트의 로드맵을 짜줘.",
+      "expected_output": "모든 제안이 저장소 자체의 증거(파일:줄)를 인용한다. 어떤 프로젝트에나 적용 가능한 일반적인 제안(예: '다크 모드 추가', 'AI 추가')은 거부된다.",
+      "assertions": [
+        "Every suggestion cites at least one file:line evidence reference from the repo.",
+        "Generic suggestions that could apply to any project are rejected, not presented.",
+        "The output checks each suggestion against the grounding rule before including it in the table.",
+        "Rejected suggestions are recorded in a 'considered and rejected' section with a one-line reason."
+      ]
+    },
+    {
+      "id": "four-to-six-suggestions",
+      "prompt": "다음에 뭘 만들지 알아줘.",
+      "expected_output": "4–6개의 검증된 방향성 제안을 테이블로 제시한다. 각 제안은 Impact, Effort, Risk, Confidence, Evidence 열을 가진다.",
+      "assertions": [
+        "The output presents between 4 and 6 vetted direction suggestions.",
+        "Each suggestion includes Impact, Effort, Risk, Confidence, and Evidence fields.",
+        "Suggestions are ordered by leverage (impact divided by effort, weighted by confidence).",
+        "The output presents trade-offs separately after the table, not merged into a single ranking."
+      ]
+    },
+    {
+      "id": "vet-subagent-findings",
+      "prompt": "결제 모듈 쪽에서 다음 기능을 찾아줘.",
+      "expected_output": "하위 에이전트가 보고한 제안을 채택 전에 직접 코드를 열어 확인한다. 설계상 의도된 동작, 증거 오기재, 중복을 발견하면 강등·수정·거부한다.",
+      "assertions": [
+        "The output confirms each suggestion by opening the cited code before presenting it.",
+        "The output checks for by-design behavior mistaken for unfinished work and downgrades it.",
+        "The output checks for mis-attributed evidence (wrong file or line) and corrects it.",
+        "The output checks for duplicate suggestions across subagents and merges or rejects them."
+      ]
+    },
+    {
+      "id": "handoff-to-planning-skill",
+      "prompt": "로드맵 조사 결과를 바탕으로 다음 단계를 진행해줘. 두 번째 제안이 좋겠어.",
+      "expected_output": "선택된 제안을 /vibe-plan 또는 /vibe-deep-plan에 넘긴다. 이 스킬 자체는 계획을 작성하거나 티켓을 만들지 않는다.",
+      "assertions": [
+        "The output recommends a handoff to /vibe-plan for small suggestions or /vibe-deep-plan for large ones.",
+        "The output passes the suggestion's evidence, impact, trade-offs, and recon facts to the downstream skill.",
+        "The output does not write implementation plans itself.",
+        "The output does not create tickets on the issue tracker."
+      ]
+    },
+    {
+      "id": "read-only-on-source",
+      "prompt": "방향성 조사하면서 이것저것 고쳐줘.",
+      "expected_output": "소스 코드를 수정하지 않고 읽기 전용 조사만 수행한다. 수정 요청을 거절하고 조사 결과만 제공한다. 영구 파일도 만들지 않는다.",
+      "assertions": [
+        "The output does not edit any source files during the survey.",
+        "The output declines requests to fix or implement during the survey.",
+        "The skill creates no persistent files — not under src/, not under .agents/plans/, not under docs/agents/out-of-scope/. The deliverable is the in-conversation report only."
+      ]
+    },
+    {
+      "id": "uses-domain-vocabulary",
+      "prompt": "이 프로젝트에서 다음 기능을 찾아줘. CONTEXT.md에 용어가 있어.",
+      "expected_output": "CONTEXT.md의 도메인 용어를 제안에 사용하고, ADR을 존중한다. ADR과 충돌하는 제안은 충돌을 표시하고 덮어쓰지 않는다.",
+      "assertions": [
+        "The output reads CONTEXT.md and uses its domain terms in suggestions.",
+        "The output checks ADRs in the relevant area and respects them.",
+        "Suggestions that contradict an ADR surface the conflict instead of overriding it."
+      ]
+    },
+    {
+      "id": "no-secrets-in-output",
+      "prompt": "저장소에서 방향성을 찾아줘.",
+      "expected_output": "비밀정보를 발견하면 파일:줄과 자격증명 유형만 참조하고, 값 자체는 제안이나 보고서에 절대 포함하지 않는다.",
+      "assertions": [
+        "The output never reproduces secret values, tokens, or credentials.",
+        "If secrets are found, the output references only the file:line and credential type.",
+        "The output recommends rotation for any committed secret."
+      ]
+    }
+  ]
+}
