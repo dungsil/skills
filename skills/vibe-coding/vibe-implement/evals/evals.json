@@ -130,13 +130,29 @@
     {
       "id": "caller-owned-mode-returns-commit-only-result",
       "prompt": "vibe-goal이 caller-owned 모드로 호출한 티켓 구현을 끝내고 리뷰도 통과했어. 이제 결과를 넘겨줘.",
-      "expected_output": "호출자가 통합과 반영을 소유하므로 공급받은 base 위에서 선형을 유지한 티켓 브랜치 하나에만 커밋하고 추가 브랜치나 worktree를 만들지 않으며, 병합·반영·작업공간 정리·트래커 변경 없이 브랜치 이름, 정확한 SHA, 검증 근거, 읽기 전용 vibe-review verdict/report를 호출자에게 반환한다.",
+      "expected_output": "호출자가 통합과 반영을 소유하므로 공급받은 branch·worktree에서 공급받은 base 위에 선형으로 직접 커밋하고 추가 브랜치나 worktree를 만들지 않으며, 병합·반영·작업공간 정리·트래커 변경 없이 브랜치 이름, 정확한 SHA, 검증 근거, 읽기 전용 vibe-review verdict/report를 호출자에게 반환한다. 같은 티켓의 후속 review-fix·respawn·resume도 같은 공급받은 branch·worktree에서 이어진다.",
       "assertions": [
-        "The workflow records caller-owned mode at invocation and commits only the supplied ticket branch, creating no extra branch or worktree.",
-        "The ticket branch stays linear on the caller-supplied base, with no merge of the integration branch or the target into it.",
+        "The workflow records caller-owned mode at invocation and commits only the supplied branch, creating no extra branch or worktree.",
+        "The supplied branch stays linear on the caller-supplied base, with no merge of the integration branch or the target into it.",
         "The return includes the branch name, exact commit SHA, verification evidence, and a read-only vibe-review verdict and report.",
-        "The output never merges or lands into an integration workspace or original target, never publishes or treats the ticket branch as a durable artifact, and never cleans or deletes the caller-owned branch or worktree, leaving that deletion to the caller after integration.",
-        "The output never changes hosted tracker state and treats vibe-review as read-only evidence rather than tracker-write authority; a version-controlled local Markdown ticket file stays inside that same ticket commit."
+        "The output never merges or lands into an integration workspace or original target, never publishes or treats the branch as a durable artifact, and never cleans or deletes the caller-owned branch or worktree, leaving that deletion to the caller after integration.",
+        "The output never changes hosted tracker state and treats vibe-review as read-only evidence rather than tracker-write authority; a version-controlled local Markdown ticket file stays inside that same commit.",
+        "A same-ticket review-fix, respawn, or resume reuses the same supplied branch and worktree with no new branch, worktree, or ticket ID."
+      ]
+    },
+    {
+      "id": "caller-owned-reuses-supplied-ticket-workspace-for-same-ticket-lifecycle",
+      "prompt": "vibe-goal이 티켓 A를 caller-owned로 시켰고 A가 통과했어. 같은 티켓 A 리뷰에서 수정이 나와서 A를 다시 시켜야 해. 새 서브에이전트에 새 브랜치·worktree를 만들어서 파견해줘.",
+      "expected_output": "티켓 A의 implement → review → fix → re-review는 공급받은 A 전용 ticket branch·worktree를 재사용한다. 새 sub-agent는 허용하지만 새 branch·worktree·ticket ID는 금지한다. 각 invocation은 호출자가 준 supplied base를 review fixed point로 쓰고 그 base 위에 선형으로 커밋한다. workspace가 stale·dirty하거나 head가 기록과 다르면 reset 단축키를 쓰지 않고 상태를 보존해 보고한다. workspace는 정확한 record에서 찾고 branch name·number·slug로 추측하지 않는다. 서로 다른 티켓 B는 A의 ticket workspace를 공유하지 않는다.",
+      "assertions": [
+        "The same canonical ticket A's implement → review → fix → re-review reuses the supplied ticket branch and worktree, creating no new branch, worktree, or ticket ID.",
+        "A fresh sub-agent is allowed for the fix, but a new workspace is forbidden for the same ticket.",
+        "Each invocation uses the caller-supplied base as its review fixed point and stays linear on that base with no merge commit.",
+        "The output does not reset, clean, or rewrite the supplied workspace as a shortcut when it is stale, dirty, or mismatched with the recorded state, and reports the mismatch for explicit resolution.",
+        "The output finds the workspace by its exact record (canonical ticket ID), never by guessing a branch name, number, or slug.",
+        "Each return gives the branch name, exact SHA, verification evidence, and a read-only vibe-review verdict and report.",
+        "The workflow never merges, lands, publishes, cleans, or deletes the supplied workspace, and never mutates hosted tracker state.",
+        "A different ticket B gets its own supplied workspace and never shares ticket A's supplied branch or worktree."
       ]
     },
     {
@@ -183,6 +199,18 @@
         "When commit.gpgsign is enabled by config, the output overrides it per commit with -c commit.gpgsign=false so the commit is honestly unsigned.",
         "The no-sign rule applies to the implementation commit including any checkbox-flip edits that ride it.",
         "The output does not disable signing globally or modify the user's git config; the override is per-commit only."
+      ]
+    },
+    {
+      "id": "reuses-exact-workspace-across-review-fix-and-resume",
+      "prompt": "vibe/3-notification-api 티켓을 이미 구현하고 리뷰까지 통과했어. 그런데 리뷰에서 이슈가 하나 남아서 같은 티켓의 수정본을 다시 구현해줘. 이전에 만든 worktree는 아직 있어.",
+      "expected_output": "같은 논리 작업의 기존 workspace record를 먼저 확인하고, 구현·리뷰·수정·재개를 그 worktree에서 계속하며 새 번호 branch나 새 worktree를 만들지 않는다. fixed point는 record의 최초 값을 유지하고 현재 HEAD로 다시 잡지 않으며, branch 이름·번호·slug로 추측하지 않는다.",
+      "assertions": [
+        "The output looks for an existing workspace record for the same ticket before any git command, and identifies the existing vibe/3-notification-api branch and worktree from that record rather than from branch-name or number guessing.",
+        "The output continues the review-fix in the existing worktree and creates no new vibe/* branch and no second worktree for the same ticket.",
+        "The output keeps the original fixed point from the record and does not recompute it from the current HEAD.",
+        "The output never guesses a workspace by branch number, slug, the latest vibe/* branch, or a similar name when the record is absent, ambiguous, or held by another active owner.",
+        "When the prior worktree was removed but its branch was retained, the output reattaches a worktree to that exact retained branch instead of creating a new numbered branch."
       ]
     }
   ]
