@@ -41,6 +41,10 @@ Reference docs, read as needed:
 
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
 
+## Commit signing
+
+This workflow's commits are authored by an AI, not a human, so they must never be signed as if a person made them. Never pass `-S`, `--gpg-sign`, or `--signoff` to `git commit`. If the repository or global config enables signing by default (`commit.gpgsign = true`), override it per commit with `git -c commit.gpgsign=false commit …` so the result is honestly unsigned. This applies to every commit this workflow creates, including the checkbox-flip edits that ride the implementation commit.
+
 ## Completion disposition
 
 1. Read `docs/agents/issue-tracker.md`.
