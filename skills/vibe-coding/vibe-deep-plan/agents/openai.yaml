@@ -1,6 +1,0 @@
-interface:
-  display_name: "Vibe Deep Plan"
-  short_description: "대규모 작업을 결정 티켓 지도로 설계"
-  default_prompt: "Use $vibe-deep-plan to chart and work through a shared map of decision tickets for this large effort."
-policy:
-  allow_implicit_invocation: false

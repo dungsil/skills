@@ -1,7 +1,0 @@
-interface:
-  display_name: "Vibe Plan"
-  short_description: "인터뷰·스펙·티켓을 한 흐름으로 계획"
-  default_prompt: "Use $vibe-plan to take this idea from interview through spec to published tickets."
-
-policy:
-  allow_implicit_invocation: false

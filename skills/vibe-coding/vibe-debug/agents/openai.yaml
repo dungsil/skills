@@ -1,7 +1,0 @@
-interface:
-  display_name: "Vibe Debug"
-  short_description: "견고한 피드백 루프로 어려운 버그 진단"
-  default_prompt: "Use $vibe-debug to diagnose a bug with a red-capable feedback loop."
-
-policy:
-  allow_implicit_invocation: true
