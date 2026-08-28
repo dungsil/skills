@@ -106,6 +106,18 @@
       ]
     },
     {
+      "id": "github-issue-main-state-without-pr",
+      "prompt": "프로젝트 이슈 트래커는 GitHub다. Issue #18의 요구사항이 현재 origin/main에 올바르게 구현되었는지 rq로 검증해줘.",
+      "expected_output": "Issue #18에서 요구사항을 가져오고 origin/main의 전체 구현 상태를 검증한다. PR을 찾거나 PR 번호를 묻지 않으며, 전체 보고서는 .agents/reports/rq/18.md에 저장한다.",
+      "assertions": [
+        "The workflow treats Issue #18 as the requirement source and origin/main as the exact review target.",
+        "The evidence review inspects origin/main implementation state rather than substituting the current branch or a pull-request diff.",
+        "The workflow does not search for candidate pull requests, choose a pull request, or ask the user for a pull-request number.",
+        "The full report is saved at .agents/reports/rq/18.md even though the project tracker is GitHub.",
+        "The report is not posted to Issue #18 or to any pull request."
+      ]
+    },
+    {
       "id": "github-pr-comment-report",
       "prompt": "루트 AGENTS.md가 docs/agents/issue-tracker.md를 가리키고, 그 문서는 이슈 트래커를 GitHub로 명시한다. 이슈 #482를 구현한 현재 변경의 PR #91을 품질 게이트로 검증해줘.",
       "expected_output": "전체 Markdown 보고서를 <!-- rq-report: 482 --> 표식과 함께 GitHub PR #91의 대화 덧글 본문에 게시하거나 같은 표식의 기존 덧글을 갱신한다. 로컬 보고서 파일은 만들지 않고, 최종 채팅에는 상태 계약에 맞는 짧은 출력만 표시한다.",

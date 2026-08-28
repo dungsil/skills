@@ -1,6 +1,15 @@
 # Report Delivery
 
-Resolve the report destination before reviewing so a hosted report is not posted to the wrong change.
+Resolve the review target before the report destination. Report delivery must not change what code or state is being verified.
+
+## Review Target
+
+Classify the user's requested review target first:
+
+- `HOSTED_CHANGE`: an explicit pull request or merge request, or a branch/change review that the user wants reported on its corresponding hosted change.
+- `STATE`: a named ref such as `main` or `origin/main`, the whole repository state, or an issue's implementation on that state.
+
+Use the exact target the user named. An issue number identifies requirements and the report key; it does not imply `HOSTED_CHANGE`. For `STATE`, do not search open changes, ask for a pull-request or merge-request number, or switch evidence to a change diff.
 
 ## Tracker Resolution
 
@@ -14,20 +23,21 @@ Use the known issue number as the report key. Otherwise derive a short kebab-cas
 
 ## Destination
 
-| Tracker class | Full report destination |
-|---|---|
-| `LOCAL_OR_UNKNOWN` | `.agents/reports/rq/<report-key>.md` |
-| `GITHUB` | Conversation comment on the verified corresponding pull request |
-| `GITLAB` | Note or comment on the verified corresponding merge request |
+| Review target | Tracker class | Full report destination |
+|---|---|---|
+| `STATE` | Any | `.agents/reports/rq/<report-key>.md` |
+| `HOSTED_CHANGE` | `LOCAL_OR_UNKNOWN` | `.agents/reports/rq/<report-key>.md` |
+| `HOSTED_CHANGE` | `GITHUB` | Conversation comment on the verified corresponding pull request |
+| `HOSTED_CHANGE` | `GITLAB` | Note or comment on the verified corresponding merge request |
 
-For GitHub or GitLab:
+For a GitHub or GitLab `HOSTED_CHANGE`:
 
 - Resolve the target from an explicit pull-request or merge-request reference first, then from the reviewed branch or change when the provider confirms exactly one match.
 - Never post the report to an issue, another open change, or a guessed target. Ask for the target when none or more than one remains possible.
 - Start the report comment with `<!-- rq-report: <report-key> -->`. If that marker already exists on the target, update that comment instead of adding a duplicate.
 - Do not also create the local report file unless the user or project instructions request a second copy.
 
-For `LOCAL_OR_UNKNOWN`, create missing parent directories and keep the existing local-file behavior.
+For every local destination, create missing parent directories and keep the existing local-file behavior. A local report for `STATE` is the intended destination, not a fallback for an unresolved hosted target.
 
 ## Follow-up and Failure
 
