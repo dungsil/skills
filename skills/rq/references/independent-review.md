@@ -40,7 +40,8 @@ For `HEAVY`, the same reviewer also attempts a plausible counterexample or alter
 The main agent resolves every finding, records accepted and rejected objections with reasons, updates the draft, and recalculates affected statuses. A reviewer call without item-level results or resolution is incomplete.
 
 Independent review is complete when every independent source requirement has one reviewer result and all disagreements are resolved. If a required subagent is unavailable, mark that requirement's independent verification incomplete; a self-review cannot satisfy the independent-review requirement.
-Save the initial full report, each post-report addendum, and each revised full report to the same `.agents/reports/rq/<issue-number-or-name>.md` path. Append an addendum to that report's end; update the same report with a revised full report. If saving fails, use `ERROR`: state that the report was not saved, name the risk, and recommend checking the path and write permission before retrying. The final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and must not repeat the full addendum.
+
+Deliver the initial full report, each post-report addendum, and each revised full report to the same artifact selected by [report-delivery.md](report-delivery.md). Append an addendum to that artifact; replace its report body only for a revised full report. If delivery fails, use `ERROR`: state that the detailed report was not delivered, name the risk, and recommend checking the local path or hosted target, authentication, and write permission before retrying. The final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and must not repeat the full addendum.
 
 
 ## Optional Post-report Adversarial Verification
@@ -58,4 +59,4 @@ Run this only when the user explicitly requests adversarial verification after t
 4. Return `UPHELD` or `CHANGES_REQUIRED`, exact evidence, the attempted counterexample, and the affected criteria or status.
 5. The main agent resolves findings once. Do not start another adversarial round unless the user requests it.
 
-Append an addendum containing the item assignments, findings, resolutions, and whether the original verdict remains valid to the end of the existing report. Update that same report with a full revised report only when requested.
+Append an addendum containing the item assignments, findings, resolutions, and whether the original verdict remains valid to the existing report artifact. Update that same artifact with a full revised report only when requested.

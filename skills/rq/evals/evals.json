@@ -85,23 +85,59 @@
     },
     {
       "id": "stored-pass-report-with-issue-number",
-      "prompt": "이슈 #482: 사용자는 저장 후에만 검사를 실행할 수 있어야 한다. 현재 브랜치 diff가 이 요구사항을 만족하는지 품질 게이트로 봐줘.",
+      "prompt": "프로젝트에는 이슈 트래커가 정의되어 있지 않다. 이슈 #482: 사용자는 저장 후에만 검사를 실행할 수 있어야 한다. 현재 브랜치 diff가 이 요구사항을 만족하는지 품질 게이트로 봐줘.",
       "expected_output": "전체 품질 게이트 보고서를 .agents/reports/rq/482.md에 저장하고, 최종 채팅에는 PASS 상태만 간단히 표시한다.",
       "assertions": [
         "The full Markdown quality-gate report is saved at .agents/reports/rq/482.md, using the issue number when one is known.",
+        "An undefined issue tracker uses the local report destination rather than inferring GitHub from a remote or available integration.",
         "The saved file keeps the full report template, including requirement mapping, evidence, gate statuses, risks, limits, and independent review details.",
         "The overall status is PASS, and the final chat output contains only that status: no report path, verdict summary, risks, recommendations, evidence, evidence table, or report body."
       ]
     },
     {
       "id": "stored-warning-report-with-kebab-name",
-      "prompt": "요구사항: 결제 취소는 중복 요청에도 한 번만 처리되어야 한다. 구현은 있어 보이는데 테스트가 없는 상태야. 품질 게이트로 판단해줘.",
+      "prompt": "프로젝트의 이슈 트래커는 Local Markdown이다. 요구사항: 결제 취소는 중복 요청에도 한 번만 처리되어야 한다. 구현은 있어 보이는데 테스트가 없는 상태야. 품질 게이트로 판단해줘.",
       "expected_output": "이슈 번호가 없으므로 전체 품질 게이트 보고서를 .agents/reports/rq/payment-cancellation-idempotency.md에 저장한다. WARNING 또는 FAIL 최종 채팅에는 상태, 리스크, 권고만 표시하고 전체 보고서 본문이나 evidence 표는 반복하지 않는다.",
       "assertions": [
         "When no issue number is available, the full Markdown quality-gate report is saved at .agents/reports/rq/payment-cancellation-idempotency.md, using a short kebab-case requirement name.",
         "The overall status is WARNING or FAIL. The final chat output contains only the status, risks, and recommendations.",
         "The WARNING or FAIL final chat output contains no report path, additional summary, verdict detail, full report body, full evidence table, requirement mapping, or independent review details.",
         "If report storage fails, the output reports ERROR rather than presenting a successful status."
+      ]
+    },
+    {
+      "id": "github-pr-comment-report",
+      "prompt": "루트 AGENTS.md가 docs/agents/issue-tracker.md를 가리키고, 그 문서는 이슈 트래커를 GitHub로 명시한다. 이슈 #482를 구현한 현재 변경의 PR #91을 품질 게이트로 검증해줘.",
+      "expected_output": "전체 Markdown 보고서를 <!-- rq-report: 482 --> 표식과 함께 GitHub PR #91의 대화 덧글 본문에 게시하거나 같은 표식의 기존 덧글을 갱신한다. 로컬 보고서 파일은 만들지 않고, 최종 채팅에는 상태 계약에 맞는 짧은 출력만 표시한다.",
+      "assertions": [
+        "The workflow reads the project-defined issue-tracker guidance and selects GitHub rather than the local report path.",
+        "The full Markdown report is posted to the verified PR #91 conversation with the marker <!-- rq-report: 482 -->, updating the matching comment instead of duplicating it.",
+        "The workflow does not create .agents/reports/rq/482.md unless the user or project instructions request a second copy.",
+        "The report is not posted to GitHub issue #482 or another pull request.",
+        "After successful comment delivery, the final chat output follows the compact status contract and does not repeat the full report."
+      ]
+    },
+    {
+      "id": "gitlab-mr-comment-report",
+      "prompt": "루트 AGENTS.md가 연결한 이슈 트래커 문서는 GitLab을 명시한다. 이슈 73과 연결된 MR !104의 현재 변경을 품질 게이트로 봐줘.",
+      "expected_output": "전체 Markdown 보고서를 <!-- rq-report: 73 --> 표식과 함께 GitLab MR !104의 note 또는 comment로 게시하거나 같은 표식의 기존 note를 갱신한다. 로컬 보고서 파일은 만들지 않고 최종 채팅에는 짧은 상태 출력만 표시한다.",
+      "assertions": [
+        "The workflow selects the project-defined GitLab tracker and verifies MR !104 as the report target.",
+        "The full report is delivered to the MR note or comment with marker <!-- rq-report: 73 --> and is not posted to the GitLab issue.",
+        "The workflow does not create a local report copy unless separately requested.",
+        "A rerun updates the marked note instead of adding a duplicate report.",
+        "The final chat output does not repeat the full report."
+      ]
+    },
+    {
+      "id": "hosted-report-target-ambiguous",
+      "prompt": "프로젝트 이슈 트래커는 GitHub다. 품질 게이트 보고서를 올려줘. 현재 변경과 관련될 수 있는 열린 PR이 두 개지만 어느 PR인지 정해지지 않았다.",
+      "expected_output": "PR 대상을 하나만 고르도록 확인 질문을 하고 임의로 덧글을 게시하지 않는다. 확인할 수 없는 실행 흐름에서는 ERROR로 처리하며 로컬 파일로 조용히 대체하지 않는다.",
+      "assertions": [
+        "The workflow does not guess between multiple possible pull requests.",
+        "The workflow asks for the corresponding PR before posting when interaction is possible.",
+        "It does not post to an issue, an arbitrary PR, or the local report path as a silent fallback.",
+        "If the target cannot be resolved, the output reports ERROR and states that the detailed report was not delivered."
       ]
     },
     {

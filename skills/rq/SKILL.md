@@ -33,21 +33,22 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
 ## Workflow
 
 1. **Partition the request:** separate the source requirement, requested review scope, supplied evidence, and limits. Only the source requirement can create acceptance criteria.
-2. **Build the gate plan:** apply the scope model, list included and excluded domains, and create a gate item for every independent obligation before deriving criteria. `CODE`/`TEST`/`MIGRATION` items may share a user-requested implementation scope; operational, deployment, and data items may not.
-3. **Derive criteria:** phrase source-stated required behavior, not files, migrations, tests, logs, commands, or evidence that may prove it. For every criterion record `ID`, `Criterion`, `Evidence domain`, `In scope`, `Evidence`, `Status`, and `Impact on overall status`.
+2. **Select the report destination:** read [references/report-delivery.md](references/report-delivery.md), resolve the project-defined issue tracker and report key, and verify the target pull request or merge request when the tracker is GitHub or GitLab. Ask rather than guessing when a hosted target is missing or ambiguous.
+3. **Build the gate plan:** apply the scope model, list included and excluded domains, and create a gate item for every independent obligation before deriving criteria. `CODE`/`TEST`/`MIGRATION` items may share a user-requested implementation scope; operational, deployment, and data items may not.
+4. **Derive criteria:** phrase source-stated required behavior, not files, migrations, tests, logs, commands, or evidence that may prove it. For every criterion record `ID`, `Criterion`, `Evidence domain`, `In scope`, `Evidence`, `Status`, and `Impact on overall status`.
    - Out-of-scope source obligations may remain as traceability rows, but must use `In scope=false`, `OUT_OF_SCOPE` or `SEPARATE_GATE`, and impact `none`.
    - Review instructions, supplied evidence, likely safeguards, and recommendations cannot add criteria.
-4. **Choose the review tier:**
+5. **Choose the review tier:**
    - `LIGHT`: narrow UI, copy, validation, or local behavior.
    - `HEAVY`: security, auth, permissions, persistence, transactions, concurrency, cache invalidation, external integrations, broad cross-layer changes, or user-requested rigor. Reviewers apply deeper evidence checks and counterexample analysis, but the assignment topology does not change.
    - Every independent source requirement gets exactly one subagent reviewer that verifies all criteria and gate items derived from that requirement end to end.
-5. **Gather evidence:** inspect user-provided artifacts first, then the current branch against the likely base, working-tree/staged/untracked changes, and finally relevant existing source found by requirement terms.
-6. **Map evidence:** prefer service, controller, use case, adapter, repository, endpoint, handler, policy, validator, migration, and integration code over DTOs, generated output, docs, or superficial name matches.
+6. **Gather evidence:** inspect user-provided artifacts first, then the current branch against the likely base, working-tree/staged/untracked changes, and finally relevant existing source found by requirement terms.
+7. **Map evidence:** prefer service, controller, use case, adapter, repository, endpoint, handler, policy, validator, migration, and integration code over DTOs, generated output, docs, or superficial name matches.
    - A positive `CODE` or `MIGRATION` judgment requires source or diff implementation evidence. Tests and command results are supporting evidence, not substitutes.
    - Other gates require primary evidence for their domain: test source/results for `TEST`, execution records for `OPERATION`, release records for `DEPLOYMENT`, observed state for `DATA`, and recorded human observation for `MANUAL`.
-7. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
-8. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent source requirement in parallel, resolve every disagreement, update the draft, and recalculate status.
-9. **Report:** use [references/report-template.md](references/report-template.md) for a full report. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). Save the full Markdown report to `.agents/reports/rq/<issue-number-or-name>.md`: use the issue number when it is known; otherwise use a short kebab-case name based on the requirement. Create the parent directories when absent. If creating the directory or saving the report fails, set the overall status to `ERROR`; do not present the report as successfully saved. State that the report was not saved, name the risk, and recommend checking the path and write permission before retrying. The final chat message must not repeat the full report: for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status.
+8. **Draft each gate verdict:** map every in-scope criterion, calculate that gate's status only, and list excluded obligations under separate gates.
+9. **Review every draft independently:** read [references/independent-review.md](references/independent-review.md), dispatch one subagent per independent source requirement in parallel, resolve every disagreement, update the draft, and recalculate status.
+10. **Report:** use [references/report-template.md](references/report-template.md) for the full report and deliver it to the destination selected in step 2. Before writing a Korean report, read [references/korean-report-values.md](references/korean-report-values.md). If delivery fails, set the overall status to `ERROR` and use the failure output defined in [references/report-delivery.md](references/report-delivery.md). The final chat message must not repeat the full report: for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status.
 
 ## Optional Post-report Adversarial Verification
 
@@ -58,7 +59,7 @@ Do not run adversarial verification as part of the initial gate report. Run it o
 - `품질 게이트 적대 검증`
 - `\$rq adversarial`
 
-Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). For an addendum request, append the adversarial-verification addendum to the end of the existing `.agents/reports/rq/<issue-number-or-name>.md` report; do not remove its body or create another file. For a revised full report request, update that same report path with the new full report. If saving fails, use the `ERROR` path above. After saving, the final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and do not repeat the full addendum.
+Follow [references/independent-review.md](references/independent-review.md#optional-post-report-adversarial-verification). Keep the addendum or revised full report in the same report artifact selected by [references/report-delivery.md](references/report-delivery.md). If delivery fails, use the `ERROR` path above. After delivery, the final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and do not repeat the full addendum.
 
 ## Status Aggregation
 
@@ -71,7 +72,7 @@ overall status =
 
 Apply these rules in order:
 
-1. `ERROR`: required inputs could not be processed.
+1. `ERROR`: required inputs could not be processed or the full report could not be delivered.
 2. `NO_CHANGES_FOUND`: an implementation review found no relevant implementation or change evidence.
 3. `FAIL`: any required in-scope criterion is clearly `not satisfied`.
 4. `NEEDS_REVIEW`: no criterion clearly fails, but an essential in-scope criterion is `unknown` because mapping or required evidence is insufficient.
@@ -109,4 +110,6 @@ Before reporting:
 - Missing or unrun verification is visible without becoming a hidden criterion.
 - Every independent source requirement has one reviewer result covering all of its criteria and gate items, including scope, evidence, verdict, disagreements, and resulting changes. Splitting a requirement into separate evidence-domain gates does not add reviewers.
 - Mapping relevance remains separate from correctness judgment.
+- The report destination follows the project-defined issue tracker; any hosted pull-request or merge-request target is verified rather than guessed.
+- The full report was delivered exactly once to the selected artifact, while the final chat response follows the compact output contract.
 - Final status, severity, limits, and recommendations use the user's language.

@@ -1,6 +1,6 @@
 # Requirement Quality Gate Report Template
 
-Use this template for the full Markdown report saved at `.agents/reports/rq/<issue-number-or-name>.md`. Use the issue number when it is known; otherwise use a short kebab-case name based on the requirement. Create missing parent directories before saving. If directory creation or initial report saving, addendum appending, or revised-report saving fails, set the overall status to `ERROR` and do not present it as successfully saved. The saved file is the only full report: do not return the full Markdown report in chat. In the final chat message, for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status. If `ERROR` is caused by directory creation or report saving failure, state the risk that the detailed report was not saved and recommend confirming that the output path can be created and is writable, then retrying. Use the user's language for headings, labels, values, and prose. Before writing a Korean report, read [korean-report-values.md](korean-report-values.md).
+Use this template for the full Markdown report. First read [report-delivery.md](report-delivery.md) and deliver the report to its selected local file or hosted pull-request/merge-request comment. Use the issue number as the report key when known; otherwise use a short kebab-case name based on the requirement. If initial delivery, addendum append, or revised-report update fails, set the overall status to `ERROR` and do not present it as successful. The delivered artifact is the only full report: do not return the full Markdown report in chat. In the final chat message, for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status. For a delivery `ERROR`, state the risk that the detailed report was not delivered and recommend checking the local path or hosted target, authentication, and write permission before retrying. Use the user's language for headings, labels, values, and prose. Before writing a Korean report, read [korean-report-values.md](korean-report-values.md).
 
 # Requirement Quality Gate Report
 
@@ -116,7 +116,7 @@ Use this template for the full Markdown report saved at `.agents/reports/rq/<iss
 
 ## Optional Adversarial Verification Addendum
 
-Include this section only when the user explicitly requests post-report adversarial verification. For an addendum-only request, append this addendum to the end of the existing report at `.agents/reports/rq/<issue-number-or-name>.md`; do not erase the report body or create a separate file. For a revised full report request, update that same saved file with the revised full report. Do not return the full addendum in chat; use the compact final-chat contract above. If the append or update fails, report `ERROR`, state the risk that the detailed report was not saved, and recommend confirming that the output path can be created and is writable, then retrying.
+Include this section only when the user explicitly requests post-report adversarial verification. For an addendum-only request, append this addendum to the existing report artifact selected by [report-delivery.md](report-delivery.md); do not erase the report body or create a separate artifact. For a revised full report request, update that same artifact with the revised full report. Do not return the full addendum in chat; use the compact final-chat contract above. If the append or update fails, report `ERROR`, state the risk that the detailed report was not delivered, and recommend checking the local path or hosted target, authentication, and write permission before retrying.
 
 | Item | Result |
 |---|---|
@@ -125,5 +125,4 @@ Include this section only when the user explicitly requests post-report adversar
 | Findings | `<항목별 유지 또는 변경 필요, 근거, 반례 시도>` |
 | Resolution | `<수용·기각 근거와 상태 변경>` |
 | Original verdict | `<유효 | 수정 필요>` |
-
 
