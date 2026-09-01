@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "skills/**"
+      - "scripts/validate-skills"
       - "package.json"
       - "bun.lock"
       - ".github/workflows/validate-skills.yml"
   push:
     paths:
       - "skills/**"
+      - "scripts/validate-skills"
       - "package.json"
       - "bun.lock"
       - ".github/workflows/validate-skills.yml"
