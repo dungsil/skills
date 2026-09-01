@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { readdir, readFile } from "node:fs/promises";
-import { basename, dirname, relative, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,21 +17,6 @@ const topLevelKeys = new Set([
   "sources",
   "requires",
 ]);
-const extensionSkillPaths = new Set([
-  "vibe-coding/vibe-deep-plan/SKILL.md",
-  "vibe-coding/vibe-goal/SKILL.md",
-  "vibe-coding/vibe-handoff/SKILL.md",
-  "vibe-coding/vibe-implement/SKILL.md",
-  "vibe-coding/vibe-init/SKILL.md",
-  "vibe-coding/vibe-plan/SKILL.md",
-  "vibe-coding/vibe-refactor/SKILL.md",
-  "vibe-coding/vibe-next-plan/SKILL.md",
-]);
-
-function relativeSkillPath(filePath) {
-  return relative(skillsDirectory, filePath).replaceAll("\\", "/");
-}
-
 async function collectSkillFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
@@ -111,39 +96,14 @@ function parseFrontmatter(content, filePath) {
   return { fields, metadata, body: content.slice(match[0].length) };
 }
 
-function validateExtensionFlag(fields, metadata, filePath, skillPath) {
-  const hasFlag = fields.has("disable-model-invocation");
-  if (!extensionSkillPaths.has(skillPath)) {
-    if (hasFlag) {
-      throw new Error(`${filePath}: disable-model-invocation is allowed only for the configured extension skills`);
-    }
-    return;
-  }
-
-  if (fields.get("disable-model-invocation") !== "true") {
-    throw new Error(
-      `${filePath}: expected top-level boolean "disable-model-invocation: true"`,
-    );
-  }
-  if (metadata?.has("disable-model-invocation")) {
-    throw new Error(`${filePath}: disable-model-invocation must not be nested under metadata`);
-  }
-}
-
 function validateSkill(content, filePath) {
-  const skillPath = relativeSkillPath(filePath);
   const { fields, metadata } = parseFrontmatter(content, filePath);
   const name = fields.get("name");
   const description = fields.get("description");
   const skillDirectory = basename(dirname(filePath));
 
-  validateExtensionFlag(fields, metadata, filePath, skillPath);
-
   for (const [key, value] of fields) {
-    if (key === "disable-model-invocation" && !extensionSkillPaths.has(skillPath)) {
-      throw new Error(`${filePath}: non-spec top-level key "${key}"`);
-    }
-    if (!topLevelKeys.has(key) && key !== "disable-model-invocation") {
+    if (!topLevelKeys.has(key)) {
       throw new Error(`${filePath}: non-spec top-level key "${key}"`);
     }
     if (key !== "metadata" && key !== "sources" && key !== "requires" && value === "") {
@@ -180,13 +140,6 @@ function validateSkill(content, filePath) {
 
 async function main() {
   const files = await collectSkillFiles(skillsDirectory);
-  const skillPaths = new Set(files.map(relativeSkillPath));
-
-  for (const expectedPath of extensionSkillPaths) {
-    if (!skillPaths.has(expectedPath)) {
-      throw new Error(`Missing extension skill: ${expectedPath}`);
-    }
-  }
 
   for (const filePath of files) {
     validateSkill(await readFile(filePath, "utf8"), filePath);

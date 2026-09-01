@@ -46,7 +46,7 @@ bun install
 bun run validate:skills
 ```
 
-`bun run lint`와 `bun run validate:skills`는 `scripts/validate-skills`가 지정된 8개 스킬의 최상위 `disable-model-invocation: true`를 검사하고, 모든 스킬의 Agent Skills frontmatter를 독립적으로 검증합니다. 외부 검증 패키지에 의존하지 않습니다.
+`bun run lint`와 `bun run validate:skills`는 `scripts/validate-skills`를 실행하여 모든 스킬의 Agent Skills frontmatter를 검증합니다. 외부 검증 패키지에 의존하지 않습니다.
 
 각 스킬의 `evals/evals.json`은 스킬 의도를 검토하기 위한 평가 케이스와 기대 출력 기준입니다. 스킬 동작을 바꾸는 경우 관련 eval의 `prompt`, `expected_output`, `assertions`를 함께 갱신하고, 실패 사례는 해당 assertion이 어떤 계약을 지키지 못했는지 드러나게 작성합니다.
 
