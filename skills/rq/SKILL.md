@@ -33,7 +33,7 @@ Record the coarse evidence boundary separately as `CODE`, `RUNTIME`, or `MIXED` 
 ## Workflow
 
 1. **Partition the request:** separate the source requirement, requested review scope, review target, supplied evidence, and limits. The review target may be a pull request, merge request, diff, branch, named ref such as `main` or `origin/main`, or the repository state. Only the source requirement can create acceptance criteria. A named ref or issue number does not imply a pull request review.
-2. **Select the report destination:** read [references/report-delivery.md](references/report-delivery.md), then use both the review target and project-defined issue tracker to choose the destination. Verify a pull request or merge request only when the requested review target is that hosted change. Do not search for or ask for a pull request when the user asked to verify a named ref, the repository state, or an issue's implementation on that state.
+2. **Select the report destination:** read [references/report-delivery.md](references/report-delivery.md), then choose the destination from any issue, pull request, or merge request supplied and resolved as a remote input. Post the full report to the selected item's conversation without creating a local report file. Keep the evidence target independent: an issue may supply requirements and receive the report while a named ref such as `origin/main` remains the exact state being verified. Use the local report path only when no remote report item was resolved.
 3. **Build the gate plan:** apply the scope model, list included and excluded domains, and create a gate item for every independent obligation before deriving criteria. `CODE`/`TEST`/`MIGRATION` items may share a user-requested implementation scope; operational, deployment, and data items may not.
 4. **Derive criteria:** phrase source-stated required behavior, not files, migrations, tests, logs, commands, or evidence that may prove it. For every criterion record `ID`, `Criterion`, `Evidence domain`, `In scope`, `Evidence`, `Status`, and `Impact on overall status`.
    - Out-of-scope source obligations may remain as traceability rows, but must use `In scope=false`, `OUT_OF_SCOPE` or `SEPARATE_GATE`, and impact `none`.
@@ -111,6 +111,6 @@ Before reporting:
 - Every independent source requirement has one reviewer result covering all of its criteria and gate items, including scope, evidence, verdict, disagreements, and resulting changes. Splitting a requirement into separate evidence-domain gates does not add reviewers.
 - Mapping relevance remains separate from correctness judgment.
 - The evidence comes from the user's requested review target; a named ref or repository-state review is never replaced with a PR or MR diff.
-- The report destination follows the review target and project-defined issue tracker; any requested hosted pull-request or merge-request target is verified rather than guessed.
+- The report destination is the supplied remote issue, pull request, or merge request when present; otherwise it is the local report path. Delivery never changes the requested evidence target.
 - The full report was delivered exactly once to the selected artifact, while the final chat response follows the compact output contract.
 - Final status, severity, limits, and recommendations use the user's language.
