@@ -59,12 +59,10 @@ bun run validate:skills
 
 | 프로젝트 이름 | 라이선스 | 대상 파일 |
 | ------------- | :------: | --------- |
-| [dungsil/dotfiles] | [MIT](./skills/duninit/LICENSE) | [skills/duninit](./skills/duninit/) |
 | [Conventional Commits] | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) | [skills/duninit/assets/COMMIT_MESSAGE_CONVENTION.md](./skills/duninit/assets/COMMIT_MESSAGE_CONVENTION.md) |
 
 
 <!-- 링크 -->
-[dungsil/dotfiles]: https://github.com/dungsil/dotfiles
 [Conventional Commits]: https://www.conventionalcommits.org/en/v1.0.0/
 [rq]: skills/rq
 [duninit]: skills/duninit
