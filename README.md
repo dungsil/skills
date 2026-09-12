@@ -51,13 +51,21 @@ bun run validate:skills
 각 스킬의 `evals/evals.json`은 스킬 의도를 검토하기 위한 평가 케이스와 기대 출력 기준입니다. 스킬 동작을 바꾸는 경우 관련 eval의 `prompt`, `expected_output`, `assertions`를 함께 갱신하고, 실패 사례는 해당 assertion이 어떤 계약을 지키지 못했는지 드러나게 작성합니다.
 
 ## 라이선스
-이 저장소의 스킬과 스크립트는 [MIT-0](./LICENSE) 혹은 [Unlicense](./UNLICENSE)에 따라 배포됩니다.
+별도 라이선스가 명시되지 않은 스킬과 스크립트는 [MIT-0](./LICENSE) 혹은 [Unlicense](./UNLICENSE)에 따라 배포됩니다.
 
-`duninit`은 [dungsil/dotfiles](https://github.com/dungsil/dotfiles)에서 이전했으며, [기존 MIT 라이선스](./skills/duninit/LICENSE)를 유지합니다.
-해당 스킬의 커밋 규칙에는 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)의 내용을 수정하여 사용한 부분이 있으며, 이 부분에는 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)이 적용됩니다.
+### 크레딧
+
+이 프로젝트는 아래 프로젝트에서 가져오거나 수정한 코드와 문서를 사용합니다.
+
+| 프로젝트 이름 | 라이선스 | 대상 파일 |
+| ------------- | :------: | --------- |
+| [dungsil/dotfiles] | [MIT](./skills/duninit/LICENSE) | [skills/duninit](./skills/duninit/) |
+| [Conventional Commits] | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) | [skills/duninit/assets/COMMIT_MESSAGE_CONVENTION.md](./skills/duninit/assets/COMMIT_MESSAGE_CONVENTION.md) |
 
 
 <!-- 링크 -->
+[dungsil/dotfiles]: https://github.com/dungsil/dotfiles
+[Conventional Commits]: https://www.conventionalcommits.org/en/v1.0.0/
 [rq]: skills/rq
 [duninit]: skills/duninit
 [java-code-design]: skills/java/java-code-design
