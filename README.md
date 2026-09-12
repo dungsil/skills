@@ -14,6 +14,7 @@ pnpm dlx skills add dungsil/skills -g
 | 스킬 명                    | 설명                 |
 |----------------------------|----------------------|
 | [rq] | 요구사항 품질 게이트 |
+| [duninit] | 저장소 공통 지침과 PR/MR 템플릿을 추가하거나 갱신합니다. |
 | [opencode-models] | Tailscale provider 모델 자동 탐지·등록 (opencode 설정) |
 
 ## 언어 별 스킬
@@ -53,9 +54,13 @@ bun run validate:skills
 ## 라이선스
 이 저장소의 스킬과 스크립트는 [MIT-0](./LICENSE) 혹은 [Unlicense](./UNLICENSE)에 따라 배포됩니다.
 
+`duninit`은 [dungsil/dotfiles](https://github.com/dungsil/dotfiles)에서 이전했으며, [기존 MIT 라이선스](./skills/duninit/LICENSE)를 유지합니다.
+해당 스킬의 커밋 규칙에는 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)의 내용을 수정하여 사용한 부분이 있으며, 이 부분에는 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)이 적용됩니다.
+
 
 <!-- 링크 -->
 [rq]: skills/rq
+[duninit]: skills/duninit
 [opencode-models]: skills/opencode-models
 [java-code-design]: skills/java/java-code-design
 [writing-java-tests]: skills/java/writing-java-tests
