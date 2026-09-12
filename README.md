@@ -15,7 +15,6 @@ pnpm dlx skills add dungsil/skills -g
 |----------------------------|----------------------|
 | [rq] | 요구사항 품질 게이트 |
 | [duninit] | 저장소 공통 지침과 PR/MR 템플릿을 추가하거나 갱신합니다. |
-| [opencode-models] | Tailscale provider 모델 자동 탐지·등록 (opencode 설정) |
 
 ## 언어 별 스킬
 
@@ -61,7 +60,6 @@ bun run validate:skills
 <!-- 링크 -->
 [rq]: skills/rq
 [duninit]: skills/duninit
-[opencode-models]: skills/opencode-models
 [java-code-design]: skills/java/java-code-design
 [writing-java-tests]: skills/java/writing-java-tests
 [writing-javadoc]: skills/java/writing-javadoc
