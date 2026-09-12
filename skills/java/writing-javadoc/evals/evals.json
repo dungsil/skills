@@ -3,32 +3,43 @@
   "evals": [
     {
       "id": "record-accessor-omit",
-      "prompt": "이 Java record의 각 accessor에 Javadoc을 달아야 하는지 보고, 필요한 Javadoc만 한국어로 작성해줘.",
-      "expected_output": "단순 record accessor Javadoc은 생략하고, 계약이 달라지는 component나 type-level 계약만 간결한 한국어 Javadoc으로 작성한다.",
+      "prompt": "이 Java record의 접근자마다 Javadoc이 필요한지 확인하고 필요한 문서만 한국어로 작성해 줘.",
+      "expected_output": "명백한 record 접근자는 생략하고, 별도 계약이 필요한 컴포넌트나 타입 계약만 간결한 한국어로 작성한다.",
       "assertions": [
-        "The output avoids boilerplate Javadocs for obvious record accessors.",
-        "The output writes Korean contract-focused prose when documentation is useful.",
-        "The output does not include usage examples."
+        "명백한 record 접근자에 상투적인 Javadoc을 작성하지 않는다.",
+        "문서가 유용한 곳에 한국어로 계약을 설명한다.",
+        "사용 예시를 포함하지 않는다."
       ]
     },
     {
       "id": "factory-either-return",
-      "prompt": "domain factory가 Either<List<Problem>, Order>를 반환해. 이 메서드 Javadoc의 @return 문구를 프로젝트 스타일로 써줘.",
-      "expected_output": "성공 시 생성되는 값과 실패 시 누적되는 Problem 목록의 의미를 짧게 설명하는 한국어 @return을 작성한다.",
+      "prompt": "도메인 팩터리가 Either<List<Problem>, Order>를 반환해. 이 메서드의 @return 문구를 프로젝트 스타일에 맞게 작성해 줘.",
+      "expected_output": "성공 시 생성 값과 실패 시 누적되는 Problem 목록을 짧은 한국어 @return으로 설명한다.",
       "assertions": [
-        "The output describes both success and failure shapes in @return.",
-        "The output uses concise Korean declarative style.",
-        "The output keeps code literals inside {@code} where needed."
+        "@return에 성공과 실패 형태를 모두 설명한다.",
+        "간결한 한국어 평서문을 사용한다.",
+        "필요한 코드 리터럴을 {@code}로 감싼다."
       ]
     },
     {
       "id": "configuration-properties",
-      "prompt": "Spring @ConfigurationProperties 클래스 Javadoc을 봐줘. 어떤 내용을 남기고 어떤 설명을 빼야 해?",
-      "expected_output": "외부 설정 의미, 기본값, 단위, 검증 제약은 남기고 Spring binding mechanics 설명은 제거하도록 안내한다.",
+      "prompt": "Spring @ConfigurationProperties 클래스의 Javadoc을 검토해 줘. 어떤 내용을 남기고 어떤 설명을 빼야 할까?",
+      "expected_output": "외부 설정 의미, 기본값, 단위와 검증 제약은 유지하고 Spring 바인딩 처리 설명은 제거하도록 안내한다.",
       "assertions": [
-        "The output focuses on configuration contract visible to callers/operators.",
-        "The output removes framework mechanics that Claude or Java developers already know.",
-        "The output follows the Korean Javadoc style rules."
+        "호출부·운영자에게 보이는 설정 계약에 집중한다.",
+        "에이전트나 Java 개발자가 이미 아는 프레임워크 처리 설명을 제거한다.",
+        "한국어 Javadoc 문체 규칙을 따른다.",
+        "검토 요청만으로 파일을 수정하지 않는다."
+      ]
+    },
+    {
+      "id": "docs-only-no-nullmarked",
+      "prompt": "이 패키지에는 JSpecify 설정이 없어. 동작이나 의존성은 바꾸지 말고 이 메서드의 현재 null 반환 계약만 Javadoc으로 설명해 줘.",
+      "expected_output": "현재 구현의 null 계약을 문서화하고 JSpecify 의존성, @NullMarked, package-info.java를 새로 추가하지 않는다.",
+      "assertions": [
+        "문서 수정 범위를 유지한다.",
+        "@NullMarked나 JSpecify 의존성, package-info.java를 자동으로 도입하지 않는다.",
+        "확인한 실제 null 반환 동작을 문서에 반영한다."
       ]
     }
   ]

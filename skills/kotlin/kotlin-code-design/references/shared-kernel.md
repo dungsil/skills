@@ -1,28 +1,28 @@
-# Shared Kernel
+# 공유 커널
 
-Use this reference when changing the DDD shared kernel: small, stable concepts, value objects, contracts, and policies deliberately shared by multiple bounded contexts.
+여러 바운디드 컨텍스트가 의도적으로 공유하는 작고 안정적인 개념, 값 객체, 계약과 정책을 변경할 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Start with one shared-kernel module for small, stable concepts, value objects, contracts, and policies that multiple bounded contexts deliberately agree to share.
-- Keep `shared` reserved for the DDD shared kernel. Put technical common code in explicitly named common/support modules.
-- Do not turn the shared kernel into a catch-all utility bucket. Keep feature-specific rules with their owning context.
-- Keep public shared-kernel APIs small, stable, and easy to discover from Kotlin call sites.
-- Promote code only after another bounded context actually reuses the same contract or primitive. Keep first-use behavior in the owning context.
-- Validation or pagination types belong in `shared` only when they express agreed cross-context domain/application contracts; technical mechanics and persistence support belong elsewhere.
+- 여러 컨텍스트가 공유하기로 합의한 작은 개념을 공유 커널 모듈 하나에서 시작한다.
+- `shared`는 DDD 공유 커널에만 사용한다. 기술 공통 코드는 역할이 명확한 공통·지원 모듈에 둔다.
+- 범용 유틸리티 모음으로 만들지 않는다. 기능별 규칙은 소유 컨텍스트에 둔다.
+- 공개 API는 작고 안정적이며 Kotlin 호출부에서 쉽게 찾을 수 있게 유지한다.
+- 다른 컨텍스트가 같은 계약이나 기본 요소를 실제로 재사용한 뒤에만 옮긴다. 처음 사용하는 동작은 소유 컨텍스트에 둔다.
+- 검증·페이지네이션 타입은 합의된 컨텍스트 간 도메인·애플리케이션 계약일 때만 `shared`에 둔다. 기술 처리와 영속성 지원은 다른 곳에 둔다.
 
-## Contract Shape
+## 계약
 
-- Use Kotlin nullable types to express legitimate absence and non-null types for required values.
-- Copy mutable inputs with `toList`, `toSet`, or another appropriate snapshot when a shared type promises immutable outward-facing state.
-- Use sealed results for closed success/failure outcomes when callers must branch on domain construction or parsing failures.
-- Use explicit exception types for construction misuse and wrong-state access when exceptions are the established contract.
-- Preserve current result shape, absence policy, mutability, and error model unless the requested change explicitly changes them.
-- Consider Java-facing bytecode and binary compatibility before exposing value classes, data classes, default parameters, or inline APIs from a published shared kernel.
+- 정상적인 부재는 Kotlin 널 허용 타입, 필수 값은 비널 타입으로 표현한다.
+- 외부에 불변 상태를 보장하면 `toList`, `toSet` 등으로 가변 입력의 스냅샷을 만든다.
+- 호출부가 도메인 생성·파싱 실패에 따라 분기해야 하면 닫힌 성공·실패를 sealed 결과로 표현한다.
+- 예외가 기존 계약이면 잘못된 생성과 상태 접근에 명시적인 예외 타입을 사용한다.
+- 요청에서 명시적으로 바꾸지 않으면 결과 형태, 부재 정책, 변경 가능성과 오류 모델을 유지한다.
+- 배포하는 공유 커널에서 값 클래스, 데이터 클래스, 기본 인자나 인라인 API를 노출하기 전에 Java 바이트코드와 바이너리 호환성을 검토한다.
 
-## Naming
+## 이름
 
-- Name shared-kernel concepts with the ubiquitous language shared by the bounded contexts.
-- Name shared result types with nouns that describe their contract.
-- Name reusable validation errors by violations, not validators or callers.
-- Name shared domain/application exceptions by policy, such as invalid query or query limit exceeded.
+- 컨텍스트들이 공유하는 유비쿼터스 언어로 개념 이름을 짓는다.
+- 결과 타입은 계약을 설명하는 명사로 이름을 짓는다.
+- 검증 오류는 검증기나 호출부가 아닌 위반 내용으로 이름을 짓는다.
+- 공유 도메인·애플리케이션 예외는 잘못된 쿼리나 쿼리 제한 초과 같은 정책으로 이름을 짓는다.

@@ -1,101 +1,55 @@
 ---
 name: writing-java-tests
-description: Write, improve, or review Java tests with JUnit, Mockito, Spring Boot, Spring Data JPA, and JSpecify across unit, integration, and E2E levels. Use only for Java test work, including domain, use-case, entity, validation, repository, adapter, HTTP API, nullability, or Java test-level selection decisions.
+description: Java 테스트를 작성·수정·검토하고 적절한 단위·통합·E2E 테스트 수준을 선택한다. Java 테스트 작업에 사용한다.
 ---
 
-# Writing Test
+# Java 테스트 작성
 
-Use this skill to choose the right test level first, then write compact contract-focused Java tests.
+공개 계약을 검증하는 작고 명확한 테스트를 작성한다. JUnit으로 테스트 구조와 단언을 작성하고, 상호작용이 중요할 때 Mockito를 사용한다. 기존 프로젝트에서 사용하지 않는 AssertJ, Hamcrest, Truth 등의 단언 라이브러리를 새로 도입하지 않는다. E2E JSON 검증에는 `jsonPath`를 사용하며, 그 단언 안에서만 Hamcrest 매처를 허용한다.
 
-Use JUnit APIs for assertions and test structure. Mockito is allowed when interaction matters, but keep assertions in JUnit. Do not introduce AssertJ, Hamcrest, Truth, or other assertion libraries unless the project already uses them. For E2E JSON body checks, use `jsonPath`; Hamcrest matchers are allowed only inside `jsonPath` assertions.
+## 작업 범위와 완료 조건
 
-## Workflow
+- 검토 요청에서는 테스트나 운영 코드를 수정하지 않는다. 누락된 계약, 중복 검증, 잘못된 테스트 수준을 근거와 함께 보고한다.
+- 작성·수정 요청에서는 대상 코드와 주변 테스트를 확인하고, 가장 낮은 유효 테스트 수준에서 필요한 최소 사례를 추가한다.
+- 단위·통합 테스트는 동작을 소유한 모듈에 둔다. 좁은 관련 테스트부터 실행하고, 실패나 남은 위험이 있을 때만 검증 범위를 넓힌다.
+- 운영 코드나 애너테이션의 불일치를 발견하면 보고한다. 그 수정이 현재 요청 범위에 포함된 경우에만 운영 코드를 변경하고 테스트한다.
 
-1. Read the target code and nearby tests before writing anything.
-2. Decide the lowest useful test level: unit, integration, or E2E.
-3. Load the matching reference only when needed:
-   - Unit tests: [references/unit.md](references/unit.md)
-   - Integration tests: [references/integration.md](references/integration.md)
-   - E2E tests: [references/e2e.md](references/e2e.md)
-4. Identify the public contract and add the smallest useful test set.
-5. Avoid duplicate coverage across levels.
-6. Put unit and integration tests in the module that owns the behavior.
-7. Run the narrowest relevant test command first, then broader tests when risk justifies it.
+## 테스트 수준과 참조 문서
 
-## Test Levels
+필요한 수준의 문서만 읽는다.
 
-Choose the lowest useful level:
+- 값 객체, 엔티티의 순수 보조 메서드, 유스케이스 분기, 저장소 어댑터의 호출 계약: [단위 테스트](references/unit.md)
+- JPA 매핑, 저장소 쿼리, 트랜잭션·생명주기: [통합 테스트](references/integration.md)
+- HTTP 경로, 직렬화, 보안 필터, 컨트롤러부터 저장소까지의 연결: [E2E 테스트](references/e2e.md)
 
-- Domain value object, entity helper method, use-case branch, repository adapter call shape: unit test.
-- JPA entity mapping, repository query method, transaction/lifecycle behavior: integration test.
-- HTTP route, serialization, security filter, controller-service-use-case-repository flow: E2E test.
+E2E가 HTTP → 저장소 → 도메인 → JSON을 검증한다면 어댑터 단위 테스트에서 모든 매핑 필드를 다시 검증하지 않는다. `activeOnly = true` 강제 같은 어댑터 고유 정책과 `isDeleted()`·`setDeleted()` 같은 순수 엔티티 계약에는 별도 단위 테스트를 유지한다.
 
-Avoid duplicate coverage:
+## 픽스처와 구조
 
-- If E2E verifies HTTP -> repository -> domain -> JSON, do not also assert every mapped domain field in adapter unit tests.
-- Keep adapter unit tests only for adapter-specific policy, such as forcing `activeOnly = true` on repository calls.
-- Keep entity unit tests for pure entity helper contracts such as `isDeleted()` and `setDeleted()`.
+- 여러 모듈에서 픽스처를 공유해야 할 때만 Gradle `java-test-fixtures`를 사용한다.
+- 픽스처 타입을 소유한 어댑터 모듈에 픽스처를 두는 것을 우선한다. 앱 테스트에서 필요하면 `testFixtures(project(":<adapter-module>"))`에 의존한다.
+- 단일 어댑터의 테스트 데이터만을 위한 별도 픽스처 모듈은 만들지 않는다.
+- 한 클래스에 여러 의미 있는 동작이 있으면 `@Nested` 그룹을 우선한다. 의미 있는 그룹이 하나이고 곧 확장할 이유도 없다면 테스트를 평평하게 배치한다.
+- 성공·유효 사례, 경계 사례, 무효·예외 사례 순서로 배치한다.
+- 여러 사례에서 반복하는 준비 작업은 `@BeforeEach`로 공유하고, 동작별 값은 테스트 메서드 안에 둔다.
 
-## Test Fixtures
+## 이름과 단언
 
-- Use Gradle `java-test-fixtures` only when fixtures must be shared across modules.
-- Prefer fixtures in the adapter module that owns the fixture type.
-- App-level E2E or integration tests may depend on `testFixtures(project(":<adapter-module>"))` when they need adapter-owned entity fixtures.
-- Do not create a separate fixture module for a single adapter's test data.
+- 메서드 이름은 `shouldBe...`를 우선한다.
+- 무효 입력은 `shouldBeRejectedWhen...`, getter·보조 메서드 반환은 `shouldBeReturned...When...`, 예외 경로는 `shouldBeThrownWhen...`을 사용한다.
+- 상세 동작은 프로젝트 언어에 맞는 `@DisplayName`에 적는다. 한국어 테스트 문장은 `~해야 한다` 또는 `~이어야 한다`로 끝낸다.
+- E2E 클래스·파일 이름의 `E2E`는 대문자로 쓴다. 예: `UserProfileE2ETest`.
+- 한 동작에서 여러 관찰 가능한 속성이 나오면 `assertAll`을 사용한다.
+- 예외 메시지가 공개 계약인 경우에만 메시지를 단언한다.
+- JSON 응답은 필드 경로에 대한 `jsonPath` 또는 파싱한 값으로 확인한다. 원문 문자열의 `contains`로 확인하지 않는다.
 
-## Common Structure
+## JSpecify 널 계약
 
-Prefer `@Nested` groups when a class has multiple meaningful behavior surfaces.
+- 선언된 JSpecify 애너테이션을 계약의 기준으로 삼는다.
+- `@NullMarked` 같은 기본값 아래에서 `@Nullable`이 없는 매개변수·필드·반환값은 비널이다. 일반 계약 테스트에서 `null`을 전달하거나 `null` 반환을 기대하지 않는다.
+- `@Nullable` 계약에는 `null` 사례와 운영 코드가 정한 처리 방식을 명시적으로 검증한다.
+- 실제 널 허용 동작과 애너테이션이 다르면 불일치를 보고한다. 운영 코드 수정이 승인된 범위라면 애너테이션을 바로잡고 그 계약을 테스트한다.
+- 계약 위반에 대한 방어 동작 자체가 검증 대상이면 `@SuppressWarnings("DataFlowIssue")`로 정적 검사를 억제하고 `@DisplayName`에 의도를 명시한다.
+- 테스트 보조 함수·가짜 구현·픽스처에도 운영 계약에 맞는 JSpecify 애너테이션을 사용한다. 테스트 대역의 널 허용 범위를 더 느슨하게 만들지 않는다.
 
-If there is only one meaningful group, and the class is unlikely to expand soon, keep the test cases flat in the test class. Do not create a single `@Nested` group only for ceremony.
-
-Within a group or flat class, place successful/valid cases first, then boundary cases, then invalid/exception cases.
-
-Use `@BeforeEach` when multiple test cases repeat the same setup or fixture creation. Keep shared preconditions in setup and behavior-specific values inside the test method.
-
-## Naming
-
-- Prefer `shouldBe...` method names.
-- Use `shouldBeRejectedWhen...` for invalid inputs.
-- Use `shouldBeReturned...When...` for getter/helper return behavior.
-- Use `shouldBeThrownWhen...` for expected exception paths.
-- Keep detailed behavior text in `@DisplayName`; match the repository's language, but Korean test cases must always end with `~해야 한다` or `~이어야 한다`.
-- Always write E2E with uppercase `E2E` in class and file names, such as `UserProfileE2ETest`.
-
-## Assertions
-
-Use `assertAll` when one action produces a state with multiple observable properties.
-
-Avoid asserting exception messages unless the message is part of the public contract.
-
-## Gotchas
-
-- Do not write null tests for non-null JSpecify contracts.
-- Do not create controller unit tests only to mirror JSON response shape.
-- Do not duplicate E2E coverage with repository or adapter tests unless the lower-level policy differs.
-- Do not use AssertJ only because examples online use it; follow the project assertion stack.
-- Do not verify JSON responses with raw string `contains`; use `jsonPath` or parsed JSON assertions at the intended field path.
-
-## Nullability Policy
-
-Respect JSpecify nullability contracts. Treat declared annotations as the source of truth.
-
-- A parameter, field, or return type without `@Nullable` is non-null under JSpecify defaults such as `@NullMarked`. Do not write tests that pass `null` to those parameters or expect `null` from those returns.
-- A parameter, field, or return type with `@Nullable` may be `null`. Cover the `null` case explicitly, including the policy encoded by the production code.
-- If existing code is missing `@Nullable` but actually accepts `null`, fix the source annotation first, then write the test.
-- When verifying defensive behavior against a contract violation, suppress static checks with `@SuppressWarnings("DataFlowIssue")` and make the intent clear in `@DisplayName`.
-- Annotate test helpers, fakes, and fixtures with JSpecify annotations to match the production contract. Do not relax nullability in test doubles.
-
-## Review Pass
-
-Before finishing:
-
-- Check the chosen test level is the lowest useful level.
-- Check level-specific reference rules were followed.
-- Check success cases appear before failure cases.
-- Check method names follow project conventions.
-- Check tests cover the intended contract without duplicating higher-level coverage.
-- Check `null` tests exist only for declared nullable contracts or explicit misuse defense tests.
-- Check E2E class/file names use uppercase `E2E`.
-- Check E2E JSON body assertions use `jsonPath`.
-- Run the narrow test command and report the result.
+JSON 모양만 복제하는 컨트롤러 단위 테스트와, 별도 정책 없이 E2E를 반복하는 저장소·어댑터 테스트는 추가하지 않는다. 완료 시 선택한 수준, 실제 검증한 계약과 실행 결과를 보고한다.

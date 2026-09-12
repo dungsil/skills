@@ -1,70 +1,63 @@
-# Report Delivery
+# 보고서 전달
 
-Resolve the evidence target and report input separately. Report delivery must not change what code or state is being verified.
+증거 대상과 보고서 전달 대상을 따로 결정한다. 이 문서가 전달 위치, 갱신 방식, 실패 처리와 최종 채팅 응답을 정의한다.
 
-## Evidence Target
+## 증거 대상
 
-Classify the user's requested evidence target first:
+- `HOSTED_CHANGE`: 사용자가 diff 검증을 명시적으로 요청한 PR·MR이다.
+- `STATE`: `main`·`origin/main` 같은 ref, 전체 저장소 상태나 해당 상태에서의 이슈 구현이다.
 
-- `HOSTED_CHANGE`: an explicit pull request or merge request whose diff is being verified.
-- `STATE`: a named ref such as `main` or `origin/main`, the whole repository state, or an issue's implementation on that state.
+사용자가 지정한 정확한 대상을 사용한다. 원격 이슈가 요구사항과 보고서 위치를 제공해도 증거 대상은 `STATE`일 수 있다. `STATE` 검토에서 열린 변경을 검색하거나 PR·MR 번호를 요청하거나 diff 검토로 전환하지 않는다.
 
-Use the exact target the user named. A remote issue may provide requirements and receive the report while `STATE` remains the evidence target. For `STATE`, do not search open changes, ask for a pull-request or merge-request number, or switch evidence to a change diff.
+## 추적 시스템 확인
 
-## Tracker Resolution
+저장소 루트 `AGENTS.md`를 읽고, 프로젝트 이슈 추적 지침을 참조하면 해당 파일을 읽는다. 보통 경로는 `docs/agents/issue-tracker.md`다.
 
-1. Read the repository-root `AGENTS.md`.
-2. If it points to project issue-tracker guidance, normally `docs/agents/issue-tracker.md`, read that file and use its explicit tracker type.
-3. Classify an explicit GitHub tracker as `GITHUB`, an explicit GitLab tracker as `GITLAB`, and Local Markdown or every missing, unreadable, other, or unclear definition as `LOCAL_OR_UNKNOWN`.
+- 명시적인 GitHub는 `GITHUB`, GitLab은 `GITLAB`으로 분류한다.
+- Local Markdown, 누락·읽기 실패·기타·불명확한 정의는 `LOCAL_OR_UNKNOWN`으로 분류한다.
+- 명시적인 GitHub·GitLab 이슈·PR·MR URL은 프로젝트 지침이 없어도 제공자를 식별한다.
+- `#18`, `!104` 같은 짧은 참조는 프로젝트 지침과 저장소 문맥으로 제공자·저장소를 확인한다.
+- git remote, 설치된 통합, 사용 가능한 CLI나 현재 브랜치만으로 원격 보고서 항목을 추정하지 않는다.
 
-An explicit GitHub or GitLab issue, pull-request, or merge-request URL identifies its provider even when project guidance is missing. For short references such as `#18` or `!104`, use project guidance and repository context to resolve the provider and repository. Do not infer a remote report item only from a git remote, installed integration, available CLI, or current branch.
+알고 있는 이슈 번호를 보고서 키로 사용한다. 없으면 요구사항에서 짧은 kebab-case 키를 만든다.
 
-Use the known issue number as the report key. Otherwise derive a short kebab-case key from the requirement.
+## 전달 대상 선택
 
-## Report Input
+사용자가 입력으로 제공한 원격 항목은 요구사항 출처, 증거 대상 또는 둘 모두일 수 있다.
 
-Identify whether the user supplied one remote item as an input. It may be the requirement source, the evidence target, or both:
+1. 제공한 PR·MR 하나가 증거 대상이면 그 변경에 게시한다. 요구사항을 제공한 원격 이슈가 별도로 있어도 동일하다.
+2. 그렇지 않고 원격 이슈 하나가 요구사항 출처이면 해당 이슈에 게시한다. 증거 대상은 ref나 저장소 상태여도 된다.
+3. 선택한 역할에 해당하는 항목이 여러 개이고 사용자가 지정하지 않았으면 어느 항목에 전달할지 묻는다.
 
-- GitHub issue or pull request
-- GitLab issue or merge request
+이슈를 관련 변경으로 바꾸거나 변경을 이슈로 바꾸지 않는다. 다른 원격 항목을 검색하여 대체하지 않는다.
 
-Choose the destination by the role each supplied item has:
-
-1. When one supplied pull request or merge request is the evidence target, post to that change even when a remote issue also supplied its requirements.
-2. Otherwise, when one supplied remote issue is the requirement source, post to that issue even when a named ref or repository state is the evidence target.
-3. If more than one item has the selected role and the user did not choose between them, ask which item should receive the report.
-
-Do not replace an issue with a related change, replace a change with its issue, or search for another hosted item.
-
-## Destination
-
-| Report input | Full report destination |
+| 입력 | 전체 보고서 위치 |
 |---|---|
-| One explicit or resolved GitHub issue | Conversation comment on that issue |
-| One explicit or resolved GitHub pull request | Conversation comment on that pull request |
-| One explicit or resolved GitLab issue | Note or comment on that issue |
-| One explicit or resolved GitLab merge request | Note or comment on that merge request |
-| No remote issue, pull request, or merge request | `.agents/reports/rq/<report-key>.md` |
+| 명시했거나 확인한 GitHub 이슈 | 해당 이슈 대화의 댓글 |
+| 명시했거나 확인한 GitHub PR | 해당 PR 대화의 댓글 |
+| 명시했거나 확인한 GitLab 이슈 | 해당 이슈의 노트·댓글 |
+| 명시했거나 확인한 GitLab MR | 해당 MR의 노트·댓글 |
+| 원격 이슈·PR·MR이 없음 | `.agents/reports/rq/<report-key>.md` |
 
-For every remote destination:
+원격 댓글은 `<!-- rq-report: <report-key> -->`로 시작한다. 같은 표지가 있으면 새 댓글 대신 해당 댓글을 수정한다. 사용자나 프로젝트가 두 번째 사본을 명시적으로 요청하지 않으면 로컬 보고서를 만들지 않는다. 제공된 항목에만 게시하며 관련되거나 추측한 항목에 게시하지 않는다.
 
-- Start the report comment with `<!-- rq-report: <report-key> -->`. If that marker already exists on the item, update that comment instead of adding a duplicate.
-- Do not create a local report file unless the user or project instructions explicitly request a second copy.
-- Post only to the supplied item. Never post to a related or guessed item.
+로컬 대상은 필요한 상위 디렉터리를 만들고 파일로 저장한다. 로컬 저장은 원격 입력이 없을 때의 의도된 위치이며 원격 전달 실패의 대체 경로가 아니다.
 
-For a local destination, create missing parent directories and keep the existing local-file behavior. Local storage is the intended destination only when no remote report item was supplied; it is not a fallback for failed remote delivery.
+## 후속 보고서와 실패
 
-## Follow-up and Failure
+초기 보고서, 적대적 검증 부록과 전체 수정 보고서는 같은 산출물에 유지한다.
 
-Keep the initial report, an adversarial addendum, and a revised full report in the same artifact:
+- 로컬에서는 기존 파일에 부록을 추가하고 전체 수정 보고서이면 해당 파일을 교체한다.
+- GitHub·GitLab에서는 표지가 있는 댓글을 수정하여 부록을 추가하거나 전체 수정 본문으로 교체한다.
 
-- Local: append the addendum to the file or replace that file for a revised report.
-- GitHub or GitLab: edit the marked comment to append the addendum or replace its report body for a revised report.
+파일 저장, 원격 항목 확인이나 댓글 생성·수정에 실패하면 종합 상태를 `ERROR`로 정한다. 전달에 성공했다고 말하거나 다른 위치로 조용히 대체하지 않는다.
 
-If the local file cannot be saved, the remote item cannot be resolved, or the comment cannot be created or updated, set the overall status to `ERROR`. Do not claim successful delivery or silently fall back to another destination. The final chat response must state only:
+## 최종 채팅 응답
 
-- the `ERROR` status
-- the risk that the detailed report was not delivered
-- the action needed to check the path or issue/pull-request/merge-request target, authentication, and write permission before retrying
+전체 보고서는 선택한 산출물에만 전달하고 채팅에서 반복하지 않는다. 부록도 동일하다.
 
-After successful delivery, the final chat response still follows the compact output contract in `SKILL.md`.
+- `WARNING`·`FAIL`·`ERROR`이면 상태, 위험과 권고 조치만 출력한다.
+- 다른 상태이면 상태만 출력한다.
+- 전달 실패의 `ERROR`이면 상세 보고서가 전달되지 않은 위험과 재시도 전에 로컬 경로 또는 원격 대상, 인증과 쓰기 권한을 확인해야 한다는 조치를 포함한다.
+
+표시값과 설명은 사용자 언어를 따른다. 한국어에서는 [표시값 규칙](korean-report-values.md)을 적용한다.

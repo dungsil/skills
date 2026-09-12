@@ -1,7 +1,7 @@
 interface:
-  display_name: "Writing Javadoc"
-  short_description: "한국어 Javadoc 계약 문서 작성과 검토"
-  default_prompt: "Use $writing-javadoc to write or review concise Korean Javadoc comments for Java code."
+  display_name: "Javadoc 작성"
+  short_description: "Java 코드의 계약에 맞는 간결한 한국어 Javadoc을 작성하고 검토한다."
+  default_prompt: "$writing-javadoc을 사용하여 Java 코드에 간결한 한국어 Javadoc을 작성하거나 검토해 줘."
 
 policy:
   allow_implicit_invocation: true

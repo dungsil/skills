@@ -1,7 +1,7 @@
 interface:
-  display_name: "Kotlin Code Design"
-  short_description: "Kotlin·헥사고날·Spring 코드 및 모듈 설계"
-  default_prompt: "Use $kotlin-code-design to design, write, refactor, or review idiomatic Kotlin code and modular Spring Boot structure."
+  display_name: "Kotlin 코드 설계"
+  short_description: "Kotlin과 Spring 코드의 계약·경계·모듈 구성을 설계하고 검토한다."
+  default_prompt: "$kotlin-code-design을 사용하여 Kotlin 코드와 모듈형 Spring Boot 구조를 설계·작성·리팩터링·검토해 줘."
 
 policy:
   allow_implicit_invocation: true

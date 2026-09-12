@@ -3,32 +3,33 @@
   "evals": [
     {
       "id": "port-leaks-jpa-query",
-      "prompt": "이 use case port 설계가 괜찮은지 봐줘. port 메서드가 findByDeletedFalseAndStatusIn처럼 JPA query method 이름을 그대로 쓰고 있어.",
-      "expected_output": "JPA/adapter assumption이 application port에 누출되었다고 지적하고, application need 중심의 port 이름과 signature를 제안한다.",
+      "prompt": "이 유스케이스 포트 설계가 괜찮은지 검토해 줘. 포트 메서드가 findByDeletedFalseAndStatusIn처럼 JPA 쿼리 메서드 이름을 그대로 사용하고 있어.",
+      "expected_output": "JPA·어댑터 가정이 애플리케이션 포트에 드러났다고 지적하고, 애플리케이션 요구를 중심으로 이름과 시그니처를 제안한다.",
       "assertions": [
-        "The output identifies the JPA query method naming as an adapter leak.",
-        "The output proposes a port contract named around application intent rather than persistence mechanics.",
-        "The output keeps concrete repository or JPA details outside the application port."
+        "JPA 쿼리 메서드 이름이 어댑터 세부 사항을 노출한다는 점을 지적한다.",
+        "영속성 처리 대신 애플리케이션 의도를 나타내는 포트 계약을 제안한다.",
+        "구체 저장소와 JPA 세부 사항을 애플리케이션 포트 밖에 둔다.",
+        "검토 요청만으로 파일을 수정하거나 포맷하지 않는다."
       ]
     },
     {
       "id": "shared-vs-common-module",
-      "prompt": "여러 모듈에서 쓰는 문자열 정규화 유틸을 packages/shared-text에 두려고 해. shared kernel로 봐도 될까?",
-      "expected_output": "technical utility는 shared kernel이 아니라 common/support module 후보라고 판단하고, shared를 DDD 공유 개념에만 쓰도록 권고한다.",
+      "prompt": "여러 모듈에서 사용하는 문자열 정규화 유틸리티를 packages/shared-text에 두려고 해. 공유 커널로 볼 수 있을까?",
+      "expected_output": "기술 유틸리티는 공유 커널보다 공통·지원 모듈에 적합하다고 판단하고, shared를 DDD 공유 개념에만 사용하도록 권고한다.",
       "assertions": [
-        "The output distinguishes shared kernel concepts from technical common/support utilities.",
-        "The output recommends a common/support module name instead of a shared-* module.",
-        "The output explains the boundary in terms of domain language or dependency responsibility."
+        "공유 커널 개념과 기술 공통·지원 유틸리티를 구별한다.",
+        "shared-* 대신 공통·지원 모듈 이름을 권고한다.",
+        "도메인 언어나 의존 책임으로 경계를 설명한다."
       ]
     },
     {
       "id": "record-or-class-domain",
-      "prompt": "이 도메인 객체는 값만 들고 있는데 record로 만들지 class로 만들지 결정해줘. 생성 시 정규화와 실패 누적 검증이 필요할 수도 있어.",
-      "expected_output": "transparent immutable carrier면 record를 고려하되, invariant, normalization, identity, lifecycle, framework construction이 있으면 class가 낫다고 판단한다.",
+      "prompt": "이 도메인 객체는 값만 갖고 있어. record와 class 중 어느 것이 적합한지 판단해 줘. 생성 시 정규화와 오류 누적 검증이 필요할 수도 있어.",
+      "expected_output": "단순한 불변 값 전달 객체에는 record를 고려하고, 불변식·정규화·식별성·생명주기·프레임워크 생성 제약이 있으면 class를 검토한다.",
       "assertions": [
-        "The output ties record/class choice to invariants, normalization, identity, lifecycle, or framework constraints.",
-        "The output avoids choosing a Java feature only because it is newer.",
-        "The output asks for or states the public contract before recommending convenience methods."
+        "record·class 선택을 불변식, 정규화, 식별성, 생명주기나 프레임워크 제약과 연결한다.",
+        "최신 기능이라는 이유만으로 선택하지 않는다.",
+        "편의 메서드를 권고하기 전에 공개 계약을 확인하거나 명시한다."
       ]
     }
   ]

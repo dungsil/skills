@@ -1,39 +1,36 @@
-# Adapter
+# 어댑터
 
-Use this reference when changing persistence, REST, Spring config, or other framework-facing packages.
+영속성, REST, Spring 설정 등 프레임워크와 접하는 패키지를 다룰 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Adapters translate between external frameworks and application/domain contracts.
-- Keep framework annotations, HTTP DTOs, persistence entities, cache details, and serialization concerns out of domain and use-case code.
-- Persistence entities map storage concerns; do not treat them as the domain model by default.
-- REST/OpenAPI classes own request parsing and response shapes, not domain rules.
+- 외부 프레임워크와 애플리케이션·도메인 계약 사이를 변환한다.
+- 프레임워크 애너테이션, HTTP DTO, 영속성 엔티티, 캐시와 직렬화 관심사를 도메인·유스케이스 코드에 넣지 않는다.
+- 영속성 엔티티는 저장소 관심사를 표현하며, 기본 도메인 모델로 취급하지 않는다.
+- REST·OpenAPI 클래스는 요청 파싱과 응답 형태를 담당하고 도메인 규칙을 소유하지 않는다.
 
-## Persistence
+## 영속성
 
-- Map domain value objects to persistence primitives before calling repositories or clients.
-- Reconstruct domain objects through domain factories or explicit mapping policies.
-- Persisted invalid rows are infrastructure/data-integrity failures, not silent misses. Throw an infrastructure/data-integrity exception when a persisted record cannot be reconstructed as a valid domain object.
-- Keep JPA repository and entity assumptions in persistence adapters.
-- Use `common-persistence`, `persistence-support`, or another project-standard common/support module only for genuinely reusable persistence base behavior.
+- 저장소나 클라이언트를 호출하기 전에 도메인 값 객체를 저장소의 기본 타입으로 변환한다.
+- 도메인 팩터리나 명시적인 매핑 정책으로 도메인 객체를 복원한다.
+- 저장된 행이 유효한 도메인 객체로 복원되지 않으면 인프라·데이터 무결성 예외를 던진다. 조용히 미발견 결과로 바꾸지 않는다.
+- JPA 저장소와 엔티티의 전제는 영속성 어댑터 안에 둔다.
+- 실제로 재사용하는 영속성 기본 동작에만 `common-persistence`, `persistence-support` 등 프로젝트 표준 공통·지원 모듈을 사용한다.
 
-## Naming
+## 이름
 
-- Use `Config` for Java configuration classes and `Properties` for configuration property carriers.
-- Use `Controller`, `RequestParam`, and `Response` suffixes only in REST adapter packages.
-- Use `Entity`, `JpaRepository`, and `<Technology>Adapter` suffixes only in persistence adapter packages.
-- Name adapter implementations as `<PortName><Technology>Adapter`.
-- Name port wiring config as `<Context>PortConfig` or `<Context><Boundary>Config`.
-- Name Spring Data repositories as `<Entity>JpaRepository` and persistence entities as `<DomainThing>Entity`.
-- Name a single framework repository dependency `repository`.
-- Use short role names for collaborators in core code; keep technology names in adapter class names.
+- Java 설정 클래스에는 `Config`, 설정값 타입에는 `Properties`를 사용한다.
+- `Controller`, `RequestParam`, `Response` 접미사는 REST 어댑터 패키지에서만 사용한다.
+- `Entity`, `JpaRepository`, `<Technology>Adapter` 접미사는 영속성 어댑터 패키지에서만 사용한다.
+- 어댑터 구현은 `<PortName><Technology>Adapter`로 명명한다.
+- 포트 연결 설정은 `<Context>PortConfig` 또는 `<Context><Boundary>Config`로 명명한다.
+- Spring Data 저장소는 `<Entity>JpaRepository`, 영속성 엔티티는 `<DomainThing>Entity`로 명명한다.
+- 프레임워크 저장소 의존성이 하나면 필드 이름은 `repository`로 둔다.
+- 핵심 코드의 협력 객체는 짧은 역할 이름을 사용하고, 기술 이름은 어댑터 클래스 이름에 둔다.
 
-## Wiring
+## 구성과 테스트
 
-- Put port wiring config in the adapter module that provides the concrete implementation.
-
-## REST And Framework Tests
-
-- Keep JSON shape and HTTP behavior at REST/E2E boundaries.
-- Keep adapter-specific unit tests for adapter policy only, such as forced repository filters or mapping rules.
-- Use `$writing-java-tests` when choosing between unit, integration, and E2E coverage.
+- 포트 연결 설정은 구체 구현을 제공하는 어댑터 모듈에 둔다.
+- JSON 형태와 HTTP 동작은 REST·E2E 경계에서 검증한다.
+- 어댑터 단위 테스트는 저장소 필터 강제나 매핑 규칙 등 어댑터 고유 정책에 한정한다.
+- 단위·통합·E2E 수준을 선택할 때는 `$writing-java-tests`를 사용한다.

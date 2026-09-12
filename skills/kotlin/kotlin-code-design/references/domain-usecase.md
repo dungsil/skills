@@ -1,60 +1,49 @@
-# Domain Use Case
+# 도메인 유스케이스
 
-Use this reference when changing application packages: use cases, commands/queries, ports, and application-level outcomes.
+유스케이스, 명령·쿼리, 포트와 애플리케이션 결과를 변경할 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Use cases coordinate domain behavior through ports.
-- Put use cases in `<context>-usecase-<usecase>` modules when they have meaningful behavior, dependencies, ports, or test boundaries. Keep them in `<context>-core` only when splitting a small context would add ceremony.
-- Ports live on the inner/application side and describe what the application needs, not how an adapter implements it.
-- Keep Spring Data, JPA, HTTP, cache, transaction APIs, serialization, table, query-method, and framework assumptions out of ports.
-- Keep use cases focused on application decisions such as validation ownership, lookup behavior, ordering, limits, missing-result policy, and transaction-sized orchestration.
-- Prefer constructor injection with minimal non-null `val` dependencies.
-- Keep pure port interfaces contract-oriented. Prefer KDoc over forced behavior tests for interfaces with no implementation.
+- 유스케이스는 포트를 통해 도메인 동작을 조합한다.
+- 의미 있는 동작·의존성·포트·테스트 경계가 있으면 `<context>-usecase-<usecase>` 모듈에 둔다. 작은 컨텍스트의 분리가 형식만 늘리면 `<context>-core`에 둔다.
+- 포트는 내부 애플리케이션 계층에 두고 어댑터 구현 방법이 아닌 애플리케이션 요구를 설명한다.
+- Spring Data, JPA, HTTP, 캐시, 트랜잭션 API, 직렬화, 테이블, 쿼리 메서드와 프레임워크 가정을 포트에 넣지 않는다.
+- 검증 책임, 조회 동작, 순서, 제한, 결과 부재 정책과 트랜잭션 단위 조합에 집중한다.
+- 최소한의 비널 `val` 의존성을 생성자로 주입한다.
+- 순수 포트 인터페이스는 계약에 집중한다. 구현이 없는 인터페이스에 억지로 동작 테스트를 만들기보다 KDoc을 우선한다.
 
-## Naming
+## 이름
 
-- Name use cases `<Verb><Scope><Thing>UseCase` or `<Verb><Thing>UseCase` and include cardinality when it changes behavior.
-- Name input carriers `<Verb><Thing>Command` or `<Verb><Thing>Query` when a request object improves the boundary.
-- Name functions from caller intent, such as `get`, `find`, `register`, or `change`.
-- Name ports by application need: `Query` for read-only lookup, `Repository` for aggregate persistence semantics, and `Gateway` or `Client` for external systems.
-- Keep technology words in adapter or starter types, not domain or use-case names.
-- Name application outcomes and exceptions by policy, such as invalid query, query limit exceeded, or not found.
+- 유스케이스는 `<Verb><Scope><Thing>UseCase` 또는 `<Verb><Thing>UseCase`로 이름을 짓고 결과 개수가 동작을 바꾸면 이를 드러낸다.
+- 요청 객체가 경계를 개선하면 `<Verb><Thing>Command`·`<Verb><Thing>Query`를 사용한다.
+- 함수는 `get`, `find`, `register`, `change`처럼 호출 의도로 이름을 짓는다.
+- 읽기 조회에는 `Query`, 애그리거트 영속성에는 `Repository`, 외부 시스템에는 `Gateway`·`Client`를 사용한다.
+- 기술명은 어댑터·스타터 타입에 두고 도메인·유스케이스 이름에 넣지 않는다.
+- 결과와 예외는 잘못된 쿼리, 쿼리 제한 초과, 찾지 못함 같은 정책으로 이름을 짓는다.
 
-## Error Boundaries
+## 오류와 입출력
 
-- Separate invalid input from valid-but-missing results.
-- Use shared-kernel application outcomes only when the policy is genuinely cross-context.
-- Let single-result ports return `T?` for ordinary absence and collection-shaped results for multi-result queries.
-- Let the use case throw, return a result, filter, or preserve misses according to its public contract.
-- Do not reuse validation-error accessors or sentinel values for not-found outcomes.
+- 잘못된 입력과 유효하지만 없는 결과를 구별한다. 실제 컨텍스트 간 정책에만 공유 커널 애플리케이션 결과를 사용한다.
+- 단건 포트는 정상적인 부재에 `T?`, 다건 쿼리는 컬렉션 형태를 반환한다.
+- 유스케이스는 공개 계약에 따라 예외, 결과 반환, 필터링이나 누락 보존을 선택한다. 찾지 못함을 검증 오류 접근자나 센티널 값으로 표현하지 않는다.
+- 유스케이스가 검증 정책을 소유할 때만 원시 입력을 받는다. 외부 포트 호출 전에 도메인 타입으로 변환한다.
+- 일괄 조회·필터의 잘못된 값이나 없는 값을 제외·보존·거절할지 명시한다.
+- REST DTO, JPA 엔티티나 직렬화 구조 대신 도메인 객체·애플리케이션 결과를 반환한다.
+- 공개 계약에서 요구하면 입력 순서를 유지한다.
+- 실제 경계 의미에 맞을 때만 일회성 비동기 작업에 `suspend`, 스트림에 `Flow`를 사용한다.
 
-## Input And Output
+## 포트와 멤버
 
-- Accept raw input only when the use case owns validation policy for it.
-- Convert raw input into domain types before calling outbound ports.
-- Decide explicitly whether invalid or missing values in bulk lookup/filter operations are excluded, preserved, or rejected.
-- Return domain objects or application results, not REST DTOs, JPA entities, or serialized shapes.
-- Preserve input order when the public contract requires it.
-- Use `suspend` for one-shot asynchronous work and `Flow` for streams only when those are real boundary semantics, not ceremonial coroutine types.
+- 포트 시그니처는 도메인 값과 도메인·애플리케이션 결과 타입을 사용한다.
+- 없는 단건 조회는 `T?`, 순서가 중요할 수 있는 다건 조회는 `List<T>`를 반환한다.
+- 엄격한 컬렉션 타입이 계약에 포함되지 않으면 일괄 입력은 `Collection<ValueObject>`로 받는다.
+- 단건·다건 조회 함수 이름은 애플리케이션 언어로 구별한다.
+- 호출부가 추론하기 어려운 부재 정책, 특히 일괄 연산의 정책은 KDoc에 설명한다.
+- 포트에 Spring 스테레오타입을 붙이지 않는다.
+- 외부 포트 프로퍼티는 `query`, `repository`, `gateway`, `client`처럼 역할로 이름을 짓는다.
+- 어댑터 서비스가 여러 유스케이스를 조합하면 주입 프로퍼티는 동작으로 이름을 짓는다.
+- 유스케이스 계약에 포함된 상수만 노출한다. 지역 관례에 맞으면 제한 상수에 `MAX_...`를 사용한다.
 
-## Port Shape
+## 테스트 경계
 
-- Use domain values and domain/application result types in port signatures.
-- Use `T?` for single-item lookups that may not exist and `List<T>` when multi-result ordering may matter.
-- Accept `Collection<ValueObject>` for bulk input unless a stricter collection type is part of the contract.
-- Keep single and bulk lookup function names distinct in application language.
-- Document missing-result policy in KDoc when callers cannot infer it, especially for bulk operations.
-- Do not annotate ports with Spring stereotypes.
-
-## Fields And Constants
-
-- Name outbound port properties by role, such as `query`, `repository`, `gateway`, or `client`.
-- Name injected use-case properties by action when an adapter service composes several use cases.
-- Expose constants only when they are part of the use-case contract.
-- Name limit constants with `MAX_...` when that matches local style.
-
-## Testing Boundary
-
-- Test use cases with fake ports when behavior matters.
-- Do not duplicate adapter mapping, repository query, HTTP routing, or JSON coverage in use-case tests; use `$writing-kotlin-tests` when test-level choice is unclear.
+동작이 있는 유스케이스는 가짜 포트로 검증한다. 어댑터 매핑, 저장소 쿼리, HTTP 경로나 JSON 검증을 반복하지 않는다. 테스트 수준이 불명확하면 `$writing-kotlin-tests`를 사용한다.

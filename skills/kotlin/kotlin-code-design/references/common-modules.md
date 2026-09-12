@@ -1,49 +1,41 @@
-# Common Modules
+# 공통 모듈
 
-Use this reference when changing technical common/support modules that are reusable but are not part of the DDD shared kernel.
+DDD 공유 커널에 속하지 않는 재사용 가능한 기술 공통·지원 모듈을 변경할 때 읽는다.
 
-## Responsibility
+## 책임과 의존성
 
-- Use common/support modules for technical reuse such as validation helpers, pagination mechanics, string/order/date utilities, persistence base behavior, test support, or framework integration support.
-- Name modules by dependency concern or support role, such as `common-validation`, `common-pagination`, `common-ordering`, `persistence-support`, or `test-support`.
-- Do not use `shared-*` for technical common modules. Keep `shared` reserved for the shared kernel.
-- Avoid bare `common`; prefer a name that tells callers what dependency or behavior they import.
-- Keep common/support modules narrow and smaller than feature modules.
-- Do not put bounded-context domain rules, use-case orchestration, adapter mapping, or app composition into common modules.
+- 검증 도우미, 페이지네이션, 문자열·순서·날짜 유틸리티, 영속성 기반 동작, 테스트·프레임워크 지원 같은 기술 재사용을 담당한다.
+- `common-validation`, `common-pagination`, `common-ordering`, `persistence-support`, `test-support`처럼 의존 대상이나 지원 역할을 이름에 드러낸다.
+- `shared`는 공유 커널에만 사용한다. 기술 공통 모듈에 `shared-*`를 사용하지 않는다.
+- 단순한 `common`보다 가져오는 의존성이나 동작을 알 수 있는 이름을 우선한다.
+- 기능 모듈보다 작고 좁게 유지한다. 도메인 규칙, 유스케이스 조합, 어댑터 매핑과 앱 구성을 넣지 않는다.
+- 여러 모듈이 안정적이고 프레임워크 의존성이 적은 API를 직접 호출하면 `common-<concern>`을 사용한다.
+- 특정 기술·계층·프레임워크 생명주기·픽스처·런타임을 지원하면 `<concern>-support`를 사용한다.
+- 일부에만 Spring, JPA, HTTP, 캐시, 직렬화, 런타임 스코프에 결합된 코루틴이나 테스트 인프라가 필요하면 모듈을 나눈다.
+- 프레임워크 의존성이 적은 공통 모듈은 Spring, JPA, HTTP, 캐시, 직렬화나 실행 앱에 의존하지 않는다.
+- 영속성 지원은 재사용 가능한 기반 동작에 한해 JPA·Spring Data에 의존할 수 있다.
+- 내부 모듈이 전이 의존성을 통해 불필요한 프레임워크·리플렉션·런타임 생명주기 제약을 받지 않도록 의존성을 명시한다.
 
-## Common Vs Support
+## 유틸리티
 
-- Use `common-<concern>` when multiple modules directly call a stable, framework-light technical API.
-- Use `<concern>-support` when the module mainly helps implement a technology, layer, framework lifecycle, fixture, or runtime concern.
-- Split a module when one part can stay framework-light but another needs Spring, JPA, HTTP, cache, serialization, coroutines tied to a runtime scope, or test infrastructure.
+- 네임스페이스 객체가 계약을 추가하지 않으면 응집된 무상태 연산에 작은 최상위 함수를 우선한다.
+- 싱글턴 식별성, 상태, 인터페이스 구현이나 의도적인 네임스페이스 API가 필요하면 `object`를 사용한다. Java 유틸리티 클래스를 형식적으로 재현하지 않는다.
+- 확장 함수는 가시성을 좁게 유지하고 수신 객체의 공개 계약에 자연스럽게 맞춘다.
+- 도우미는 `normalize`, `hasText`, `sortedByInput`처럼 계약으로 이름을 짓는다.
+- 널, 변경, 순서나 실패 계약이 다른 도우미를 구분한다.
 
-## Dependency Policy
+## 검증과 페이지네이션
 
-- Split a common module when dependency type or framework coupling would pollute other consumers.
-- Framework-light common modules should not depend on Spring, JPA, HTTP, cache, serialization, or runnable apps.
-- Persistence support may depend on JPA or Spring Data only for reusable persistence base behavior.
-- Keep dependencies explicit so inner modules do not acquire unwanted framework, reflection, or runtime lifecycle constraints transitively.
+- 여러 컨텍스트에서 같은 API가 필요할 때만 공통 검증 처리를 추가한다.
+- 결과 객체, 검증 체인, DSL 상태 수집기, 규칙 구현과 오류 모델의 책임을 구분한다.
+- 검증 함수는 `maxLength`, `positive` 같은 통과 조건으로 이름을 짓는다.
+- 타입별 널 허용 검증 규칙은 널 검사 규칙이 아니면 `null`을 건너뛴다. 널이 아닌 잘못된 타입은 명시적으로 실패해야 한다.
+- DSL 도우미는 상태를 수집하고 검증기는 검증 로직을 담당한다.
+- 페이지네이션이 컨텍스트 간 기술 계약일 때만 요청·결과 처리를 공통화한다.
 
-## Utility Style
+## API 규칙
 
-- Prefer small top-level functions for cohesive stateless operations when a namespace object adds no contract.
-- Use an `object` when singleton identity, state, interface implementation, or a deliberate namespaced API is part of the design; do not recreate Java utility classes ceremonially.
-- Keep extension functions narrow in visibility and natural to the receiver's public contract.
-- Name helpers by contract, such as `normalize`, `hasText`, or `sortedByInput`.
-- Keep similar helpers separate when their null, mutation, ordering, or failure contracts differ.
-
-## Validation And Pagination
-
-- Add reusable validation mechanics only after multiple contexts need the same API.
-- Keep validation roles distinct: result object, validation chain, DSL state collector, rule implementation, and error model should not absorb each other's behavior.
-- Name validation functions by pass conditions such as `maxLength` or `positive`.
-- Type-specific nullable validation rules should skip `null` unless they are the null rule; wrong non-null types should fail explicitly.
-- Keep DSL helpers as state collectors and validation logic in validators.
-- Add pagination request/result mechanics only when pagination behavior is a cross-context technical contract.
-
-## API Rules
-
-- Express absence with nullable types or empty collections according to cardinality; do not introduce `Optional` into Kotlin common APIs.
-- Snapshot mutable inputs when the public contract exposes immutable state.
-- Use explicit exceptions for construction misuse and wrong-state access.
-- Add common abstractions only when repeated use proves a real cross-feature technical contract.
+- 값의 개수에 따라 부재를 널 허용 타입이나 빈 컬렉션으로 표현한다. Kotlin 공통 API에 `Optional`을 도입하지 않는다.
+- 공개 계약이 불변 상태를 제공하면 가변 입력의 스냅샷을 만든다.
+- 잘못된 생성과 잘못된 상태 접근에는 명시적인 예외를 사용한다.
+- 반복 사용에서 실제 기능 간 기술 계약이 확인될 때만 공통 추상화를 추가한다.

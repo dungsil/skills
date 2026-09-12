@@ -1,27 +1,27 @@
-# Shared Kernel
+# 공유 커널
 
-Use this reference when changing the DDD shared kernel: small, stable concepts, value objects, contracts, and policies deliberately shared by multiple bounded contexts.
+여러 바운디드 컨텍스트가 의도적으로 공유하는 작고 안정적인 개념, 값 객체, 계약과 정책을 변경할 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Start with one shared kernel module for small, stable concepts, value objects, contracts, and policies that multiple bounded contexts deliberately agree to share.
-- Keep `shared` reserved for the DDD shared kernel. Put technical common code in explicitly named common/support modules.
-- Do not turn the shared kernel into a catch-all utility bucket. If a rule is specific to one feature or domain concept, keep it in that feature.
-- Keep public shared-kernel APIs small, stable, and easy to discover from call sites.
-- Promote code to shared only after another bounded context actually reuses the same contract or primitive. Keep first-use behavior in the owning context.
-- Validation or pagination types may live under `shared` only when they express agreed cross-context domain/application contracts; technical helpers and persistence base behavior belong in the owning context or a narrower common/support module.
+- 여러 컨텍스트가 공유하기로 합의한 작고 안정적인 개념을 공유 커널 모듈 하나에서 시작한다.
+- `shared`는 DDD 공유 커널에만 사용한다. 기술 공통 코드는 역할이 명확한 공통·지원 모듈에 둔다.
+- 공유 커널을 범용 유틸리티 모음으로 만들지 않는다. 특정 기능이나 도메인에 속하는 규칙은 해당 기능에 둔다.
+- 공개 API는 작고 안정적이며 호출부에서 쉽게 찾을 수 있게 유지한다.
+- 다른 바운디드 컨텍스트가 같은 계약이나 기본 요소를 실제로 재사용한 뒤에만 공유 커널로 옮긴다. 처음 사용하는 동작은 소유 컨텍스트에 둔다.
+- 검증·페이지네이션 타입은 합의된 컨텍스트 간 도메인·애플리케이션 계약일 때만 `shared`에 둔다. 기술 도우미와 영속성 기반 동작은 소유 컨텍스트나 더 좁은 공통·지원 모듈에 둔다.
 
-## Contract Shape
+## 계약 형태
 
-- Respect JSpecify nullness before adding runtime null checks.
-- Defensively copy mutable inputs when a shared-kernel type exposes immutable semantics.
-- Use explicit exception types for construction misuse and wrong-state access.
-- Preserve current result contracts, nullness policy, and error model shape unless the requested change explicitly changes them.
-- Use closed success/failure results for domain factory and parser outcomes when that result type is part of the shared kernel.
+- 런타임 널 검사를 추가하기 전에 JSpecify 계약을 확인한다.
+- 불변 의미를 제공하면 가변 입력을 방어적으로 복사한다.
+- 잘못된 생성과 잘못된 상태 접근에 명시적인 예외 타입을 사용한다.
+- 요청에서 명시적으로 바꾸지 않으면 기존 결과 계약, 널 정책과 오류 모델 형태를 유지한다.
+- 도메인 팩터리·파서 결과 타입이 공유 커널에 속하면 닫힌 성공·실패 결과를 사용한다.
 
-## Naming
+## 이름
 
-- Name shared-kernel concepts with the ubiquitous language shared by the bounded contexts.
-- Name shared result types with nouns that describe their contract.
-- Name reusable validation error types by violations, not validators or callers.
-- Name shared domain/application exceptions by policy, such as invalid query or query limit exceeded.
+- 컨텍스트들이 공유하는 유비쿼터스 언어로 개념 이름을 짓는다.
+- 결과 타입은 계약을 설명하는 명사로 이름을 짓는다.
+- 재사용하는 검증 오류 타입은 검증기나 호출부가 아닌 위반 내용으로 이름을 짓는다.
+- 공유 도메인·애플리케이션 예외는 잘못된 쿼리나 쿼리 제한 초과 같은 정책으로 이름을 짓는다.

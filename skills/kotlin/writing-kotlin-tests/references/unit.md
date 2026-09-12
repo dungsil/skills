@@ -1,60 +1,46 @@
-# Unit Test Reference
+# 단위 테스트
 
-Use this reference for tests that instantiate the unit directly and verify a small public contract.
+대상을 직접 생성하고 작은 공개 계약을 검증할 때 읽는다.
 
-## Scope
+## 적용 범위
 
-Good unit-test targets:
+도메인 값 클래스, 실제 값 의미를 갖는 데이터 클래스, 애그리거트 팩터리, 검증·결과 타입, 유스케이스 분기, `isDeleted()`·`setDeleted()` 같은 엔티티 도우미, `activeOnly = true` 강제 같은 어댑터 정책과 프레임워크가 스케줄링을 소유하지 않는 순수 코루틴·Flow 변환을 검증한다.
 
-- Domain value classes, data classes with genuine value semantics, and aggregate factories.
-- Validation and result types.
-- Use-case branches.
-- Entity helper methods such as `isDeleted()` and `setDeleted()`.
-- Adapter call-shape policies such as forcing `activeOnly = true`.
-- Pure coroutine or Flow transformations whose scheduling is not framework-owned.
+REST JSON 계약, Spring 트랜잭션·캐시·보안·MVC·프록시, JPA 매핑과 저장소 쿼리는 단위 테스트로 검증하지 않는다.
 
-Avoid unit tests for:
+## 검증 범위
 
-- REST controller JSON contracts.
-- Spring transaction, cache, security, MVC, or proxy behavior.
-- JPA mapping and repository query behavior.
+- 성공한 생성·상태와 거절하면 안 되는 정상 입력을 검증한다.
+- 잘못된 입력, 예외와 누적 오류 결과를 검증한다.
+- 널 허용 타입의 `null`, 빈 값, 임계값, 타입 불일치와 선택 값 동작을 검증한다.
+- 생성자·팩터리, 공개 도우미, 종단 연산과 변환을 검증한다.
+- 관련 불변식, 방어적 복사와 반환 컬렉션의 변경 가능성을 검증한다.
 
-## Coverage
+타입이 약속하지 않은 동작을 추측하여 테스트하지 않는다.
 
-Cover the contract from both directions:
+## 테스트 대역
 
-- Happy path: successful creation or state and normal inputs that must not be rejected.
-- Failure path: invalid inputs, exception paths, and accumulated error results.
-- Boundaries and policies: `null` only for nullable types, empty values, threshold edges, type mismatch, and optional-value behavior.
-- API surface: constructors or factories, public helpers, terminal operations, and transformations.
-- State integrity: invariants, defensive copies, and returned collection mutability when relevant.
+- 의존성이 데이터나 마커 구현뿐이면 작은 가짜 구현이나 객체 표현식을 사용한다.
+- 상호작용이 중요하거나 협력 객체의 비용이 크거나 가짜 구현이 테스트를 복잡하게 만들면 MockK를 사용한다.
+- 두 줄짜리 가짜 구현을 피하려고 값 객체, 단순 결과·오류 타입이나 마커 인터페이스를 모킹하지 않는다.
+- 기본적으로 relaxed mock을 피한다. 계약에 필요한 호출을 명시적으로 스텁하여 예상 밖 호출이 실패하게 한다.
+- 일반 호출은 `every`·`verify`, 중단 호출은 `coEvery`·`coVerify`를 사용한다.
+- 호출 횟수가 계약일 때만 `verify(exactly = n)`을 사용한다. 추가 상호작용이 없어야 하는 것 자체가 요구 동작일 때만 `confirmVerified`를 사용한다.
+- MockK로 준비·검증해도 상태·값 단언은 `kotlin.test`로 작성한다.
 
-Do not add speculative tests for behavior the type does not promise.
+## 코루틴과 Flow
 
-## Test Doubles
+- 프로젝트의 코루틴 테스트 스코프에서 중단 함수를 직접 호출한다. sleep이나 실제 지연을 사용하지 않는다.
+- 지연, 타임아웃, 재시도나 스케줄링 동작이 계약일 때만 가상 시간을 사용한다.
+- 관련 방출 값, 완료, 실패, 취소와 순서를 검증한다. 코루틴 구현 세부 사항을 단언하지 않는다.
+- 운영 코드의 책임을 제어해야 할 때만 디스패처·스코프를 주입한다. 테스트만을 위해 운영 코드를 재설계하지 않는다.
 
-- Use a small fake or object expression when the dependency is just data or a marker implementation.
-- Use MockK when interaction matters, a collaborator is expensive, or a concrete fake would obscure the test.
-- Do not mock value objects, simple result or error types, or trivial marker interfaces only to avoid a two-line fake.
-- Avoid relaxed mocks by default; explicitly stub calls the contract uses so unexpected calls fail.
-- Use `every` and `verify` for ordinary calls, and `coEvery` and `coVerify` for suspending calls.
-- Specify `verify(exactly = n)` only when call count is part of the contract. Use `confirmVerified` only when no additional interactions is itself required behavior.
-- Keep state and value assertions in `kotlin.test` even when MockK is used for setup or verification.
+## 검증 DSL
 
-## Coroutines And Flow
+검증 DSL·결과 타입을 테스트할 때 적용한다.
 
-- Call a suspend function directly from the project's coroutine test scope; do not use sleeps or real delays.
-- Use virtual time only when delay, timeout, retry, or scheduling behavior is the contract.
-- Test emitted values, completion, failure, cancellation, and ordering as applicable; do not assert coroutine implementation details.
-- Inject dispatchers or scopes only when production ownership must be controlled. Do not redesign production code solely to satisfy a test.
-
-## Validation DSL
-
-Use this section only when testing validation DSLs or validation result types.
-
-- Prefer pass-condition method names such as `maxLength(50)`, `positive()`, and `notBlank()`.
-- Keep error types named after violations, such as `TooLong`, `NonPositive`, or `Required`.
-- Add success-before-failure cases.
-- Add threshold boundary tests.
-- Add type mismatch tests when a rule is type-specific.
-- Separate terminal operations into groups such as `result` and `resultOrNull` when their contracts differ.
+- 메서드는 `maxLength(50)`, `positive()`, `notBlank()` 같은 통과 조건으로 이름을 짓는다.
+- 오류는 `TooLong`, `NonPositive`, `Required`처럼 위반 내용으로 이름을 짓는다.
+- 성공 사례를 실패 사례보다 먼저 두고 임계값을 검증한다.
+- 타입별 규칙은 타입 불일치를 검증한다.
+- 계약이 다르면 종단 연산을 `result`, `resultOrNull` 같은 그룹으로 나눈다.

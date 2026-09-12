@@ -1,45 +1,39 @@
-# E2E Test Reference
+# E2E 테스트
 
-Use this reference for tests that exercise the user-facing boundary through a real running application.
+실제로 실행한 애플리케이션을 통해 사용자에게 노출되는 경계를 검증할 때 읽는다.
 
-## Scope
+## 적용 범위
 
-Good E2E targets:
+HTTP 경로·메서드, 직렬화·JSON 필드 계약, 보안 필터 참여와 컨트롤러 -> 서비스 -> 유스케이스 -> 저장소 -> 도메인 -> 응답 동작을 검증한다.
 
-- HTTP route and method.
-- Serialization and JSON field contract.
-- Security filter participation.
-- Controller -> service -> use case -> repository -> domain -> response flow.
-
-Do not create REST service unit tests just to mirror controller JSON behavior. Prefer E2E for REST API contracts.
+컨트롤러 JSON 동작을 반복하기 위한 REST 서비스 단위 테스트를 만들지 않는다. REST API 계약에는 E2E를 우선한다.
 
 ## Spring Boot E2E
 
-- Keep E2E tests in the runnable app module because they exercise the assembled application boundary.
-- Put E2E tests under `apps/<app>/src/test/kotlin` by default. Do not create a separate E2E module or source set unless the project already requires it.
-- Use `@SpringBootTest(useMainMethod = ALWAYS, webEnvironment = RANDOM_PORT)`.
-- Inject `@LocalServerPort` and send actual HTTP requests.
-- Prepare data through application-supported APIs or JPA `EntityManager.persist()` inside a committed transaction.
-- If setup uses `EntityManager` from the test thread and the HTTP request runs on the server thread, commit setup with `TransactionTemplate` before sending the request.
-- Use `@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)` only when fixture isolation needs a fresh in-memory schema or context.
+- 조립한 애플리케이션 경계를 검증하므로 실행 앱 모듈에 둔다.
+- 기본 경로는 `apps/<app>/src/test/kotlin`이다. 프로젝트가 이미 요구하지 않으면 별도 모듈·소스 세트를 만들지 않는다.
+- `@SpringBootTest(useMainMethod = ALWAYS, webEnvironment = RANDOM_PORT)`를 사용한다.
+- `@LocalServerPort`를 주입받아 실제 HTTP 요청을 보낸다.
+- 앱이 지원하는 API나 커밋된 트랜잭션 안의 `EntityManager.persist()`로 데이터를 준비한다.
+- 테스트 스레드에서 준비하고 서버 스레드에서 HTTP를 처리하면 요청 전에 `TransactionTemplate`으로 준비 데이터를 커밋한다.
+- 픽스처 격리에 새 인메모리 스키마·컨텍스트가 필요할 때만 `@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)`를 사용한다.
 
-## Hard Rules
+## 필수 규칙
 
-- Use uppercase `E2E` in file and class names, such as `UserProfileE2ETest`.
-- Do not call a real HTTP server test an integration test.
-- Do not use `@Sql`, raw SQL, or `JdbcTemplate` fixture setup unless the project already requires that pattern.
-- Do not mock controllers or services.
-- Import ordinary test annotations and assertions from `kotlin.test`, not JUnit.
-- When asserting JSON response bodies, use the HTTP client's `jsonPath` support or parse JSON and assert fields with `kotlin.test`.
-- Do not validate response JSON with raw string `contains`.
+- 파일·클래스명에 `UserProfileE2ETest`처럼 대문자 `E2E`를 사용한다.
+- 실제 HTTP 서버 테스트를 통합 테스트라고 부르지 않는다.
+- 프로젝트가 이미 요구하지 않으면 `@Sql`, 원시 SQL이나 `JdbcTemplate`으로 픽스처를 준비하지 않는다.
+- 컨트롤러·서비스를 모킹하지 않는다.
+- 일반 테스트 애너테이션·단언은 JUnit 대신 `kotlin.test`에서 가져온다.
+- JSON은 HTTP 클라이언트의 `jsonPath`나 파싱한 필드를 `kotlin.test`로 검증한다. 원시 문자열의 `contains`로 검증하지 않는다.
 
-## JSON Body Assertions
+## JSON 본문 단언
 
-Prefer the JSONPath or parsed JSON API already used by the project. Assert the intended field path and value, not incidental serialization text.
+프로젝트의 기존 JSONPath·파싱 API를 우선한다. 부수적인 직렬화 문자열보다 의도한 필드 경로와 값을 단언한다.
 
 ```kotlin
 jsonPath("$.id").assertValue(response.body, "user-1")
 jsonPath("$.items").assertValue(response.body, emptyList<Any>())
 ```
 
-When the client has no suitable JSON assertion API, deserialize the body and use `assertEquals`, `assertContentEquals`, or `assertIs` from `kotlin.test`.
+클라이언트에 적절한 API가 없으면 역직렬화하고 `kotlin.test`의 `assertEquals`, `assertContentEquals`, `assertIs`로 검증한다.

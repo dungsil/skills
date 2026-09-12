@@ -1,30 +1,29 @@
-# Coroutines And Flow
+# 코루틴과 Flow
 
-## Ownership And Structure
+## 책임과 구조
 
-- Start work in a scope owned by the lifecycle that should cancel it. Prefer `coroutineScope` or `supervisorScope` for child work that belongs to the current operation.
-- Do not create ad hoc scopes in functions or use `GlobalScope` for ordinary application work. Inject or own a longer-lived scope only when the work must intentionally outlive the caller.
-- The layer that starts a coroutine owns its failure observation and lifecycle. Lower layers usually expose `suspend` functions for one-shot work and `Flow` for streams.
-- Use `async` only for genuine concurrent decomposition whose result is awaited. Sequential dependencies should remain sequential.
+- 작업을 취소해야 하는 생명주기가 소유한 스코프에서 시작한다. 현재 작업에 속하는 하위 작업은 `coroutineScope`·`supervisorScope`를 우선한다.
+- 일반 앱 작업에서 함수 안에 임의 스코프를 만들거나 `GlobalScope`를 사용하지 않는다. 호출부보다 의도적으로 오래 실행해야 할 때만 장기 스코프를 주입하거나 소유한다.
+- 코루틴을 시작하는 계층이 실패 관찰과 생명주기를 책임진다. 하위 계층은 보통 일회성 작업을 `suspend`, 스트림을 `Flow`로 노출한다.
+- 결과를 기다리는 실제 동시 분해에만 `async`를 사용한다. 순차 의존성은 순차로 유지한다.
 
-## Context And Blocking Work
+## 컨텍스트와 블로킹 작업
 
-- A `suspend` modifier does not make blocking code non-blocking. The boundary performing file, JDBC, legacy network, or CPU-heavy work owns the required `withContext` shift.
-- Keep libraries context-preserving unless their contract explicitly owns execution. In applications, inject or centralize dispatcher selection when deterministic testing or platform policy requires it; do not scatter hardcoded dispatchers.
-- Avoid redundant `withContext` around already suspending, context-safe APIs.
+- `suspend`는 블로킹 코드를 논블로킹으로 바꾸지 않는다. 파일·JDBC·레거시 네트워크·CPU 집약 작업을 수행하는 경계가 필요한 `withContext` 전환을 담당한다.
+- 계약에서 실행을 명시적으로 소유하지 않으면 라이브러리는 컨텍스트를 보존한다. 앱에서 결정적 테스트나 플랫폼 정책이 필요하면 디스패처 선택을 주입하거나 중앙화한다. 하드코딩한 디스패처를 흩어 놓지 않는다.
+- 이미 중단 가능하고 컨텍스트에 안전한 API에 불필요한 `withContext`를 추가하지 않는다.
 
-## Cancellation And Failure
+## 취소와 실패
 
-- Cancellation is control flow. Never catch and suppress `CancellationException`; rethrow it before translating or wrapping other failures.
-- `launch` propagates uncaught child failure through its hierarchy; `async` exposes failure through `await`. Observe every started job or deferred result according to its contract.
-- `CoroutineExceptionHandler` is for uncaught root-coroutine handling, typically logging or terminal reporting. It does not recover failed children and does not handle `async` failures before `await`.
-- Use supervision only when sibling failures are intentionally independent. Handle each supervised child's failure; supervision is not silent error suppression.
-- Keep non-cancellable cleanup minimal and limited to operations that must complete during cancellation.
+- 취소는 제어 흐름이다. `CancellationException`을 잡아 억제하지 않는다. 다른 실패를 변환하거나 감싸기 전에 다시 던진다.
+- `launch`의 처리되지 않은 하위 실패는 계층으로 전파되고, `async` 실패는 `await`로 드러난다. 시작한 모든 작업과 지연 결과를 계약에 맞게 관찰한다.
+- `CoroutineExceptionHandler`는 보통 로깅·최종 보고 같은 루트 코루틴의 미처리 예외를 다룬다. 실패한 하위 작업을 복구하거나 `await` 전의 `async` 실패를 처리하지 않는다.
+- 형제 실패가 의도적으로 독립적일 때만 supervision을 사용하고 각 하위 실패를 처리한다. 오류를 조용히 무시하는 수단으로 사용하지 않는다.
+- 취소할 수 없는 정리는 취소 중에도 반드시 끝내야 하는 최소 작업으로 제한한다.
 
-## Flow And State
+## Flow와 상태
 
-- Expose `Flow`, `StateFlow`, or another read-only stream type; keep `MutableStateFlow` and mutable state private.
-- Choose cold versus shared/stateful flow deliberately. Document replay, initial value, completion, errors, and collection lifetime when callers cannot infer them.
-- Avoid hidden launches inside flow operators. Prefer declarative operators and let the collecting scope own cancellation.
-- Do not use Flow for a single immediate value when a regular or suspending function is clearer.
-
+- `Flow`, `StateFlow` 등 읽기 전용 타입을 노출하고 `MutableStateFlow`와 가변 상태는 비공개로 유지한다.
+- 콜드 스트림과 공유·상태 스트림을 의도적으로 선택한다. 호출부가 추론할 수 없으면 재생, 초기값, 완료, 오류와 수집 생명주기를 설명한다.
+- 연산자 안에 숨은 코루틴 실행을 넣지 않는다. 선언적 연산자를 우선하고 수집 스코프가 취소를 소유하게 한다.
+- 즉시 반환하는 단일 값은 일반 함수나 중단 함수가 더 명확하면 Flow로 표현하지 않는다.

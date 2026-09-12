@@ -1,62 +1,54 @@
-# Independent Review
+# 독립 검토
 
-Every quality gate requires independent subagent review before the final report.
+모든 품질 게이트는 최종 보고서 전에 독립 서브에이전트 검토를 거쳐야 한다. 이 문서가 검토 배정과 완료 조건을 정의한다.
 
-## Assignment
+## 배정
 
-1. Split the request into independent source requirements before dispatch. Keep every criterion and evidence-domain gate under its parent requirement.
-2. Dispatch exactly one subagent per independent source requirement, in parallel when there are multiple requirements.
-3. Each reviewer owns scope, evidence, and verdict verification for all criteria and gate items derived from its assigned requirement.
-4. Do not create extra reviewers when one requirement splits into `CODE`, `OPERATION`, `DEPLOYMENT`, `DATA`, or other gates. Do not create separate scope, evidence, verdict, or adversarial reviewers unless the user explicitly requests another review pass.
+1. 요청을 독립적인 원 요구사항으로 나눈다. 각 기준과 증거 영역별 게이트는 원 요구사항 아래에 유지한다.
+2. 독립 원 요구사항마다 서브에이전트 한 명을 배정한다. 여러 요구사항은 병렬로 검토한다.
+3. 각 검토자는 배정된 요구사항에서 도출한 모든 기준·게이트의 범위, 증거와 판정을 함께 검증한다.
+4. 하나의 요구사항이 `CODE`, `OPERATION`, `DEPLOYMENT`, `DATA` 등으로 나뉘어도 검토자를 추가하지 않는다. 사용자가 추가 검토를 명시적으로 요청하지 않으면 범위·증거·판정·적대적 검토자를 따로 만들지 않는다.
 
-One independent source requirement means one reviewer. Review tier and gate count change review depth, not reviewer count or topology.
+검토 깊이와 게이트 수는 검토자 수나 배정 구조를 바꾸지 않는다.
 
-## Review Packet
+## 전달 자료와 반환 결과
 
-Give each reviewer only the material relevant to its assigned item:
+검토자에게 배정 항목에 관련된 자료만 제공한다.
 
-- source requirement and requested review scope
-- extracted criteria with evidence domains and `In scope` values
-- implementation evidence and test or execution results
-- separate-gate relationship and current-gate impact
-- draft criterion and gate statuses
-- known ambiguities and limits
+- 원 요구사항과 요청한 검토 범위
+- 증거 영역과 `In scope`를 포함한 기준
+- 구현 증거와 테스트·실행 결과
+- 별도 게이트 관계와 현재 게이트 영향
+- 기준·게이트 상태 초안
+- 알려진 모호성과 제한
 
-## Reviewer Result
+검토자는 다음 결과를 반환한다.
 
-Each reviewer returns:
+- `PASS` 또는 `CHANGES_REQUIRED`
+- 범위: 기준이 원 요구사항과 요청 범위에 속하는지 확인한 결과
+- 증거: 각 판정에 해당 영역의 일차 증거가 있는지 확인한 결과
+- 판정: 상태, 심각도, 집계와 별도 게이트 영향이 맞는지 확인한 결과
+- 정확한 증거나 규칙
+- 이의, 필요한 수정과 미해소 모호성·제한
 
-- `PASS` or `CHANGES_REQUIRED`
-- scope result: criteria belong to the source requirement and requested scope
-- evidence result: every judgment has domain-appropriate primary evidence
-- verdict result: statuses, severity, aggregation, and separate-gate impact are correct
-- exact supporting evidence or rule
-- objections, required changes, and unresolved ambiguity or limitation
+`HEAVY`에서는 같은 검토자가 결과를 바꿀 수 있는 타당한 반례나 대안 해석도 시도한다.
 
-For `HEAVY`, the same reviewer also attempts a plausible counterexample or alternate interpretation that could change its assigned item's outcome.
+## 완료 조건
 
-## Completion
+주 에이전트가 모든 발견 사항을 해소하고, 수용·기각한 이의와 이유를 기록하며, 초안과 관련 상태를 수정한다. 항목별 결과나 이견 해소 없이 도구만 호출하면 완료가 아니다.
 
-The main agent resolves every finding, records accepted and rejected objections with reasons, updates the draft, and recalculates affected statuses. A reviewer call without item-level results or resolution is incomplete.
+모든 독립 요구사항에 검토 결과 하나가 있고 모든 이견이 해소되어야 완료한다. 필수 서브에이전트를 사용할 수 없으면 해당 요구사항의 독립 검증을 미완료로 표시한다. 자체 검토로 독립 검토를 대체할 수 없다.
 
-Independent review is complete when every independent source requirement has one reviewer result and all disagreements are resolved. If a required subagent is unavailable, mark that requirement's independent verification incomplete; a self-review cannot satisfy the independent-review requirement.
+보고서와 후속 산출물은 [보고서 전달](report-delivery.md)에 따라 전달한다.
 
-Deliver the initial full report, each post-report addendum, and each revised full report to the same artifact selected by [report-delivery.md](report-delivery.md). Append an addendum to that artifact; replace its report body only for a revised full report. If delivery fails, use `ERROR`: state that the detailed report was not delivered, name the risk, and recommend checking the local path or hosted target, authentication, and write permission before retrying. The final chat message must show only the current status; add risks and recommended actions only for `WARNING`, `FAIL`, or `ERROR`, and must not repeat the full addendum.
+## 보고서 후속 적대적 검증
 
+초기 보고서 이후 사용자가 명시적으로 요청할 때만 수행한다.
 
-## Optional Post-report Adversarial Verification
+1. 기존 보고서, 원 요구사항과 인용 증거를 자료로 사용한다.
+2. 독립 원 요구사항마다 새 적대적 검증자 한 명을 배정하고 여러 요구사항은 병렬로 검토한다. 각 검증자는 해당 요구사항의 모든 기준·게이트를 다룬다.
+3. 누락·발명·범위 오류가 있는 의무, 일차 증거 없는 긍정 판정, 테스트·실행 주장으로 대체한 구현 증거, 제외·별도 게이트가 현재 상태에 미친 영향, 결과를 바꾸는 반례·대안 해석을 찾는다.
+4. `UPHELD` 또는 `CHANGES_REQUIRED`, 정확한 증거, 시도한 반례와 영향받는 기준·상태를 반환한다.
+5. 주 에이전트는 발견 사항을 한 차례 해소한다. 사용자가 요청하지 않으면 추가 적대적 검증을 시작하지 않는다.
 
-Run this only when the user explicitly requests adversarial verification after the initial report.
-
-1. Use the existing report, original requirement, and cited evidence as the review packet.
-2. Dispatch one new adversarial subagent per independent source requirement, in parallel. The verifier covers every criterion and gate item derived from that requirement.
-3. Each verifier tries to falsify its assigned requirement's result by finding:
-   - an omitted, invented, or mis-scoped obligation
-   - a positive judgment without domain-appropriate primary evidence
-   - a test or execution claim substituted for implementation evidence
-   - an excluded or separate-gate result contaminating the current status
-   - a plausible counterexample or alternate interpretation that changes the outcome
-4. Return `UPHELD` or `CHANGES_REQUIRED`, exact evidence, the attempted counterexample, and the affected criteria or status.
-5. The main agent resolves findings once. Do not start another adversarial round unless the user requests it.
-
-Append an addendum containing the item assignments, findings, resolutions, and whether the original verdict remains valid to the existing report artifact. Update that same artifact with a full revised report only when requested.
+배정, 발견 사항, 해소 결과와 기존 판정의 유효 여부를 부록에 기록한다. 전체 수정 보고서는 요청한 경우에만 작성한다. 저장 위치와 추가·갱신 방식은 [보고서 전달](report-delivery.md)을 따른다.

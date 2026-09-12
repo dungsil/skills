@@ -1,44 +1,35 @@
 ---
 name: writing-javadoc
-description: Write or review concise Korean Javadoc comments for Java code. Use when adding, revising, or checking Javadocs for Java types, constructors, fields, methods, private helpers, parameters, return values, null behavior, exceptions, deprecations, references, generic type parameters, test-aligned contracts, or project style consistency.
+description: Java 코드의 한국어 Javadoc을 작성하거나 검토한다. Javadoc 추가·수정·계약 확인 요청에 사용한다.
 ---
 
-# Writing Javadoc
+# Javadoc 작성
 
-Use this skill to write concise, contract-focused Javadoc that matches the surrounding Java code, tests, and project style.
+주변 Java 코드, 테스트와 프로젝트 스타일에 맞는 간결한 계약 문서를 작성한다.
 
-## Core Rules
+## 작업 범위
 
-- Write Javadocs in Korean. Keep Java identifiers, API names, tags, and code literals in their original form.
-- Do not return example code or generate usage examples.
-- Do not add new `@author`, `@version`, or `@since` tags.
-- Preserve existing `@author`, `@version`, and `@since` tags when revising existing Javadocs unless the user explicitly asks to remove them.
-- Document public and protected members when their contract is useful to callers.
-- Document package-private and private members only when the behavior is complex, non-obvious, or intentionally differs from nearby public methods.
-- Do not generate boilerplate documentation for simple fields or type member properties.
-- Keep documentation close to the code's actual behavior and tested contract.
+- 검토만 요청받으면 파일을 변경하지 않고 발견 사항과 근거를 보고한다.
+- 작성·수정 요청에서는 필요한 Javadoc만 변경한다. 선언, 애너테이션, 의존성 등 운영 코드의 변경은 요청 범위에 포함된 경우에만 수행한다.
+- 실제 동작과 문서가 다르면 불일치를 알린다. 문서를 맞추기 위해 운영 코드의 동작을 임의로 바꾸지 않는다.
+- 바꾼 주석과 링크를 확인한다. 프로젝트의 문서 검증이 관련되면 실행하고, 주석 수정만을 이유로 전체 동작 테스트를 반복하지 않는다.
 
-## Korean Style
+## 내용과 문체
 
-- Use concise report-style declarative sentences.
-- Do not use endings like `~입니다.`
-- Change `~합니다.` to `~한다.`
-- Prefer natural Korean developer wording. Avoid parser-like wording such as `소비한다` unless the code is actually parser/tokenizer logic.
-- Keep the first line as a short summary phrase, similar to `문자열 정규화`.
-- Do not add a period to the first summary line unless surrounding Javadocs require it for consistency.
+- Javadoc은 한국어로 작성하고 Java 식별자, API 이름, 태그와 코드 리터럴은 유지한다.
+- 예제 코드나 사용 예시는 만들지 않는다.
+- `@author`, `@version`, `@since`를 새로 추가하지 않는다. 기존 태그는 사용자가 삭제를 요청하지 않으면 보존한다.
+- 호출자에게 유용한 계약이 있는 public·protected 멤버를 문서화한다.
+- package-private·private 멤버는 복잡하거나 명확하지 않은 동작, 인접 공개 메서드와 의도적으로 다른 동작이 있을 때만 문서화한다. 단순 필드·속성의 상투적인 설명은 생략한다.
+- 간결한 평서체를 사용한다. `~입니다.`를 쓰지 않고 `~합니다.`는 `~한다.`로 바꾼다.
+- 첫 줄은 `문자열 정규화`처럼 짧은 요약 구절로 쓴다. 주변 관례가 요구하지 않으면 마침표를 붙이지 않는다.
+- 자연스러운 개발자 용어를 사용한다. 실제 파서·토크나이저 동작이 아니면 `소비한다` 같은 직역 표현을 피한다.
 
-## Method Javadoc Shape
+## 메서드 문서 형식
 
-Use this order for method Javadocs:
+짧은 요약, 필요한 경우의 상세 설명, `@param`, `@return`, `@throws` 순서로 작성한다. 반환 타입이 `void`가 아닌 메서드에는 요약만으로 반환값이 완전히 명확한 경우를 제외하고 `@return`을 사용한다.
 
-1. Short summary phrase.
-2. When additional detail is needed, place `<p>` on the line immediately after the summary. Do not insert an empty Javadoc line before it or add `</p>`.
-3. One or two behavior sentences.
-4. `@param` tags.
-5. `@return` tag for non-void methods unless the summary already makes the return value completely obvious.
-6. `@throws` tags for documented exceptions.
-
-Use this format when a method needs a detail paragraph and has parameter, return value, and exception contracts:
+상세 설명이 필요하면 요약 바로 다음 줄에 `<p>`를 두고 한두 문장으로 설명한다. 그 앞에 빈 Javadoc 줄을 넣거나 `</p>`를 쓰지 않는다. HTML은 이 문단 구분용 `<p>`만 사용한다.
 
 ```text
 /**
@@ -52,41 +43,24 @@ Use this format when a method needs a detail paragraph and has parameter, return
  */
 ```
 
-Keep the body short. Let focused tests carry edge-case detail when the Javadoc would become long.
+본문이 길어지면 구현의 세부 경계 사례는 집중 테스트로 검증하고, 호출자가 알아야 할 계약을 간결하게 남긴다.
 
-## Contract Documentation
+## 계약과 태그
 
-- Document what the method promises, not how every line is implemented.
-- Document `null` behavior when it is part of the public contract.
-- Put exception behavior in `@throws`, not in the prose body.
-- Only document exceptions callers can reasonably trigger or need to know.
-- Use `@see` for references to other types or members.
-- Use `@param <T>` for generic type parameters when the type parameter's role is not obvious.
-- Use `{@code}` for inline code snippets, including `true`, `false`, and `null`.
-- Avoid HTML tags in Javadocs except for `<p>` when paragraph separation is needed. Place `<p>` on its own line at the paragraph break and omit `</p>`.
-- Use `@deprecated` to mark a member as deprecated and provide an alternative.
-- If two similar methods intentionally have different contracts, document that difference briefly.
-- If changing one method must not mechanically change another, state that the contracts are different and should be checked separately.
+- 구현 과정을 나열하기보다 메서드가 보장하는 동작을 설명한다.
+- `null` 처리가 공개 계약에 포함되면 문서화한다.
+- 호출자가 유발하거나 알아야 할 예외만 `@throws`에 적고 일반 본문에 섞지 않는다.
+- 다른 타입·멤버는 `@see`로 참조한다. 역할이 자명하지 않은 타입 매개변수에는 `@param <T>`를 사용한다.
+- `true`, `false`, `null` 등의 인라인 코드에는 `{@code}`를 사용한다.
+- 사용 중단 멤버에는 `@deprecated`와 대안을 적는다.
+- 유사한 메서드의 계약이 의도적으로 다르면 차이를 명시하고 각각 확인한다. 한 메서드의 변경을 다른 메서드에 기계적으로 적용하지 않는다.
 
-## Common Edge Cases
+## 필요한 경우에만 확인할 사항
 
-- Omit record accessor Javadocs unless the accessor contract differs from the component name, nullness, normalization, or domain invariant.
-- Document sealed interfaces by their permitted domain variants and selection rule; do not restate every implementation detail.
-- Document enum constants only when each constant has caller-visible policy, persistence mapping, or domain meaning that is not obvious from the name.
-- Document exception types by the caller-visible failure condition and recovery meaning; avoid stack-trace or implementation prose.
-- Include `package-info.java` with `@NullMarked` by default for Java packages; also use it for package-level contracts, architectural role, or domain language that applies to every type in the package.
-  Do not repeat it in every nested package unless that nested package needs its own nullness default or package-level contract.
-- For Spring `@ConfigurationProperties` carriers, document external configuration meaning, defaulting, units, and validation constraints rather than Spring binding mechanics.
-- For factories returning result/error carriers such as `Either<List<Problem>, T>`, make `@return` state the success value and the collected failure shape without showing usage examples.
-
-## Review Checklist
-
-- First line is a short summary phrase, not a full sentence.
-- First line does not end with a needless period.
-- Prose is not longer than the surrounding Javadoc style.
-- `@throws` is used for exception contracts.
-- No example code or usage examples are included.
-- Existing `@author`, `@version`, and `@since` tags are preserved unless removal was explicitly requested.
-- No new `@author`, `@version`, or `@since` tags are added.
-- No HTML tags are added except standalone `<p>` tags at paragraph breaks, with no `</p>` closing tags.
-- Sentence endings follow the project style.
+- record 접근자는 컴포넌트 이름·널 허용 여부·정규화·불변식과 다른 계약이 있을 때만 문서화한다.
+- sealed 인터페이스는 허용하는 도메인 변형과 선택 기준을 설명하고 구현 세부를 반복하지 않는다.
+- enum 상수는 이름만으로 알 수 없는 호출자 정책·영속성 매핑·도메인 의미가 있을 때만 설명한다.
+- 예외 타입은 호출자가 보는 실패 조건과 복구 의미를 설명한다.
+- 기존 `package-info.java`의 패키지 계약·역할·도메인 용어와 널 허용 여부 기본값을 확인한다. 패키지 수준 계약 문서가 필요한 경우에만 파일을 추가하며, `@NullMarked` 도입은 요청 범위와 프로젝트 정책에 포함될 때만 수행한다. 별도 계약이 없는 하위 패키지에 반복하지 않는다.
+- Spring `@ConfigurationProperties`는 바인딩 구현보다 외부 설정의 의미, 기본값, 단위와 검증 제약을 설명한다.
+- `Either<List<Problem>, T>` 같은 팩터리 결과는 사용 예시 없이 `@return`에 성공 값과 누적 실패 형태를 설명한다.

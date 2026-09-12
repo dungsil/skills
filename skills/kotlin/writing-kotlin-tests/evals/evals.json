@@ -3,52 +3,62 @@
   "evals": [
     {
       "id": "lowest-useful-level",
-      "prompt": "Kotlin 도메인 엔티티의 isDeleted()와 setDeleted() 계약을 검증하는 테스트를 추가하려고 해. 어떤 테스트 레벨과 구조가 맞아?",
-      "expected_output": "순수 도메인 helper 계약이므로 unit test를 선택하고, 불필요한 Spring/E2E 설정 없이 kotlin.test로 성공/경계/예외 순의 작은 테스트를 제안한다.",
+      "prompt": "Kotlin 도메인 엔티티의 isDeleted()와 setDeleted() 계약을 검증할 테스트를 추가하려고 해. 어떤 수준과 구조가 적합할까?",
+      "expected_output": "순수 도메인 도우미는 단위 테스트로 검증한다. 불필요한 Spring·E2E 없이 kotlin.test로 성공·경계·예외 순의 작은 테스트를 제안한다.",
       "assertions": [
-        "The output chooses unit test as the lowest useful level.",
-        "The output avoids Spring Boot or E2E setup for pure domain behavior.",
-        "The output uses kotlin.test rather than JUnit APIs."
+        "가장 낮은 유효 수준인 단위 테스트를 선택한다.",
+        "순수 도메인 동작에 Spring Boot·E2E 설정을 추가하지 않는다.",
+        "JUnit API 대신 kotlin.test를 사용한다."
       ]
     },
     {
       "id": "adapter-policy-mockk",
-      "prompt": "REST E2E에서 이미 전체 조회 흐름은 검증했어. Kotlin persistence adapter가 repository 호출 때 activeOnly=true를 강제하는 정책만 테스트하고 싶어.",
-      "expected_output": "중복 E2E 필드 검증을 피하고 adapter-specific policy만 unit test로 검증하며, interaction이 필요하면 Mockito가 아니라 MockK를 사용한다.",
+      "prompt": "REST E2E에서 전체 조회 동작은 이미 검증했어. Kotlin 영속성 어댑터가 저장소 호출에서 activeOnly=true를 강제하는 정책만 테스트하고 싶어.",
+      "expected_output": "E2E 필드 검증을 반복하지 않고 어댑터 정책만 단위 테스트로 검증한다. 상호작용이 필요하면 MockK를 사용한다.",
       "assertions": [
-        "The output avoids duplicate coverage across test levels.",
-        "The output keeps the adapter unit test focused on the activeOnly=true policy.",
-        "The output uses MockK rather than Mockito for interaction verification."
+        "테스트 수준 간 중복 검증을 피한다.",
+        "어댑터 단위 테스트를 activeOnly=true 정책에 집중한다.",
+        "상호작용 검증에 Mockito 대신 MockK를 사용한다."
       ]
     },
     {
       "id": "kotlin-nullability",
-      "prompt": "non-null Kotlin 파라미터에 null을 넣는 테스트를 쓰려고 null as String으로 우회하려 해. 방어 로직도 확인하고 싶어.",
-      "expected_output": "일반 null 테스트는 Kotlin 계약 밖이므로 피하고, nullable 계약은 명시적으로 검증하며 Java 호출자의 misuse defense가 공개 계약일 때만 Java interop 경계에서 검증한다.",
+      "prompt": "비널 Kotlin 매개변수에 null을 넣으려고 null as String으로 우회하는 테스트를 작성하려고 해. 방어 로직도 확인하고 싶어.",
+      "expected_output": "일반적인 null 입력은 Kotlin 계약 밖이므로 피한다. 널 허용 계약은 검증하며 Java 호출자의 오용 방어가 공개 계약일 때만 Java 경계에서 검증한다.",
       "assertions": [
-        "The output treats non-null Kotlin types as non-null contracts.",
-        "The output rejects null as T or reflection as routine test techniques.",
-        "The output limits misuse-defense tests to an explicit Java-interoperability contract."
+        "비널 Kotlin 타입을 비널 계약으로 취급한다.",
+        "null as T나 리플렉션을 일반 테스트 기법으로 사용하지 않는다.",
+        "오용 방어 테스트를 명시적인 Java 상호 운용 계약에 한정한다."
       ]
     },
     {
       "id": "coroutine-mockk",
-      "prompt": "suspend use case가 repository를 한 번 호출하고 결과를 반환하는지 테스트하려고 Thread.sleep과 Mockito를 쓰려 해.",
-      "expected_output": "실제 sleep을 피하고 프로젝트의 coroutine test scope에서 실행하며, suspending interaction은 MockK의 coEvery/coVerify로 필요한 계약만 검증한다.",
+      "prompt": "suspend 유스케이스가 저장소를 한 번 호출하고 결과를 반환하는지 검증하려고 Thread.sleep과 Mockito를 사용하려고 해.",
+      "expected_output": "실제 지연 없이 프로젝트의 코루틴 테스트 스코프에서 실행하고 중단 상호작용은 MockK의 coEvery·coVerify로 필요한 계약만 검증한다.",
       "assertions": [
-        "The output rejects real sleeps for coroutine tests.",
-        "The output uses MockK coEvery and coVerify rather than Mockito.",
-        "The output verifies only observable results and contract-relevant interaction counts."
+        "코루틴 테스트에 실제 sleep을 사용하지 않는다.",
+        "Mockito 대신 MockK coEvery·coVerify를 사용한다.",
+        "관찰 가능한 결과와 계약에 필요한 상호작용 횟수만 검증한다."
       ]
     },
     {
       "id": "e2e-jsonpath-not-raw-contains",
-      "prompt": "Kotlin E2E 테스트에서 라이선스 조회 응답 JSON에 MIT가 있는지 확인하려고 response body 문자열에 contains(\"MIT\")를 쓰려 해.",
-      "expected_output": "raw string contains 검증을 피하고 사용 중인 HTTP 도구의 jsonPath 또는 파싱된 JSON 필드에 kotlin.test assertion을 적용해 구조와 값 계약을 검증한다.",
+      "prompt": "Kotlin E2E에서 라이선스 조회 JSON에 MIT가 있는지 확인하려고 응답 본문 문자열에 contains(\"MIT\")를 사용하려고 해.",
+      "expected_output": "원시 문자열 contains를 피하고 HTTP 도구의 jsonPath나 파싱된 필드에 kotlin.test 단언을 적용하여 구조·값을 검증한다.",
       "assertions": [
-        "The output rejects raw string contains for JSON body contract checks.",
-        "The output recommends jsonPath or parsed JSON assertions at the field path.",
-        "The output keeps ordinary assertions in kotlin.test."
+        "JSON 본문 계약을 원시 문자열 contains로 검증하지 않는다.",
+        "필드 경로를 대상으로 jsonPath나 파싱된 JSON 단언을 권고한다.",
+        "일반 단언은 kotlin.test로 작성한다."
+      ]
+    },
+    {
+      "id": "review-platform-boundary-no-edit",
+      "prompt": "Java 플랫폼 타입을 !!로 처리하는 Kotlin 테스트를 검토만 해 줘. 운영 코드의 널 계약도 불명확하지만 이번에는 파일을 수정하지 마.",
+      "expected_output": "불명확한 경계 계약과 테스트의 위험을 보고하고 운영·테스트 코드를 변경하지 않는다.",
+      "assertions": [
+        "불명확한 플랫폼 경계의 계약을 확인하거나 확인 한계를 밝힌다.",
+        "검토를 위해 운영 코드에 타입·검증을 자동 추가하지 않는다.",
+        "테스트를 수정하거나 포맷하지 않는다."
       ]
     }
   ]

@@ -1,7 +1,7 @@
 interface:
-  display_name: "Writing Kotlin Tests"
-  short_description: "Kotlin·kotlin-test·MockK 테스트 작성과 레벨 선택"
-  default_prompt: "Use $writing-kotlin-tests to design, write, or review Kotlin tests with kotlin-test and MockK."
+  display_name: "Kotlin 테스트 작성"
+  short_description: "kotlin-test와 MockK로 테스트를 작성하고 테스트 수준을 선택한다."
+  default_prompt: "$writing-kotlin-tests를 사용하여 kotlin-test와 MockK 기반 Kotlin 테스트를 설계·작성·검토해 줘."
 
 policy:
   allow_implicit_invocation: true

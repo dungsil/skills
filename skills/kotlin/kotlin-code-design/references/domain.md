@@ -1,45 +1,45 @@
-# Domain
+# 도메인
 
-Use this reference when changing domain packages, including models, value objects, aggregates, factories, and domain errors.
+모델, 값 객체, 애그리거트, 팩터리와 도메인 오류를 변경할 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Model business concepts first, not current table or payload shapes.
-- Keep domain code free of Spring, JPA, HTTP, cache, transaction, serialization, and runtime lifecycle concerns.
-- Put feature-specific violations under the context's domain error package when they are not reusable shared-kernel errors.
-- Put context-level application outcomes such as not found in a sibling application exception/result package, not under domain.
-- Keep entities and value objects honest about invariants; do not expose partially valid or broadly mutable domain objects.
+- 현재 테이블이나 페이로드 구조보다 업무 개념을 먼저 모델링한다.
+- Spring, JPA, HTTP, 캐시, 트랜잭션, 직렬화와 런타임 생명주기를 도메인에 넣지 않는다.
+- 공유 커널에서 재사용하지 않는 기능별 위반은 해당 컨텍스트의 도메인 오류 패키지에 둔다.
+- 찾지 못함 같은 애플리케이션 결과는 도메인 아래가 아닌 형제 애플리케이션 예외·결과 패키지에 둔다.
+- 엔티티와 값 객체의 불변식을 지킨다. 부분적으로 유효하거나 광범위하게 변경 가능한 도메인 객체를 노출하지 않는다.
 
-## Factories And Validation
+## 팩터리와 검증
 
-- Use private or internal construction plus a companion or top-level factory when creation validates, normalizes, selects a subtype, or may fail.
-- Name validating factories `create(...)` when that matches local style.
-- Return the project's validation or domain result type for ordinary invalid input when callers are expected to handle failure; do not throw mechanically.
-- Treat validation results as closed success/failure values. Valid results expose a value, invalid results expose errors, and wrong-state access fails through terminal operations.
-- Accept raw inputs when that matches nearby factories. Normalize only when normalization is part of the domain contract, then validate.
-- Compose child validation results before constructing aggregates and accumulate independent errors when the caller benefits from seeing all violations.
-- Use unwrap-or-throw terminal operations only after validity is established at the current boundary.
+- 생성 과정에서 검증·정규화·하위 타입 선택을 수행하거나 실패할 수 있으면 private·internal 생성자와 companion 또는 최상위 팩터리를 사용한다.
+- 지역 관례에 맞으면 검증 팩터리는 `create(...)`로 이름을 짓는다.
+- 호출부가 처리해야 하는 일반적인 잘못된 입력에는 프로젝트의 검증·도메인 결과 타입을 반환한다. 기계적으로 예외를 던지지 않는다.
+- 검증 결과는 닫힌 성공·실패 값이다. 유효한 결과는 값, 무효한 결과는 오류를 노출하며 잘못된 상태 접근은 종단 연산에서 실패한다.
+- 인접 팩터리에 맞게 원시 입력을 받는다. 도메인 계약에 포함된 정규화만 수행한 뒤 검증한다.
+- 애그리거트 생성 전에 하위 검증 결과를 조합한다. 호출부가 모든 위반을 확인할 필요가 있으면 독립적인 오류를 누적한다.
+- 현재 경계에서 유효성이 확인된 뒤에만 값을 꺼내거나 예외를 던지는 종단 연산을 사용한다.
 
-## Type Choice
+## 타입 선택
 
-- Use a `data class` only when structural equality, `copy`, destructuring, `toString`, and public construction are valid domain semantics.
-- Use a regular class when invariants, identity, lifecycle, normalization, controlled mutation, custom equality, or API evolution require a narrower contract.
-- Use a value class for a scalar domain distinction when boxing, generic use, reflection, persistence, serialization, validation, and Java callers remain acceptable.
-- Use sealed types for closed domain alternatives that callers should handle exhaustively.
-- Keep constructors private when factories are the only valid creation path.
+- 구조적 동등성, `copy`, 구조 분해, `toString`과 공개 생성이 모두 도메인 의미에 맞을 때만 `data class`를 사용한다.
+- 불변식, 식별성, 생명주기, 정규화, 통제된 변경, 사용자 정의 동등성이나 API 변경 때문에 좁은 계약이 필요하면 일반 클래스를 사용한다.
+- 박싱, 제네릭, 리플렉션, 영속성, 직렬화, 검증과 Java 호출이 적합하면 스칼라 도메인 구분에 값 클래스를 사용한다.
+- 호출부가 빠짐없이 처리해야 하는 닫힌 선택지에는 sealed 타입을 사용한다.
+- 팩터리만 유효한 생성 경로이면 생성자를 private으로 유지한다.
 
-## Naming And Members
+## 이름과 멤버
 
-- Name aggregates and domain models with domain nouns and ubiquitous language.
-- Name value objects by the concept they protect, such as `<Thing>Id`, `<Thing>Name`, or `DisplayOrder`.
-- Use `value` inside single-value objects unless a more precise domain term improves the API.
-- Use domain-language property names inside aggregates and collection names that describe relationships, not storage structures.
-- Use `MAX_<PROPERTY>`-style constants for domain limits when constants are part of the local convention.
-- Keep raw input names close to the domain concept, then convert them to validated domain types before construction.
+- 애그리거트·모델은 도메인 명사와 유비쿼터스 언어로 이름을 짓는다.
+- 값 객체는 `<Thing>Id`, `<Thing>Name`, `DisplayOrder`처럼 보호하는 개념으로 이름을 짓는다.
+- 단일 값 객체는 더 정확한 도메인 용어가 API를 개선하지 않으면 `value`를 사용한다.
+- 애그리거트 프로퍼티는 도메인 언어로, 컬렉션은 저장 구조보다 관계를 나타내는 이름으로 작성한다.
+- 지역 관례에 맞으면 제한 상수에 `MAX_<PROPERTY>` 형태를 사용한다.
+- 원시 입력 이름은 도메인 개념에 가깝게 유지하고 생성 전에 검증한 도메인 타입으로 바꾼다.
 
-## Domain Errors
+## 도메인 오류
 
-- Keep error values simple and data-focused.
-- Use shared-kernel validation errors only for genuinely reusable cross-context violations.
-- Keep domain validation failures separate from application outcomes and infrastructure failures.
-- Preserve original causes only when a domain exception legitimately translates an underlying failure; infrastructure translation normally belongs in an adapter.
+- 오류 값은 단순하게 유지하고 데이터를 중심으로 구성한다.
+- 실제로 컨텍스트 간 재사용하는 위반에만 공유 커널 검증 오류를 사용한다.
+- 도메인 검증 실패, 애플리케이션 결과와 인프라 실패를 구분한다.
+- 도메인 예외가 하위 실패를 적절하게 변환하는 경우에만 원인을 보존한다. 인프라 실패 변환은 보통 어댑터에 둔다.

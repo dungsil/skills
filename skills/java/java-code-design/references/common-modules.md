@@ -1,50 +1,45 @@
-# Common Modules
+# 공통 모듈
 
-Use this reference when changing technical common/support modules that are reusable but are not part of the DDD shared kernel.
+DDD 공유 커널에 속하지 않는 재사용 가능한 기술 공통·지원 모듈을 변경할 때 읽는다.
 
-## Responsibility
+## 책임과 이름
 
-- Use common/support modules for technical reuse such as validation helpers, pagination mechanics, string/order/date utilities, persistence base behavior, test support, or framework integration support.
-- Name modules by dependency concern or support role, such as `common-validation`, `common-pagination`, `common-persistence`, `persistence-support`, or another project-standard name.
-- Do not use `shared-*` for technical common modules. Keep `shared` reserved for the shared kernel.
-- Avoid bare `common`; prefer a name that tells callers what dependency or behavior they are importing.
-- Keep common/support modules narrow and smaller than feature modules.
-- Do not put bounded-context domain rules, use-case orchestration, adapter mapping, or app composition into common modules.
+- 검증 도우미, 페이지네이션 처리, 문자열·순서·날짜 유틸리티, 영속성 기반 동작, 테스트·프레임워크 지원 같은 기술 재사용을 담당한다.
+- `common-validation`, `common-pagination`, `common-persistence`, `persistence-support`처럼 의존 대상이나 지원 역할을 이름에 드러낸다.
+- `shared`는 공유 커널에만 사용한다. 기술 공통 모듈에 `shared-*`를 사용하지 않는다.
+- 단순한 `common`보다 호출부가 가져오는 의존성이나 동작을 알 수 있는 이름을 우선한다.
+- 기능 모듈보다 작고 좁게 유지한다. 바운디드 컨텍스트의 도메인 규칙, 유스케이스 조합, 어댑터 매핑과 앱 구성을 넣지 않는다.
 
-## Common vs Support
+## common과 support 구분
 
-- Use `common-<concern>` when multiple modules directly call the API as a stable technical contract: `common-validation`, `common-pagination`, `common-ordering`.
-- Use `<concern>-support` when the module mainly helps implement a specific technology, layer, or runtime concern: `persistence-support`, `rest-support`, `test-support`.
-- Prefer `common-<concern>` for framework-light primitives that domain, use-case, adapter, or starter modules can safely depend on.
-- Prefer `<concern>-support` when the code intentionally carries framework dependencies, lifecycle assumptions, fixtures, or adapter/starter implementation details.
-- Split the module when one part can stay framework-light but another part needs Spring, JPA, HTTP, cache, serialization, or test infrastructure.
+- 여러 모듈이 안정적인 기술 계약으로 직접 호출하면 `common-validation`, `common-pagination`, `common-ordering` 같은 `common-<concern>`을 사용한다.
+- 특정 기술·계층·런타임 구현을 지원하면 `persistence-support`, `rest-support`, `test-support` 같은 `<concern>-support`를 사용한다.
+- 도메인·유스케이스·어댑터·스타터에서 안전하게 의존할 수 있는 프레임워크 의존성이 적은 기본 요소에는 `common-<concern>`을 우선한다.
+- 프레임워크 의존성, 생명주기 가정, 픽스처나 어댑터·스타터 구현 세부 사항을 의도적으로 포함하면 `<concern>-support`를 우선한다.
+- 일부만 Spring, JPA, HTTP, 캐시, 직렬화나 테스트 인프라가 필요하면 프레임워크 의존성이 적은 부분과 분리한다.
 
-## Dependency Policy
+## 의존성 정책
 
-- Split a common module when dependency type or framework coupling would pollute other consumers.
-- Framework-light common modules should not depend on Spring, JPA, HTTP, cache, serialization, or runnable apps.
-- Persistence support modules may depend on JPA API or Spring Data JPA, but only for reusable persistence base behavior.
-- Common modules may be used by shared kernel, domain, use-case, adapter, starter, or app modules only when the dependency direction stays explicit and does not pull in unwanted framework dependencies.
+- 의존성 종류나 프레임워크 결합이 다른 소비 모듈에 불필요한 영향을 주면 모듈을 나눈다.
+- 프레임워크 의존성이 적은 공통 모듈은 Spring, JPA, HTTP, 캐시, 직렬화나 실행 앱에 의존하지 않는다.
+- 영속성 지원 모듈은 재사용 가능한 영속성 기반 동작에 한해 JPA API나 Spring Data JPA에 의존할 수 있다.
+- 공유 커널·도메인·유스케이스·어댑터·스타터·앱은 의존 방향이 명확하고 불필요한 프레임워크 의존성을 가져오지 않을 때 공통 모듈을 사용할 수 있다.
 
-## Utility Style
+## 유틸리티와 계약
 
-- Use `@UtilityClass` only for small stateless utility groups with cohesive responsibility.
-- Keep utility method names contract-oriented, such as `normalize`, `hasText`, or `sortByInput`.
-- Document null behavior when a utility intentionally accepts `null`.
-- Keep similar helpers separate when their contracts differ; do not mechanically alter one because another changed.
+- 책임이 응집된 작은 무상태 유틸리티에만 `@UtilityClass`를 사용한다.
+- 메서드 이름은 `normalize`, `hasText`, `sortByInput`처럼 계약을 나타낸다.
+- 의도적으로 `null`을 받으면 처리 방식을 문서화한다. 비슷해도 계약이 다른 도우미는 구분하고, 하나의 변경을 다른 함수에 기계적으로 적용하지 않는다.
+- 런타임 널 검사를 추가하기 전에 JSpecify 계약을 확인한다.
+- 불변 의미를 제공하는 타입은 가변 입력을 방어적으로 복사한다.
+- 잘못된 생성과 잘못된 상태 접근은 명시적인 예외 타입으로 구별한다.
+- 반복 사용에서 실제 기능 간 기술 계약이 확인될 때만 공통 추상화를 추가한다.
 
-## Validation And Pagination
+## 검증과 페이지네이션
 
-- Put reusable validation mechanics in a validation-oriented common module only when multiple contexts need the same API.
-- Keep validation roles distinct: result object, validation chain, DSL helper, and error model should not absorb each other's behavior.
-- Name validator methods by pass conditions such as `maxLength` or `positive`.
-- Type-specific validation rules should skip `null` unless they are the null rule; wrong non-null types should fail explicitly.
-- Keep DSL helpers as state collectors. Put validation logic in the validator.
-- Put pagination request/result mechanics in a pagination-oriented common module only when pagination behavior is a cross-context technical contract.
-
-## API Rules
-
-- Respect JSpecify nullness before adding runtime null checks.
-- Defensively copy mutable inputs when a common type exposes immutable semantics.
-- Use explicit exception types for construction misuse and wrong-state access.
-- Add common abstractions only when repeated use shows a real cross-feature technical contract.
+- 여러 컨텍스트에 같은 API가 필요할 때만 검증 공통 모듈에 재사용 가능한 검증 처리를 둔다.
+- 결과 객체, 검증 체인, DSL 도우미와 오류 모델의 책임을 구분한다.
+- 검증 메서드는 `maxLength`, `positive`처럼 통과 조건으로 이름을 짓는다.
+- 타입별 규칙은 널 검사 규칙이 아니면 `null`을 건너뛴다. 널이 아닌 잘못된 타입은 명시적으로 실패해야 한다.
+- DSL 도우미는 상태를 수집하고, 검증 로직은 검증기에 둔다.
+- 페이지네이션이 컨텍스트 간 기술 계약일 때만 페이지네이션 공통 모듈에 요청·결과 처리를 둔다.

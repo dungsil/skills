@@ -1,128 +1,127 @@
-# Requirement Quality Gate Report Template
+# 요구사항 품질 게이트 보고서 양식
 
-Use this template for the full Markdown report. First read [report-delivery.md](report-delivery.md) and deliver the report to its selected local file or hosted pull-request/merge-request comment. Use the issue number as the report key when known; otherwise use a short kebab-case name based on the requirement. If initial delivery, addendum append, or revised-report update fails, set the overall status to `ERROR` and do not present it as successful. The delivered artifact is the only full report: do not return the full Markdown report in chat. In the final chat message, for `WARNING`, `FAIL`, or `ERROR`, show only the status, risks, and recommended actions; for every other status, show only the status. For a delivery `ERROR`, state the risk that the detailed report was not delivered and recommend checking the local path or hosted target, authentication, and write permission before retrying. Use the user's language for headings, labels, values, and prose. Before writing a Korean report, read [korean-report-values.md](korean-report-values.md).
+전체 Markdown 보고서를 작성할 때 사용한다. 전달 위치와 최종 응답은 [보고서 전달](report-delivery.md), 한국어 값은 [표시값 규칙](korean-report-values.md)을 따른다. 제목·라벨·값·설명은 사용자 언어로 작성한다.
 
-# Requirement Quality Gate Report
+# 요구사항 품질 게이트 보고서
 
-## 1. Overall Decision
+## 1. 종합 판정
 
-| Item | Value |
+| 항목 | 값 |
 |---|---|
-| Status | `<통과 | 경고 | 실패 | 검토 필요 | 관련 변경 없음 | 오류>` |
-| Review tier | `<경량 검토 | 심층 검토>` |
-| Judgment | `<one-sentence judgment for this gate only>` |
-| Evaluated scope | `<user-requested scope>` |
-| Gate type | `<코드 구현 | 테스트 검증 | 마이그레이션 구현 | 운영 실행 | 배포 | 데이터 상태 | 수동 검증>` |
-| Evidence boundary | `<코드 증거 | 실행 증거 | 혼합 증거; 검사한 증거 출처이며 게이트 범위가 아님>` |
-| Included evidence domains | `<코드, 테스트, 마이그레이션, 운영 실행, 배포, 데이터, 수동 검증 중 해당 항목>` |
-| Excluded evidence domains | `<excluded domains and why>` |
-| Separate gates | `<게이트 이름과 상태 또는 없음>` |
-| Independent review performed | `<예 | 아니요>` |
-| Independent review result | `<반영한 변경 | 변경 없음 | 자체 반증 대체 | 해당 없음>` |
-| Success criteria | `<short summary of in-scope criteria>` |
-| Evidence coverage | `<performed and missing evidence scenarios>` |
+| 상태 | `<통과 / 경고 / 실패 / 검토 필요 / 관련 변경 없음 / 오류>` |
+| 검토 깊이 | `<경량 검토 / 심층 검토>` |
+| 판정 | `<현재 게이트만 평가한 한 문장>` |
+| 평가 범위 | `<사용자가 요청한 범위>` |
+| 게이트 종류 | `<코드 구현 / 테스트 검증 / 마이그레이션 구현 / 운영 실행 / 배포 / 데이터 상태 / 수동 검증>` |
+| 증거 경계 | `<코드 증거 / 실행 증거 / 혼합 증거; 검사한 증거 출처이며 게이트 범위가 아님>` |
+| 포함 증거 영역 | `<코드, 테스트, 마이그레이션, 운영 실행, 배포, 데이터, 수동 검증 중 해당 항목>` |
+| 제외 증거 영역 | `<제외한 영역과 이유>` |
+| 별도 게이트 | `<게이트 이름과 상태 또는 없음>` |
+| 독립 검토 수행 | `<예 / 아니요>` |
+| 독립 검토 결과 | `<반영한 변경 / 변경 없음 / 독립 검증 미완료 / 해당 없음>` |
+| 성공 기준 | `<범위 내 기준 요약>` |
+| 증거 확인 범위 | `<수행한 증거 확인과 누락된 시나리오>` |
 
-## 2. Reviewed Requirement
+## 2. 검토한 요구사항
 
-> `<source requirement only; exclude review scope, supplied evidence, and limits>`
+> `<원 요구사항만 인용한다. 검토 범위, 제공된 증거와 제한은 제외한다.>`
 
-| Item | Details |
+| 항목 | 내용 |
 |---|---|
-| Review scope | `<artifacts and outcomes the user requested>` |
-| Supplied evidence | `<사용자가 제시한 파일, 테스트, 출력 또는 없음>` |
-| Input limits | `<사용할 수 없는 증거 또는 없음>` |
-| Current gate criteria | `<in-scope source-stated required behavior>` |
-| Separate gate obligations | `<다른 게이트로 분리한 원 요구사항 또는 없음>` |
-| Constraints and non-goals | `<제약과 비목표 또는 없음>` |
-| Ambiguities | `<해소되거나 미해소된 모호성, 결과 영향 또는 없음>` |
+| 검토 범위 | `<사용자가 요청한 산출물과 결과>` |
+| 제공된 증거 | `<사용자가 제시한 파일, 테스트, 출력 또는 없음>` |
+| 입력 제한 | `<사용할 수 없는 증거 또는 없음>` |
+| 현재 게이트 기준 | `<원 요구사항에 명시된 범위 내 필수 동작>` |
+| 별도 게이트 의무 | `<다른 게이트로 분리한 원 요구사항 또는 없음>` |
+| 제약과 비목표 | `<제약과 비목표 또는 없음>` |
+| 모호성 | `<해소되거나 미해소된 모호성, 결과 영향 또는 없음>` |
 
-## 3. Implementation Mapping
+## 3. 구현 연결
 
-| Item | Value |
+| 항목 | 값 |
 |---|---|
-| Mapping confidence | `<0.00-1.00>` |
-| Relevant implementation files | `<file list>` |
-| Relevant tests or verification files | `<관련 테스트 또는 검증 파일, 없으면 없음>` |
-| Mapping status | `<충족 | 미충족 | 부분 충족 | 확인 불가 | 해당 없음>` |
-| Mapping rationale | `<why these files and evidence are relevant>` |
+| 연결 신뢰도 | `<0.00-1.00>` |
+| 관련 구현 파일 | `<파일 목록>` |
+| 관련 테스트·검증 파일 | `<관련 파일 또는 없음>` |
+| 연결 상태 | `<충족 / 미충족 / 부분 충족 / 확인 불가 / 해당 없음>` |
+| 연결 근거 | `<파일·증거가 요구사항과 관련된 이유>` |
 
-## 4. Criteria Results
+## 4. 기준별 결과
 
-모든 행은 원 요구사항에서 도출해야 한다. 증거만 설명하는 문장은 승인 기준이 아니다. 범위 밖 원 요구사항을 추적 목적으로 남길 때는 범위를 `제외`, 상태를 `범위 밖` 또는 `별도 게이트`, 종합 판정 영향을 `영향 없음`으로 표시한다.
+모든 행은 원 요구사항에서 도출한다. 증거만 설명하는 문장은 승인 기준이 아니다. 추적용 범위 밖 의무는 범위를 `제외`, 상태를 `범위 밖`·`별도 게이트`, 영향을 `영향 없음`으로 표시한다.
 
 ```text
 종합 상태 =
   범위가 "포함"인 승인 기준 상태만 집계
 ```
 
-| ID | Criterion | Evidence domain | In scope | Status | Severity | Implementation or primary evidence | Overall status impact | Judgment | Recommendation |
+| ID | 기준 | 증거 영역 | 범위 | 상태 | 심각도 | 구현·일차 증거 | 종합 상태 영향 | 판정 | 권고 |
 |---|---|---|---|---|---|---|---|---|---|
-| `AC-1` | `<required behavior>` | `<코드 | 테스트 | 마이그레이션 | 운영 실행 | 배포 | 데이터 | 수동 검증>` | `<포함 | 제외>` | `<충족 | 위험 동반 충족 | 미충족 | 확인 불가 | 범위 밖 | 별도 게이트 | 해당 없음>` | `<치명적 | 높음 | 중간 | 낮음 | 없음>` | `<evidence>` | `<종합 판정 반영 | 영향 없음>` | `<judgment>` | `<recommendation>` |
+| `AC-1` | `<요구 동작>` | `<코드 / 테스트 / 마이그레이션 / 운영 실행 / 배포 / 데이터 / 수동 검증>` | `<포함 / 제외>` | `<충족 / 위험 동반 충족 / 미충족 / 확인 불가 / 범위 밖 / 별도 게이트 / 해당 없음>` | `<치명적 / 높음 / 중간 / 낮음 / 없음>` | `<증거>` | `<종합 판정 반영 / 영향 없음>` | `<판정>` | `<권고>` |
 
 범위가 `제외`이거나 상태가 `범위 밖`, `별도 게이트`, `해당 없음`인 행은 현재 게이트 상태에 영향을 주지 않는다.
 
-## 5. Test and Verification Evidence
+## 5. 테스트와 검증 증거
 
-| Type | Item | Result |
+| 종류 | 항목 | 결과 |
 |---|---|---|
-| Relevant test | `<test file or command>` | `<verified behavior>` |
-| Missing verification | `<missing test or check>` | `<current-scope risk, separate-gate gap, or recommendation>` |
-| Executed check | `<command or manual check>` | `<result>` |
+| 관련 테스트 | `<테스트 파일·명령>` | `<검증한 동작>` |
+| 누락된 검증 | `<없는 테스트·검사>` | `<현재 범위 위험, 별도 게이트 미확인 사항 또는 권고>` |
+| 실행한 검증 | `<명령·수동 검사>` | `<결과>` |
 
-## 6. Separate Gates
+## 6. 별도 게이트
 
-| Gate | Evidence domain | Status | Reason | Impact on current gate |
+| 게이트 | 증거 영역 | 상태 | 이유 | 현재 게이트 영향 |
 |---|---|---|---|---|
-| `<gate>` | `<코드 | 테스트 | 마이그레이션 | 운영 실행 | 배포 | 데이터 | 수동 검증>` | `<통과 | 경고 | 실패 | 검토 필요 | 관련 변경 없음 | 오류>` | `<reason>` | `<영향 없음>` |
+| `<게이트>` | `<코드 / 테스트 / 마이그레이션 / 운영 실행 / 배포 / 데이터 / 수동 검증>` | `<통과 / 경고 / 실패 / 검토 필요 / 관련 변경 없음 / 오류>` | `<이유>` | `<영향 없음>` |
 
-독립 게이트의 현재 게이트 영향에는 `영향 없음`을 사용한다. 해당 게이트의 증거 부재가 현재 게이트를 하향해서는 안 된다.
+독립 게이트의 증거 부재로 현재 게이트 상태를 낮추지 않는다.
 
-## 7. Independent Review
+## 7. 독립 검토
 
-| Item | Result |
+| 항목 | 결과 |
 |---|---|
-| Reviewers used | `<독립 요구사항 → 서브에이전트 목록>` |
-| Requirement assignments | `<각 리뷰어에게 할당한 독립 요구사항과 파생 게이트>` |
-| Per-requirement results | `<각 요구사항의 전체 기준·게이트에 대한 범위·증거·판정 결과>` |
-| Disagreements | `<이견 또는 없음>` |
-| Resolution | `<수용·기각 근거와 반영한 변경>` |
+| 검토자 | `<독립 요구사항 → 서브에이전트 목록>` |
+| 요구사항 배정 | `<각 검토자에게 할당한 독립 요구사항과 파생 게이트>` |
+| 요구사항별 결과 | `<전체 기준·게이트의 범위·증거·판정 결과>` |
+| 이견 | `<이견 또는 없음>` |
+| 해소 결과 | `<수용·기각 근거와 반영한 변경>` |
 
-독립 요구사항마다 서브에이전트 한 명을 할당한다. 각 리뷰어가 해당 요구사항에서 파생된 모든 기준과 게이트의 범위·증거·판정을 함께 검증한다. 하나의 요구사항이 코드·운영·배포·데이터 게이트로 분리되어도 리뷰어를 추가하지 않는다. 여러 독립 요구사항만 병렬로 검토한다.
+배정과 완료 여부는 [독립 검토](independent-review.md)에 따라 확인한다.
 
-## 8. Risks and Recommended Actions
+## 8. 위험과 권고 조치
 
-### Risks
+### 위험
 
-| Severity | Risk | Related criteria or files |
+| 심각도 | 위험 | 관련 기준·파일 |
 |---|---|---|
-| `<치명적 | 높음 | 중간 | 낮음>` | `<in-scope risk>` | `<criteria or files>` |
+| `<치명적 / 높음 / 중간 / 낮음>` | `<현재 범위 위험>` | `<기준·파일>` |
 
-### Recommended Actions
+### 권고 조치
 
-| Priority | Action | Expected effect |
+| 우선순위 | 조치 | 기대 효과 |
 |---:|---|---|
-| `<1>` | `<action>` | `<effect>` |
+| `<1>` | `<조치>` | `<효과>` |
 
-## 9. Scope and Limits
+## 9. 범위와 제한
 
-| Item | Value |
+| 항목 | 값 |
 |---|---|
-| Change scope | `<사용자 지정 범위 | 브랜치 diff | 작업 트리 | 미추적 파일 | 검색한 소스 | 없음>` |
-| Comparison method | `<merge-base 비교 | 직접 diff | 스테이징 변경 | 미스테이징 변경 | 혼합 | 제공된 diff | 없음>` |
-| Reviewed files | `<files>` |
-| Excluded files | `<files and reasons>` |
-| External validation or separate gates | `<현재 게이트에서 판단할 수 없는 항목 또는 없음>` |
-| Limits | `<제한사항 또는 없음>` |
+| 변경 범위 | `<사용자 지정 범위 / 브랜치 diff / 작업 트리 / 미추적 파일 / 검색한 소스 / 없음>` |
+| 비교 방식 | `<merge-base 비교 / 직접 diff / 스테이징 변경 / 미스테이징 변경 / 혼합 / 제공된 diff / 없음>` |
+| 검토 파일 | `<파일>` |
+| 제외 파일 | `<파일과 이유>` |
+| 외부 검증·별도 게이트 | `<현재 게이트에서 판단할 수 없는 항목 또는 없음>` |
+| 제한 | `<제한 사항 또는 없음>` |
 
-## Optional Adversarial Verification Addendum
+## 선택적 적대적 검증 부록
 
-Include this section only when the user explicitly requests post-report adversarial verification. For an addendum-only request, append this addendum to the existing report artifact selected by [report-delivery.md](report-delivery.md); do not erase the report body or create a separate artifact. For a revised full report request, update that same artifact with the revised full report. Do not return the full addendum in chat; use the compact final-chat contract above. If the append or update fails, report `ERROR`, state the risk that the detailed report was not delivered, and recommend checking the local path or hosted target, authentication, and write permission before retrying.
+사용자가 보고서 후속 적대적 검증을 명시적으로 요청한 경우에만 포함한다. 검토 방식은 [독립 검토](independent-review.md#보고서-후속-적대적-검증), 추가·갱신·실패 처리는 [보고서 전달](report-delivery.md)을 따른다.
 
-| Item | Result |
+| 항목 | 결과 |
 |---|---|
-| Trigger | `<사용자 요청 문구>` |
-| Assignments | `<독립 요구사항 → 적대 검증자와 파생 게이트>` |
-| Findings | `<항목별 유지 또는 변경 필요, 근거, 반례 시도>` |
-| Resolution | `<수용·기각 근거와 상태 변경>` |
-| Original verdict | `<유효 | 수정 필요>` |
-
+| 요청 | `<사용자 요청 문구>` |
+| 배정 | `<독립 요구사항 → 적대적 검증자와 파생 게이트>` |
+| 발견 사항 | `<항목별 유지·변경 필요, 근거와 반례 시도>` |
+| 해소 결과 | `<수용·기각 근거와 상태 변경>` |
+| 기존 판정 | `<유효 / 수정 필요>` |

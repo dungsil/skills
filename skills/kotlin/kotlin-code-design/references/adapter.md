@@ -1,45 +1,39 @@
-# Adapter
+# 어댑터
 
-Use this reference when changing persistence, REST, Spring configuration, messaging, cache, external client, or other framework-facing code.
+영속성, REST, Spring 설정, 메시징, 캐시, 외부 클라이언트 등 프레임워크 경계 코드를 변경할 때 읽는다.
 
-## Responsibility
+## 책임과 영속성
 
-- Adapters translate between external frameworks and application/domain contracts.
-- Keep framework annotations, transport DTOs, persistence entities, cache details, serialization shapes, retries, and client mechanics out of domain and use-case code.
-- Persistence entities map storage concerns; do not treat them as domain models by default.
-- REST/OpenAPI types own request parsing and response shapes, not domain rules.
+- 외부 프레임워크와 애플리케이션·도메인 계약 사이를 변환한다.
+- 프레임워크 애너테이션, 전송 DTO, 영속성 엔티티, 캐시, 직렬화 구조, 재시도와 클라이언트 처리를 내부 코드에 넣지 않는다.
+- 영속성 엔티티는 저장 책임을 담당한다. 기본적으로 도메인 모델과 구별한다.
+- REST·OpenAPI 타입은 요청 파싱과 응답 구조를 소유하며 도메인 규칙을 소유하지 않는다.
+- Spring Data 저장소나 프레임워크 클라이언트를 호출하기 전에 값 객체를 영속성 기본 타입으로 변환한다.
+- 도메인 팩터리나 명시적인 매핑 정책으로 도메인 객체를 복원한다.
+- 저장된 행에서 유효한 도메인 객체를 복원할 수 없으면 데이터 무결성·인프라 실패로 처리한다. 조용히 없는 결과로 바꾸지 않는다.
+- JPA 저장소·엔티티·프록시·지연 로딩·쿼리 파생·삭제 플래그·조인·트랜잭션 처리는 영속성 어댑터에 둔다.
+- JPA용 개방성, 인자 없는 생성자, 가변 프로퍼티와 널 초기 상태는 엔티티에 한정한다.
+- 기본적으로 Kotlin `data class`를 JPA 엔티티로 사용하지 않는다.
+- 실제로 재사용하는 영속성 기반 동작에만 `common-persistence`, `persistence-support` 등 기존 지원 모듈을 사용한다.
 
-## Persistence
+## 이름
 
-- Map domain value objects to persistence primitives before calling Spring Data repositories or framework clients.
-- Reconstruct domain objects through domain factories or explicit mapping policy.
-- Treat persisted rows that cannot reconstruct a valid domain object as data-integrity or infrastructure failures, not silent misses.
-- Keep JPA repository, entity, proxy, lazy-loading, query derivation, deleted-flag, join, and transaction mechanics inside persistence adapters.
-- Limit JPA-required openness, no-arg construction, mutable properties, and nullable initialization state to entity types.
-- Do not use a Kotlin `data class` as a JPA entity by default.
-- Use `common-persistence`, `persistence-support`, or another established support module only for genuinely reusable persistence base behavior.
+- 프로젝트 관례에 맞으면 설정 클래스에 `Config`, 설정 프로퍼티 객체에 `Properties`를 사용한다.
+- `Controller`, `Request`, `RequestParam`, `Response` 접미사는 REST 어댑터 패키지에만 사용한다.
+- `Entity`, `JpaRepository`, `<Technology>Adapter` 접미사는 영속성 어댑터 패키지에만 사용한다.
+- 어댑터 구현은 `<PortName><Technology>Adapter`, 포트 연결 설정은 `<Context>PortConfig`·`<Context><Boundary>Config`로 이름을 짓는다.
+- 기존 관례에 맞으면 Spring Data 저장소는 `<Entity>JpaRepository`, 엔티티는 `<DomainThing>Entity`로 이름을 짓는다.
+- 단일 프레임워크 저장소 의존성은 `repository`로 이름을 짓는다. 기술명은 핵심 협력 객체 프로퍼티보다 어댑터 타입명에 둔다.
 
-## Naming
+## 연결과 런타임 경계
 
-- Use `Config` for configuration classes and `Properties` for configuration-property carriers when that matches project conventions.
-- Use `Controller`, `Request`, `RequestParam`, and `Response` suffixes only in REST adapter packages.
-- Use `Entity`, `JpaRepository`, and `<Technology>Adapter` suffixes only in persistence adapter packages.
-- Name adapter implementations `<PortName><Technology>Adapter`.
-- Name port wiring configuration `<Context>PortConfig` or `<Context><Boundary>Config`.
-- Name Spring Data repositories `<Entity>JpaRepository` and persistence entities `<DomainThing>Entity` when those conventions are established.
-- Name a single framework repository dependency `repository`; keep technology names in adapter type names rather than core collaborator properties.
+- 구체 구현을 제공하는 어댑터·앱 모듈에 포트 연결 설정을 둔다.
+- 비널 `val` 의존성을 생성자로 주입한다.
+- Spring이 가로챌 수 있고 애플리케이션 원자성이 드러나는 곳에 트랜잭션 경계를 둔다.
+- 블로킹 JDBC·파일·레거시 클라이언트 작업은 어댑터 경계가 소유한 실행 컨텍스트에서 처리한다. `suspend`만으로 논블로킹이 되지 않는다.
+- 실패를 변환할 때 코루틴 취소를 보존한다.
+- 애플리케이션 계약이 명시적으로 소유하지 않으면 재시도, 회로 차단기, 캐시 정책, 직렬화와 프로토콜 오류 변환은 어댑터 경계에 둔다.
 
-## Wiring And Runtime Boundaries
+## 테스트
 
-- Put port wiring configuration in the adapter or app module that provides the concrete implementation.
-- Use constructor injection with non-null `val` dependencies.
-- Put transaction boundaries where Spring can intercept them and where application atomicity is visible.
-- Keep blocking JDBC, file, or legacy client work on the execution context owned by the adapter boundary; `suspend` alone is not non-blocking.
-- Preserve coroutine cancellation when translating adapter failures.
-- Keep retries, circuit breakers, cache policy, serialization, and protocol-specific error mapping at the adapter boundary unless the application contract explicitly owns the policy.
-
-## REST And Framework Tests
-
-- Keep JSON shape and HTTP behavior at REST or E2E boundaries.
-- Keep adapter-specific unit tests for adapter policy such as forced repository filters, mapping, failure translation, or ordering guarantees.
-- Use `$writing-kotlin-tests` when choosing between unit, integration, and E2E coverage.
+JSON 구조와 HTTP 동작은 REST·E2E 경계에서 검증한다. 어댑터 단위 테스트는 강제 저장소 필터, 매핑, 실패 변환과 순서 보장 같은 어댑터 정책에 집중한다. 테스트 수준 선택에는 `$writing-kotlin-tests`를 사용한다.

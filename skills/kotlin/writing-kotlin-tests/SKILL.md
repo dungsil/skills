@@ -1,103 +1,63 @@
 ---
 name: writing-kotlin-tests
-description: Write, improve, or review Kotlin tests with kotlin-test, MockK, Spring Boot, and Spring Data JPA across unit, integration, and E2E levels. Use only for Kotlin test work, including domain, use-case, entity, validation, repository, adapter, coroutine, HTTP API, nullability, or Kotlin test-level selection decisions.
+description: kotlin-test, MockK와 Spring Boot를 사용하는 Kotlin 테스트를 작성·개선·검토한다. 단위·통합·E2E 수준 선택과 Kotlin 동작 계약 검증에 사용한다.
 ---
 
-# Writing Kotlin Tests
+# Kotlin 테스트 작성
 
-Use this skill to choose the right test level first, then write compact contract-focused Kotlin tests.
+가장 낮은 유효 테스트 수준을 선택하고, 관찰 가능한 계약을 간결하게 검증한다.
 
-Use `kotlin.test` APIs for test annotations and assertions. Use MockK when interaction matters. Do not use JUnit assertion or annotation APIs, Mockito, AssertJ, Hamcrest, Truth, or another assertion library unless an existing framework assertion requires it. For E2E JSON body checks, use `jsonPath` or parse JSON and assert fields with `kotlin.test`; Hamcrest matchers are allowed only inside an existing `jsonPath` assertion API.
+테스트 애너테이션과 단언은 `kotlin.test`를 사용하고, 상호작용 검증이 필요하면 MockK를 사용한다. 기존 프레임워크 단언이 요구하는 경우를 제외하면 JUnit 애너테이션·단언, Mockito, AssertJ, Hamcrest, Truth나 다른 단언 라이브러리를 사용하지 않는다. E2E JSON 본문은 `jsonPath` 또는 파싱한 JSON 필드를 `kotlin.test`로 검증한다. Hamcrest 매처는 기존 `jsonPath` 단언 API 안에서만 허용한다.
 
-## Workflow
+## 작업 방식
 
-1. Read the target code, nearby tests, build configuration, Kotlin version, platform, and source set before writing anything.
-2. Decide the lowest useful test level: unit, integration, or E2E.
-3. Load the matching reference only when needed:
-   - Unit tests: [references/unit.md](references/unit.md)
-   - Integration tests: [references/integration.md](references/integration.md)
-   - E2E tests: [references/e2e.md](references/e2e.md)
-4. Identify the public contract and add the smallest useful test set.
-5. Avoid duplicate coverage across levels.
-6. Put unit and integration tests in the module and source set that own the behavior.
-7. Run the narrowest relevant test command first, then broader tests when risk justifies it.
+- 검토 요청에서는 테스트나 운영 코드를 수정하지 않는다. 계약 누락, 잘못된 테스트 수준과 근거를 보고한다.
+- 작성·수정 요청에서는 대상 코드와 인접 테스트부터 읽는다. 테스트 실행이나 플랫폼 제약을 판단할 때 빌드 설정, Kotlin 버전, 플랫폼과 소스 세트를 추가로 확인한다.
+- 공개 계약에 필요한 최소 테스트를 작성하고, 해당 동작을 소유한 모듈과 소스 세트에 둔다.
+- 가장 좁은 관련 테스트부터 실행한다. 변경 위험이나 실패 원인 때문에 필요할 때만 검증을 넓힌다.
 
-## Test Levels
+테스트 수준에 필요한 참조 문서를 선택한다.
 
-Choose the lowest useful level:
+- [단위 테스트](references/unit.md): 도메인 값 객체, 엔티티 도우미, 유스케이스 분기, 검증 규칙, 코루틴 변환, 저장소 어댑터 호출 형태
+- [통합 테스트](references/integration.md): JPA 매핑, 저장소 쿼리, 트랜잭션·생명주기, Spring 빈 구성
+- [E2E 테스트](references/e2e.md): HTTP 경로, 직렬화, 보안 필터와 컨트롤러부터 저장소까지 이어지는 동작
 
-- Domain value object, entity helper, use-case branch, validation rule, coroutine transformation, repository adapter call shape: unit test.
-- JPA entity mapping, repository query, transaction/lifecycle behavior, Spring bean wiring: integration test.
-- HTTP route, serialization, security filter, controller-service-use-case-repository flow: E2E test.
+E2E에서 HTTP -> 저장소 -> 도메인 -> JSON을 검증하면 어댑터 단위 테스트에서 모든 매핑 필드를 다시 단언하지 않는다. 어댑터 단위 테스트는 `activeOnly = true` 강제 같은 고유 정책에 집중한다. 엔티티 단위 테스트는 `isDeleted()`, `setDeleted()` 같은 순수 도우미 계약을 다룬다.
 
-Avoid duplicate coverage:
+## 의존성과 픽스처
 
-- If E2E verifies HTTP -> repository -> domain -> JSON, do not also assert every mapped domain field in adapter unit tests.
-- Keep adapter unit tests only for adapter-specific policy, such as forcing `activeOnly = true` on repository calls.
-- Keep entity unit tests for pure helper contracts such as `isDeleted()` and `setDeleted()`.
+- 프로젝트의 기존 `kotlin-test` 통합과 테스트 러너를 사용한다. 소스 import를 바꾸기 위해 러너 어댑터를 교체하지 않는다.
+- `Test`, `BeforeTest`, `assertEquals`, `assertContentEquals`, `assertFailsWith`, `assertIs`, `assertNotNull` 등을 `kotlin.test`에서 가져온다.
+- 목, 스텁, 스파이와 상호작용 검증에는 MockK를 사용한다.
+- 코루틴 타이밍, 디스패처, 취소나 가상 시간이 계약에 포함되고 기존 프로젝트가 제공하거나 테스트에 필요한 경우에만 `kotlinx-coroutines-test`를 사용한다.
+- 여러 모듈에서 픽스처를 공유해야 할 때만 Gradle `java-test-fixtures`를 사용한다. Kotlin 픽스처는 `src/testFixtures/kotlin`에 둔다.
+- 픽스처 타입을 소유한 어댑터 모듈에 픽스처를 두는 것을 우선한다. 앱 수준 테스트는 필요한 경우 `testFixtures(project(":<adapter-module>"))`에 의존할 수 있다.
+- 단일 어댑터의 테스트 데이터를 위해 별도 픽스처 모듈을 만들지 않는다.
+- 프로퍼티만 대입하는 빌더보다 이름 있는 인자와 유용한 기본값을 갖춘 작은 팩터리 함수를 우선한다.
 
-## Dependencies
+## 구조와 이름
 
-- Use the project's existing `kotlin-test` integration and test runner. Do not change runner adapters merely to replace source imports.
-- Import annotations and assertions from `kotlin.test`, such as `Test`, `BeforeTest`, `assertEquals`, `assertContentEquals`, `assertFailsWith`, `assertIs`, and `assertNotNull`.
-- Use MockK, not Mockito, for mocks, stubs, spies, or interaction verification.
-- Use `kotlinx-coroutines-test` only when coroutine timing, dispatchers, cancellation, or virtual time are part of the contract and the project already provides it or the test requires it.
+하나의 의미 있는 동작을 다루는 테스트 클래스는 평평하게 유지한다. 큰 클래스는 JUnit 전용 `@Nested`에 의존하지 말고 동작이나 공개 진입점별로 나눈다.
 
-## Test Fixtures
+성공·유효 사례, 경계 사례, 잘못된 입력·예외 사례 순으로 배치한다. 여러 테스트에서 반복되는 준비는 `@BeforeTest`에 두고, 동작별 값은 테스트 함수에 둔다.
 
-- Use Gradle `java-test-fixtures` only when fixtures must be shared across modules; Kotlin fixtures belong under `src/testFixtures/kotlin`.
-- Prefer fixtures in the adapter module that owns the fixture type.
-- App-level E2E or integration tests may depend on `testFixtures(project(":<adapter-module>"))` when they need adapter-owned entity fixtures.
-- Do not create a separate fixture module for a single adapter's test data.
-- Prefer small factory functions with named arguments and useful defaults over builders that only assign properties.
+- 저장소에서 허용하면 설명적인 백틱 함수명을 우선한다. 그렇지 않으면 기존 `should...` 관례를 따른다.
+- 한국어 백틱 테스트 이름은 `~해야 한다` 또는 `~이어야 한다`로 끝낸다.
+- 식별자 형태의 이름이 필요하면 잘못된 입력에는 `shouldBeRejectedWhen...`, 반환 동작에는 `shouldBeReturned...When...`, 예외에는 `shouldBeThrownWhen...`을 사용한다.
+- E2E 클래스와 파일명은 `UserProfileE2ETest`처럼 `E2E`를 대문자로 쓴다.
 
-## Common Structure
+## 단언과 널 허용 여부
 
-Keep tests flat when the class has one meaningful behavior surface. Split a large test class by behavior or public entry point instead of depending on JUnit-specific `@Nested` groups.
+- 테스트마다 하나의 동작을 실행하고 관찰 가능한 결과만 단언한다. 결과에 여러 속성이 있으면 구조적 동등성이나 필요한 개별 단언을 사용한다.
+- 예외 계약에는 `assertFailsWith<ExpectedException>`, 배열·시퀀스의 순서 있는 내용에는 `assertContentEquals`를 사용한다.
+- 공개 계약에 포함되지 않은 예외 메시지는 단언하지 않는다. 완전 수식 호출이나 별칭으로 JUnit 단언을 사용하지 않는다.
+- 비널 Kotlin 매개변수·프로퍼티·반환 타입에는 `null` 테스트를 작성하지 않는다. 널 허용 타입은 운영 코드의 처리 정책을 검증한다.
+- Java 호출의 잘못된 사용을 방어하는 것 자체가 공개 계약인 경우가 아니면 `null as T`, 리플렉션이나 Java 상호 운용으로 컴파일러를 우회하지 않는다.
+- Java 플랫폼 타입의 널 계약이 불명확하면 먼저 경계의 계약을 확인한다. 운영 코드 수정이 요청 범위에 포함될 때만 그 경계를 수정하고, 그렇지 않으면 필요한 수정 사항을 보고한다. 테스트에 `!!`를 확산시키지 않는다.
+- 테스트 대역과 픽스처는 운영 코드보다 느슨한 널 계약을 사용하지 않는다.
 
-Place successful or valid cases first, then boundary cases, then invalid or exception cases.
+## 완료 조건
 
-Use `@BeforeTest` when multiple tests repeat the same setup. Keep shared preconditions in setup and behavior-specific values inside the test function.
+테스트 수준, 중복 검증, 사례 순서, `kotlin.test` import, MockK 필요성, 널 계약과 E2E 이름·JSON 단언을 확인한다.
 
-## Naming
-
-- Prefer descriptive backtick function names when the repository permits them; otherwise follow its established `should...` convention.
-- Korean backtick test names must end with `~해야 한다` or `~이어야 한다`.
-- Use `shouldBeRejectedWhen...` for invalid inputs when identifier-style names are required.
-- Use `shouldBeReturned...When...` for getter or helper return behavior.
-- Use `shouldBeThrownWhen...` for expected exception paths.
-- Always write E2E with uppercase `E2E` in class and file names, such as `UserProfileE2ETest`.
-
-## Assertions
-
-- Prefer one action per test and assert only its observable result.
-- Use structural equality or several focused `kotlin.test` assertions when one action produces multiple observable properties.
-- Use `assertFailsWith<ExpectedException>` for exception contracts.
-- Use `assertContentEquals` for arrays and sequences whose ordered contents are the contract.
-- Avoid asserting exception messages unless the message is part of the public contract.
-- Do not use JUnit assertions through fully qualified calls or aliases.
-
-## Kotlin Nullability
-
-Treat Kotlin types as the source of truth.
-
-- Do not write `null` tests for non-null Kotlin parameters, properties, or return types; such calls are outside the Kotlin contract.
-- Cover `null` explicitly for nullable types, including the policy encoded by the production code.
-- Do not use `null as T`, reflection, or Java interop only to bypass the compiler unless Java-callable misuse defense is itself the public contract.
-- For Java platform types, make nullability explicit at the production boundary before testing internal behavior. Do not spread `!!` into tests.
-- Keep test doubles and fixtures at least as strict as the production nullability contract.
-
-## Review Pass
-
-Before finishing:
-
-- Check the chosen test level is the lowest useful level.
-- Check level-specific reference rules were followed.
-- Check success cases appear before failure cases.
-- Check imports use `kotlin.test`, not JUnit test or assertion APIs.
-- Check MockK is used instead of Mockito and only where a fake would be less clear.
-- Check tests cover the intended contract without duplicating higher-level coverage.
-- Check `null` tests exist only for nullable contracts or explicit Java-interoperability misuse defense.
-- Check E2E class and file names use uppercase `E2E`.
-- Check E2E JSON assertions target fields through `jsonPath` or parsed JSON, not raw string `contains`.
-- Run the narrow test command and report the result.
+검토에서는 발견 사항과 검증 한계를 보고한다. 작성·수정에서는 관련 테스트를 실행하고 실제 결과를 보고한다.

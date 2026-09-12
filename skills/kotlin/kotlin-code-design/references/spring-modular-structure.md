@@ -1,23 +1,19 @@
-# Spring Modular Structure
+# Spring 모듈 구성
 
-Use this reference when designing, migrating, or reviewing a Kotlin modular Spring Boot Gradle project.
+Kotlin 모듈형 Spring Boot Gradle 프로젝트를 설계·이전·검토할 때 읽는다.
 
-## Baseline
+## 기본 원칙과 컨텍스트 경계
 
-- Structure modules by responsibility, not a copied template. Keep small systems small; split only for a protected boundary, ownership, dependency isolation, lifecycle, release cadence, or repeated infrastructure wiring.
-- Put runnable processes under `apps/`, reusable modules under `packages/`, and convention plugins under `build-logic/` when the repository follows that layout.
-- Replace template app names, platform prefixes, property prefixes, environment variable prefixes, organization names, and domain names with target-project language.
+- 템플릿을 복제하지 말고 책임으로 모듈을 구성한다. 작은 시스템은 작게 유지하고 경계 보호, 소유권, 의존성 격리, 생명주기, 출시 주기나 반복 인프라 구성에 필요할 때만 나눈다.
+- 저장소가 해당 구성을 따르면 실행 프로세스는 `apps/`, 재사용 모듈은 `packages/`, 관례 플러그인은 `build-logic/`에 둔다.
+- 템플릿의 앱 이름, 플랫폼·프로퍼티·환경 변수 접두사, 조직명과 도메인명을 대상 프로젝트 언어로 바꾼다.
+- 컨텍스트는 테이블이나 컨트롤러 그룹보다 업무 능력과 언어에서 찾는다.
+- 용어, 규칙, 소유권, 출시 주기나 외부 통합이 독립적으로 달라지면 나눈다. 항상 함께 변경하고 이해하는 객체는 같은 모델에 둔다.
+- 유스케이스 집합, 도메인 이벤트, 정책과 통합 차이로 경계를 확인한다.
+- 유비쿼터스 언어는 컨텍스트 내부에 유지한다. 여러 컨텍스트가 같은 계약에 합의할 때만 공유한다.
+- 고유한 언어나 동작이 없는 단일 엔티티를 위해 컨텍스트를 만들지 않는다.
 
-## Context Boundaries
-
-- Identify bounded contexts from business capability and language, not database tables or controller groups.
-- Split contexts when words, rules, ownership, release cadence, or external integrations differ independently.
-- Keep a model together when its objects are always changed and reasoned about as one unit.
-- Validate boundaries with use-case clusters, domain events, policies, and integration differences.
-- Keep ubiquitous language inside its bounded context. Share concepts only when multiple contexts deliberately agree on the same contract.
-- Avoid creating a context for one entity without distinct language or behavior.
-
-## Default Layout
+## 기본 디렉터리 구성
 
 ```text
 apps/<app>/
@@ -32,78 +28,76 @@ packages/<platform>-spring-boot-starter[-<concern>]/
 build-logic/
 ```
 
-- Use `<context>-core` only when a compact context gains no real protection from splitting domain and use cases.
-- Name adapters by context and boundary or technology. Avoid generic `domain`, `api`, `infra`, or bare `common` names when responsibility can be explicit.
-- Give each starter one infrastructure concern such as REST, persistence, cache, messaging, or application bootstrap.
+도메인·유스케이스 분리가 실질적인 경계를 보호하지 않는 작은 컨텍스트에서만 `<context>-core`를 사용한다. 어댑터는 컨텍스트와 경계·기술로 이름을 짓는다. 책임을 드러낼 수 있으면 `domain`, `api`, `infra`, 단순한 `common` 같은 이름을 피한다. 스타터는 REST, 영속성, 캐시, 메시징이나 앱 초기화 같은 관심사 하나를 담당한다.
 
-## Module Roles And Dependency Direction
+## 역할과 의존 방향
 
-- Apps compose only the domain, use-case, adapter, starter, shared-kernel, and common/support modules they need.
-- `packages/shared` is the DDD shared kernel, not a technical utility module.
-- Use `common-<concern>` for framework-light technical contracts and `<concern>-support` for technology-, layer-, or lifecycle-coupled support.
-- Domain modules remain free of Spring, JPA, HTTP, serialization, cache, and transaction dependencies.
-- Use-case modules depend inward on domain contracts and ports, not concrete adapters or runnable apps.
-- Adapters depend inward on domain/use-case contracts and keep framework mechanics outside inner modules.
-- Starter modules provide reusable auto-configuration and framework integration, not domain rules or use-case orchestration.
-- Keep shared-kernel and common/support modules narrower than feature modules and free of unwanted transitive framework dependencies.
+- 앱은 필요한 도메인·유스케이스·어댑터·스타터·공유 커널·공통·지원 모듈만 조합한다.
+- `packages/shared`는 기술 유틸리티가 아닌 DDD 공유 커널이다.
+- 프레임워크 의존성이 적은 기술 계약에는 `common-<concern>`, 기술·계층·생명주기에 결합된 지원에는 `<concern>-support`를 사용한다.
+- 도메인은 Spring, JPA, HTTP, 직렬화, 캐시와 트랜잭션에 의존하지 않는다.
+- 유스케이스는 도메인 계약과 포트에 의존하며 구체 어댑터·실행 앱에는 의존하지 않는다.
+- 어댑터는 도메인·유스케이스 계약에 의존하고 프레임워크 처리를 내부 모듈 밖에 둔다.
+- 스타터는 재사용 자동 설정과 프레임워크 통합을 제공한다. 도메인 규칙이나 유스케이스 조합을 담당하지 않는다.
+- 공유 커널·공통·지원은 기능 모듈보다 좁게 유지하고 불필요한 전이 프레임워크 의존성을 가져오지 않는다.
 
-## Naming And Packages
+## 이름과 패키지
 
-- Use hyphen-case Gradle module names.
-- Name modules as `<context>-domain`, `<context>-usecase-<usecase>`, `<context>-adapter-<boundary>`, `common-<concern>`, or `<concern>-support` according to responsibility.
-- Name owned starters `<platform>-spring-boot-starter[-<concern>]`; use third-party technology names only when that is the repository convention.
-- Keep Kotlin package segments shorter than module names when the module path already carries architectural role.
-- Use package names to describe code responsibility: shared-kernel concepts, common concerns, application use cases, persistence, REST, boot, and runnable apps.
+- Gradle 모듈 이름은 하이픈으로 구분한다.
+- 역할에 따라 `<context>-domain`, `<context>-usecase-<usecase>`, `<context>-adapter-<boundary>`, `common-<concern>`, `<concern>-support`를 사용한다.
+- 자체 스타터는 `<platform>-spring-boot-starter[-<concern>]`로 이름을 짓는다. 저장소 관례일 때만 외부 기술명을 사용한다.
+- 모듈 경로에 아키텍처 역할이 있으면 Kotlin 패키지 구간은 모듈명보다 짧게 유지한다.
+- 패키지는 공유 커널 개념, 공통 관심사, 유스케이스, 영속성, REST, 부트와 실행 앱 등 코드 책임을 나타낸다.
 
-## Source Sets And Gradle Structure
+## 소스 세트와 Gradle
 
-- Use standard Kotlin source sets: `src/main/kotlin`, `src/test/kotlin`, and `src/testFixtures/kotlin` only when fixtures are genuinely shared.
-- Keep adapter-specific fixtures in the adapter that owns their framework types; do not create a fixture module for one adapter's data.
-- Keep runnable applications and packages physically separate even when Gradle project names are flat; map them with `projectDir` when needed.
-- Use `build-logic` as an included build and keep module `build.gradle.kts` files declarative: apply focused convention plugins, declare dependencies, and add only module-specific configuration.
-- Convention plugins should centralize the Kotlin/JVM toolchain, compiler options, test platform, coverage defaults, reproducible archives, dependency management, and narrowly scoped Spring/all-open/no-arg behavior.
-- Scope Kotlin Spring or JPA compiler plugins to framework-managed types. Do not make domain types broadly open or no-arg constructible.
-- Concern-specific starter conventions should include the base starter contract and matching Spring Boot test support.
+- `src/main/kotlin`, `src/test/kotlin`을 사용한다. 실제 공유 픽스처에만 `src/testFixtures/kotlin`을 사용한다.
+- 어댑터 픽스처는 프레임워크 타입을 소유한 어댑터에 둔다. 단일 어댑터 데이터를 위한 별도 모듈을 만들지 않는다.
+- Gradle 프로젝트명이 평평해도 앱과 패키지 디렉터리는 분리하고 필요하면 `projectDir`로 연결한다.
+- `build-logic`을 포함 빌드로 사용한다. 모듈 `build.gradle.kts`는 집중된 관례 플러그인, 의존성과 해당 모듈 설정만 선언한다.
+- 관례 플러그인은 Kotlin/JVM 도구 체인, 컴파일러 옵션, 테스트 플랫폼, 커버리지 기본값, 재현 가능한 아카이브, 의존성 관리와 좁은 범위의 Spring·all-open·no-arg 동작을 중앙화한다.
+- Kotlin Spring·JPA 컴파일러 플러그인은 프레임워크 관리 타입에 한정한다. 도메인 타입을 광범위하게 open으로 만들거나 인자 없는 생성을 허용하지 않는다.
+- 관심사별 스타터 관례에는 기본 스타터 계약과 관련 Spring Boot 테스트 지원을 포함한다.
 
-## Build And Environment
+## 빌드와 환경
 
-- Commit Gradle wrapper files so contributors and automation do not depend on a global Gradle installation.
-- Keep plugin versions and non-Boot-managed dependency versions in the repository's established central source. Do not mix version catalogs, properties, and hardcoded module versions casually.
-- Prefer Spring Boot dependency management for framework versions unless the repository standardizes on another single mechanism.
-- Follow the repository formatter and Kotlin coding conventions; centralize charset, line endings, compiler warnings, API mode, and JVM target instead of repeating them per module.
-- Keep runtime secrets out of version control. Document required variables in the repository's established example configuration.
-- Ignore local environment files, Gradle caches, build outputs, IDE metadata, and generated local tool files.
+- 전역 Gradle 설치에 의존하지 않도록 래퍼 파일을 커밋한다.
+- 플러그인 버전과 Boot가 관리하지 않는 의존성 버전은 저장소의 기존 중앙 설정에 둔다. 버전 카탈로그, 프로퍼티와 모듈별 하드코딩 버전을 임의로 혼용하지 않는다.
+- 다른 단일 방식이 저장소 표준이 아니면 프레임워크 버전에 Spring Boot 의존성 관리를 우선한다.
+- 저장소 포매터와 Kotlin 관례를 따른다. 문자셋, 줄 끝, 컴파일러 경고, API 모드와 JVM 타깃을 모듈마다 반복하지 않고 중앙화한다.
+- 런타임 비밀값은 버전 관리에서 제외한다. 필수 변수는 기존 예시 설정에 문서화한다.
+- 로컬 환경 파일, Gradle 캐시, 빌드 결과, IDE 메타데이터와 생성된 로컬 도구 파일을 무시한다.
 
-## Spring Wiring
+## Spring 연결
 
-- Prefer constructor injection with non-null `val` dependencies. Avoid field injection and mutable injected properties.
-- Keep application ports and domain types free of `@Component`, `@Service`, `@Repository`, `@Transactional`, and other Spring stereotypes.
-- Put implementation selection and port wiring in adapter or app configuration. A concrete application service may carry a stereotype only when the project deliberately treats it as a framework entrypoint.
-- Keep transaction boundaries around application operations that require atomicity. Do not leak transaction APIs into ports or domain code.
-- Account for Spring proxy semantics: self-invocation bypasses advice, and private or final methods cannot be advised by ordinary subclass proxies.
-- Use the Kotlin Spring/all-open plugin for established framework-managed annotations; prefer explicit collaborators over proxy-dependent internal calls.
+- 비널 `val` 의존성을 생성자로 주입한다. 필드 주입과 가변 주입 프로퍼티를 피한다.
+- 포트·도메인 타입에 `@Component`, `@Service`, `@Repository`, `@Transactional` 등 Spring 스테레오타입을 붙이지 않는다.
+- 구현 선택과 포트 연결은 어댑터·앱 설정에 둔다. 프로젝트가 의도적으로 프레임워크 진입점으로 취급하는 구체 애플리케이션 서비스에만 스테레오타입을 허용한다.
+- 원자성이 필요한 애플리케이션 작업을 트랜잭션으로 감싸고 트랜잭션 API를 포트·도메인에 노출하지 않는다.
+- Spring 프록시 의미를 고려한다. 자기 호출은 어드바이스를 우회하고 일반 하위 클래스 프록시는 private·final 메서드에 적용되지 않는다.
+- 기존 프레임워크 관리 애너테이션에 Kotlin Spring·all-open 플러그인을 사용한다. 프록시에 의존하는 내부 호출보다 명시적인 협력 객체를 우선한다.
 
-## Persistence
+## 영속성
 
-- Keep JPA entities in the persistence adapter and separate from domain models by default.
-- Limit JPA-required no-arg construction, proxy openness, mutable properties, lazy associations, and persistence annotations to entity types.
-- Do not use a Kotlin `data class` as a JPA entity by default: generated equality, `hashCode`, `copy`, destructuring, and `toString` often conflict with identity, proxies, and lazy relationships.
-- Keep Spring Data repositories and query derivation inside the adapter. Map entities through explicit mappers or domain factories.
-- Place `@Transactional` where Spring can intercept it and where the application operation's atomicity is visible. Avoid annotations on private methods or self-calls.
+- 기본적으로 JPA 엔티티는 영속성 어댑터에 두고 도메인 모델과 분리한다.
+- JPA용 인자 없는 생성, 프록시 개방성, 가변 프로퍼티, 지연 연관 관계와 애너테이션은 엔티티에 한정한다.
+- 자동 생성 동등성, `hashCode`, `copy`, 구조 분해와 `toString`은 식별성·프록시·지연 관계와 충돌할 수 있으므로 JPA 엔티티에 `data class`를 기본으로 사용하지 않는다.
+- Spring Data 저장소와 파생 쿼리는 어댑터 내부에 둔다. 명시적 매퍼나 도메인 팩터리로 엔티티를 변환한다.
+- Spring이 가로챌 수 있고 작업 원자성이 드러나는 위치에 `@Transactional`을 둔다. private 메서드나 자기 호출에 의존하지 않는다.
 
-## REST And Configuration
+## REST와 설정
 
-- REST adapters own request parsing, validation binding, status codes, headers, and response shapes. They translate to use-case inputs and outputs.
-- Configuration properties own external scalar configuration, defaults, units, and validation. Prefer constructor-bound immutable Kotlin properties where framework support permits.
-- Keep environment-specific values in configuration files or properties, not direct environment lookups scattered through production code.
-- Use annotation use-site targets such as `@field:`, `@get:`, or `@param:` when validation, Jackson, JPA, or reflection must inspect a specific generated JVM element.
+- REST 어댑터는 요청 파싱, 검증 바인딩, 상태 코드, 헤더와 응답 구조를 소유하고 유스케이스 입출력으로 변환한다.
+- 설정 프로퍼티는 외부 스칼라 설정, 기본값, 단위와 검증을 소유한다. 프레임워크가 지원하면 생성자 바인딩 불변 프로퍼티를 우선한다.
+- 환경별 값은 설정 파일·프로퍼티에 둔다. 운영 코드 곳곳에서 환경 변수를 직접 조회하지 않는다.
+- 검증, Jackson, JPA나 리플렉션이 특정 JVM 생성 요소를 검사하면 `@field:`, `@get:`, `@param:` 같은 사용 지점 대상을 사용한다.
 
-## Runtime Composition And Starter Scope
+## 런타임 구성과 스타터
 
-- Keep app modules thin and main functions small. Centralize reusable Spring behavior in focused starters or boot helpers.
-- Keep scanning, datasource setup, JPA configuration, repository enabling, auditing, error handling, and framework defaults close to the starter or adapter that owns them.
-- Use a dedicated runnable app for migrations, batches, or workers when lifecycle and dependencies differ from the runtime API.
-- Add each adapter or starter only to apps that need it; do not create a universal runtime dependency graph.
-- Starters may include auto-configuration, default beans, property binding, error handling, test support, and operational tools directly coupled to one infrastructure concern.
-- Split a tool into another starter only when its dependency graph, lifecycle, configuration surface, or consumers materially differ.
-- Move support code useful without the infrastructure concern to the shared kernel, a common/support module, or a narrower starter according to responsibility.
+- 앱 모듈과 메인 함수를 작게 유지한다. 재사용 Spring 동작은 집중된 스타터·부트 도우미에 모은다.
+- 스캔, 데이터소스, JPA 설정, 저장소 활성화, 감사, 오류 처리와 프레임워크 기본값은 소유 스타터·어댑터 가까이에 둔다.
+- 생명주기와 의존성이 API 런타임과 다르면 마이그레이션·배치·워커 전용 실행 앱을 사용한다.
+- 필요한 앱에만 어댑터·스타터를 추가한다. 모든 것을 포함하는 런타임 의존 그래프를 만들지 않는다.
+- 스타터는 한 관심사에 직접 결합된 자동 설정, 기본 빈, 프로퍼티 바인딩, 오류 처리, 테스트 지원과 운영 도구를 포함할 수 있다.
+- 의존성 그래프, 생명주기, 설정 범위나 소비 모듈이 실질적으로 다를 때만 도구를 별도 스타터로 나눈다.
+- 해당 인프라 없이도 유용한 코드는 책임에 따라 공유 커널, 공통·지원 모듈이나 더 좁은 스타터로 옮긴다.

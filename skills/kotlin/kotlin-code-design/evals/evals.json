@@ -3,132 +3,143 @@
   "evals": [
     {
       "id": "platform-type-null-boundary",
-      "prompt": "Java SDK의 getDisplayName() 반환값을 Kotlin 서비스 곳곳에서 !!로 쓰고 있어. 이 코드를 Kotlin답게 고쳐줘.",
-      "expected_output": "Java platform type의 nullability를 한 경계에서 명시하고 검증하거나 nullable contract로 변환하며, 내부의 반복된 !!를 제거한다.",
+      "prompt": "Java SDK의 getDisplayName() 반환값을 Kotlin 서비스 곳곳에서 !!로 사용하고 있어. Kotlin 관례에 맞게 수정해 줘.",
+      "expected_output": "Java 플랫폼 타입의 널 허용 여부를 경계에서 명시하고 검증하거나 널 허용 계약으로 변환하여 내부의 반복된 !!를 제거한다.",
       "assertions": [
-        "The output identifies the Java platform type as the unsafe boundary.",
-        "The output assigns an explicit nullable or non-null Kotlin type at that boundary.",
-        "The output removes scattered non-null assertions instead of replacing them with equivalent assertions elsewhere."
+        "Java 플랫폼 타입이 불안전한 경계임을 지적한다.",
+        "경계에서 Kotlin의 널 허용·비널 타입을 명시한다.",
+        "흩어진 비널 단언을 동등한 단언으로 옮기지 않고 제거한다."
       ]
     },
     {
       "id": "scope-function-overuse",
-      "prompt": "apply 안에 let과 run이 중첩된 Kotlin 매핑 코드를 리뷰해줘. this와 it이 여러 번 바뀌어서 읽기 어려워.",
-      "expected_output": "스코프 함수의 의도를 구분하고, 중첩을 이름 있는 지역 변수나 작은 명시적 단계로 풀어 수신자와 반환값을 분명하게 만든다.",
+      "prompt": "apply 안에 let과 run이 중첩된 Kotlin 매핑 코드를 검토해 줘. this와 it이 여러 번 바뀌어서 읽기 어려워.",
+      "expected_output": "스코프 함수의 의도를 구분하고 이름 있는 지역 변수나 명시적인 단계로 수신 객체와 반환값을 분명하게 만드는 방안을 제안한다.",
       "assertions": [
-        "The output explains the relevant receiver and return-value semantics of the scope functions.",
-        "The output recommends named locals or explicit steps where nesting obscures context.",
-        "The output does not replace the code with a different but equally nested scope-function chain."
+        "관련 스코프 함수의 수신 객체와 반환값 의미를 설명한다.",
+        "중첩이 문맥을 흐리면 이름 있는 지역 변수나 명시적 단계를 권고한다.",
+        "동일하게 중첩된 다른 스코프 함수 연쇄로 바꾸지 않는다.",
+        "검토 요청에서 파일을 수정하거나 포맷하지 않는다."
       ]
     },
     {
       "id": "coroutine-cancellation-contract",
-      "prompt": "repository가 GlobalScope.launch로 저장 작업을 시작하고 runCatching으로 모든 예외를 Result.failure로 바꿔. 취소도 계속 실패 값으로 내려와. 수정 방향을 제안해줘.",
-      "expected_output": "작업 수명에 맞는 소유 scope나 호출자 구조화 동시성으로 변경하고 CancellationException을 재전파하며, 시작된 작업의 실패 관찰 계약을 명시한다.",
+      "prompt": "저장소가 GlobalScope.launch로 저장을 시작하고 runCatching으로 모든 예외를 Result.failure로 바꿔. 취소도 실패 값으로 내려와. 수정 방향을 제안해 줘.",
+      "expected_output": "작업 생명주기에 맞는 스코프나 호출부의 구조화된 동시성을 사용하고 CancellationException을 다시 전파하며 시작한 작업의 실패 관찰 계약을 명시한다.",
       "assertions": [
-        "The output rejects GlobalScope for ordinary repository work and assigns lifecycle ownership.",
-        "The output preserves or explicitly rethrows CancellationException.",
-        "The output distinguishes ordinary failure representation from coroutine cancellation."
+        "일반 저장소 작업의 GlobalScope 사용을 거부하고 생명주기 책임을 지정한다.",
+        "CancellationException을 보존하거나 명시적으로 다시 던진다.",
+        "일반 실패 표현과 코루틴 취소를 구별한다."
       ]
     },
     {
       "id": "published-data-class-compatibility",
-      "prompt": "배포된 Kotlin JVM 라이브러리의 public data class에 기본값 있는 프로퍼티 하나를 추가하면 호환성이 유지될까? 안전한 변경안을 알려줘.",
-      "expected_output": "Kotlin source 호출과 JVM binary compatibility를 분리하고, 생성자와 copy 시그니처 변경 위험을 지적하며 기존 진입점을 보존하는 API 형태를 제안한다.",
+      "prompt": "배포한 Kotlin JVM 라이브러리의 public data class에 기본값이 있는 프로퍼티를 추가하면 호환성이 유지될까? 안전한 변경안을 알려 줘.",
+      "expected_output": "Kotlin 소스 호출과 JVM 바이너리 호환성을 구분하고 생성자·copy 시그니처 변경 위험과 기존 진입점을 보존하는 API를 제안한다.",
       "assertions": [
-        "The output distinguishes source compatibility from JVM binary compatibility.",
-        "The output identifies generated constructor and copy signatures as compatibility risks.",
-        "The output proposes preserving existing entry points or avoiding an evolvable public data class contract."
+        "소스 호환성과 JVM 바이너리 호환성을 구별한다.",
+        "생성자와 copy 시그니처가 호환성 위험임을 지적한다.",
+        "기존 진입점을 보존하거나 변경 가능한 공개 data class 계약을 피하는 방안을 제안한다."
       ]
     },
     {
       "id": "sequence-without-evidence",
-      "prompt": "20개 정도의 리스트에 map과 filter를 한 번씩 쓰는 코드를 성능 때문에 asSequence()로 바꾸려 해. 괜찮을까?",
-      "expected_output": "작고 단순한 파이프라인에는 Sequence 오버헤드가 이득보다 클 수 있으므로 컬렉션을 유지하고, 큰 입력·다단계·조기 종료 또는 측정 근거가 있을 때만 전환하도록 권고한다.",
+      "prompt": "요소가 20개 정도인 리스트에 map과 filter를 한 번씩 사용하는 코드를 성능 때문에 asSequence()로 바꾸려고 해. 괜찮을까?",
+      "expected_output": "작고 단순한 처리에서는 Sequence 오버헤드가 이득보다 클 수 있으므로 컬렉션을 유지하고, 큰 입력·다단계·조기 종료나 측정 근거가 있을 때 전환하도록 권고한다.",
       "assertions": [
-        "The output does not assume Sequence is always faster.",
-        "The output keeps eager collection operations for the stated small simple workload.",
-        "The output names laziness, multi-stage processing, early termination, or measurement as reasons to reconsider."
+        "Sequence가 항상 빠르다고 가정하지 않는다.",
+        "제시된 작은 작업에는 즉시 평가하는 컬렉션 연산을 유지한다.",
+        "지연 평가, 다단계 처리, 조기 종료나 측정을 재검토 근거로 제시한다."
       ]
     },
     {
       "id": "port-leaks-spring-data",
-      "prompt": "Kotlin use case의 outbound port가 findByDeletedFalseAndStatusIn이라는 Spring Data 메서드 이름과 JpaEntity를 그대로 노출해. 설계를 고쳐줘.",
-      "expected_output": "포트를 애플리케이션 요구 중심의 이름과 도메인 타입 계약으로 바꾸고, Spring Data와 JPA 엔티티를 persistence adapter 내부에 둔다.",
+      "prompt": "Kotlin 유스케이스의 출력 포트가 findByDeletedFalseAndStatusIn이라는 Spring Data 메서드 이름과 JpaEntity를 그대로 노출해. 설계를 수정해 줘.",
+      "expected_output": "포트를 애플리케이션 요구 중심의 이름과 도메인 타입 계약으로 바꾸고 Spring Data와 JPA 엔티티를 영속성 어댑터 내부에 둔다.",
       "assertions": [
-        "The output identifies Spring Data naming and JPA entities as adapter leakage.",
-        "The output proposes an application-intent port using domain or application types.",
-        "The output keeps repository query mechanics and entity mapping in the persistence adapter."
+        "Spring Data 이름과 JPA 엔티티를 어댑터 세부 사항의 노출로 지적한다.",
+        "도메인·애플리케이션 타입을 사용하는 포트를 제안한다.",
+        "저장소 쿼리 처리와 엔티티 매핑을 영속성 어댑터에 둔다."
       ]
     },
     {
       "id": "spring-jpa-domain-boundary",
-      "prompt": "도메인 모델을 Kotlin data class이자 @Entity로 만들고 모든 프로퍼티를 var로 열어두려 해. Spring/JPA와 헥사고날 관점에서 리뷰해줘.",
-      "expected_output": "도메인 모델과 persistence entity를 기본적으로 분리하고, JPA의 프록시·생성·변경 추적 요구는 adapter entity에 제한하며 도메인 불변식과 불변성을 보존한다.",
+      "prompt": "도메인 모델을 Kotlin data class이자 @Entity로 만들고 모든 프로퍼티를 var로 공개하려고 해. Spring/JPA와 헥사고날 아키텍처 관점에서 검토해 줘.",
+      "expected_output": "기본적으로 도메인과 영속성 엔티티를 분리하고 JPA 프록시·생성·변경 추적 요구는 어댑터 엔티티에 한정하여 도메인 불변식을 보존한다.",
       "assertions": [
-        "The output does not treat a JPA entity as the domain model by default.",
-        "The output contains proxy, construction, or persistence mutability concerns within the adapter.",
-        "The output preserves domain invariants instead of making all domain state publicly mutable."
+        "JPA 엔티티를 기본 도메인 모델로 취급하지 않는다.",
+        "프록시, 생성과 영속성 변경 가능성 문제를 어댑터 안에서 처리한다.",
+        "도메인 상태를 전부 공개 가변으로 만들지 않고 불변식을 보존한다."
       ]
     },
     {
       "id": "shared-vs-common-kotlin",
-      "prompt": "여러 Kotlin 모듈에서 쓰는 문자열 정규화와 Jackson 설정을 packages/shared에 같이 넣으려고 해. 괜찮을까?",
-      "expected_output": "DDD shared kernel과 기술 common/support를 구분하고, 문자열 정규화는 실제 재사용 계약에 맞는 common 모듈로, Jackson 설정은 framework-coupled support나 starter로 분리한다.",
+      "prompt": "여러 Kotlin 모듈에서 사용하는 문자열 정규화와 Jackson 설정을 packages/shared에 함께 넣으려고 해. 괜찮을까?",
+      "expected_output": "DDD 공유 커널과 기술 공통·지원을 구분한다. 정규화는 실제 재사용 계약에 맞는 공통 모듈에, Jackson 설정은 프레임워크에 결합된 지원·스타터에 둔다.",
       "assertions": [
-        "The output reserves shared for deliberately shared domain or application concepts.",
-        "The output places framework-light technical reuse in a named common module.",
-        "The output isolates Jackson or Spring coupling in support or starter infrastructure."
+        "shared를 의도적으로 공유하는 도메인·애플리케이션 개념에만 사용한다.",
+        "프레임워크 의존성이 적은 기술 재사용을 이름이 명확한 공통 모듈에 둔다.",
+        "Jackson·Spring 결합을 지원·스타터 인프라로 격리한다."
       ]
     },
     {
       "id": "one-file-one-class",
-      "prompt": "Order.kt 한 파일에 Order, OrderLine, OrderValidator를 모두 top-level class로 두고 관련 확장 함수도 같이 넣으려 해. Kotlin 파일 구조를 리뷰해줘.",
-      "expected_output": "파일명과 일치하는 top-level 타입 하나만 두고 나머지 타입은 각 파일로 분리한다. 소유 관계가 분명한 nested/inner class는 함께 둘 수 있으며, 여러 top-level 선언은 응집된 extension-only 파일에서 확장 함수나 프로퍼티를 모을 때만 허용한다.",
+      "prompt": "Order.kt에 Order, OrderLine, OrderValidator를 모두 최상위 클래스로 두고 확장 함수도 함께 넣으려고 해. 파일 구조를 검토해 줘.",
+      "expected_output": "파일명과 일치하는 최상위 타입 하나만 두고 나머지는 분리하도록 제안한다. 소유 관계가 명확한 중첩·inner 타입은 함께 둘 수 있고 여러 최상위 선언은 응집된 확장 전용 파일에만 허용한다.",
       "assertions": [
-        "The output requires one filename-matched top-level class, interface, or object per Kotlin file.",
-        "The output allows nested or inner classes to remain with their owning type.",
-        "The output permits multiple top-level declarations only for a cohesive extension-only file."
+        "파일마다 이름이 일치하는 최상위 클래스·인터페이스·객체 하나를 요구한다.",
+        "중첩·inner 클래스는 소유 타입과 함께 둘 수 있다.",
+        "응집된 확장 전용 파일에만 여러 최상위 선언을 허용한다."
       ]
     },
     {
       "id": "domain-factory-accumulates-validation",
-      "prompt": "Kotlin aggregate 생성자에서 첫 번째 잘못된 값에 require로 바로 실패하고 있어. 자식 value object 여러 개의 검증 오류를 한 번에 돌려주는 도메인 factory로 바꾸고 싶어.",
-      "expected_output": "불완전한 aggregate 생성을 막고 private/internal construction과 factory를 사용하며, 독립적인 자식 검증 결과를 조합해 프로젝트의 닫힌 validation result로 누적 오류를 반환한다.",
+      "prompt": "Kotlin 애그리거트 생성자가 첫 번째 잘못된 값에서 require로 실패해. 여러 하위 값 객체의 검증 오류를 함께 반환하는 도메인 팩터리로 바꾸고 싶어.",
+      "expected_output": "부분적으로 유효한 생성을 막고 private·internal 생성과 팩터리를 사용한다. 독립적인 하위 검증 결과를 조합하여 프로젝트의 닫힌 결과 타입으로 누적 오류를 반환한다.",
       "assertions": [
-        "The output keeps aggregate construction behind a factory or otherwise prevents partially valid domain objects.",
-        "The output distinguishes ordinary validation failure from exceptional programmer misuse.",
-        "The output accumulates independent child validation errors before constructing the aggregate."
+        "팩터리 등으로 부분적으로 유효한 도메인 객체의 생성을 막는다.",
+        "일반 검증 실패와 예외적인 프로그래머 오용을 구별한다.",
+        "애그리거트 생성 전에 독립적인 하위 검증 오류를 누적한다."
       ]
     },
     {
       "id": "nullable-single-and-bulk-order-contract",
-      "prompt": "Kotlin outbound port의 단건 조회는 Optional<Entity>를 반환하고, bulk 조회는 누락된 값과 입력 순서 정책이 없어. 포트 계약을 정리해줘.",
-      "expected_output": "단건 일반 부재는 Kotlin nullable domain/application type으로 표현하고 엔티티를 제거하며, bulk 조회의 순서·누락·카디널리티 정책을 명시한다.",
+      "prompt": "Kotlin 출력 포트의 단건 조회는 Optional<Entity>를 반환하고 다건 조회에는 누락 값과 입력 순서 정책이 없어. 계약을 정리해 줘.",
+      "expected_output": "단건의 일반 부재는 Kotlin 널 허용 도메인·애플리케이션 타입으로 표현하고 엔티티를 제거한다. 다건 조회의 순서·누락·결과 개수 정책을 명시한다.",
       "assertions": [
-        "The output replaces Optional with a nullable Kotlin return for ordinary single-result absence.",
-        "The output keeps persistence entities out of the application port.",
-        "The output makes bulk ordering and missing-result behavior explicit."
+        "일반적인 단건 부재에 Optional 대신 Kotlin 널 허용 반환을 사용한다.",
+        "영속성 엔티티를 애플리케이션 포트 밖에 둔다.",
+        "다건 순서와 누락 결과 동작을 명시한다."
       ]
     },
     {
       "id": "corrupt-persisted-row-is-infrastructure-failure",
-      "prompt": "JPA entity를 domain factory로 복원했는데 검증에 실패하면 adapter가 null을 반환해서 not found처럼 처리해. 괜찮은지 리뷰해줘.",
-      "expected_output": "존재하는 저장 행의 도메인 복원 실패를 데이터 무결성 또는 인프라 실패로 처리하고, ordinary absence와 구분하며 adapter 경계에서 원인을 보존해 번역한다.",
+      "prompt": "JPA 엔티티를 도메인 팩터리로 복원하다 검증에 실패하면 어댑터가 null을 반환해 찾지 못한 결과로 처리해. 괜찮은지 검토해 줘.",
+      "expected_output": "존재하는 행의 복원 실패를 데이터 무결성·인프라 실패로 처리한다. 정상적인 부재와 구분하고 어댑터에서 원인을 보존하며 변환한다.",
       "assertions": [
-        "The output distinguishes a corrupt persisted row from an absent row.",
-        "The output places the failure translation in the persistence adapter.",
-        "The output preserves meaningful cause or integrity context instead of returning null."
+        "손상된 저장 행과 없는 행을 구별한다.",
+        "실패 변환을 영속성 어댑터에 둔다.",
+        "null을 반환하지 않고 의미 있는 원인이나 무결성 문맥을 보존한다."
       ]
     },
     {
       "id": "starter-scope-and-thin-app",
-      "prompt": "모든 Spring 설정, repository scan, error handler, migration 도구를 app 모듈마다 복사하고 있어. Kotlin modular Spring 구조를 개선해줘.",
-      "expected_output": "app을 얇게 유지하고 반복되는 인프라 구성을 관심사별 starter나 adapter로 옮기며, migration은 수명주기와 의존성이 다르면 별도 runnable app으로 분리한다.",
+      "prompt": "모든 Spring 설정, 저장소 스캔, 오류 처리기와 마이그레이션 도구를 앱 모듈마다 복사하고 있어. Kotlin 모듈형 Spring 구조를 개선해 줘.",
+      "expected_output": "앱을 얇게 유지하고 반복 인프라를 관심사별 스타터·어댑터로 옮긴다. 마이그레이션은 생명주기·의존성이 다르면 별도 실행 앱으로 분리한다.",
       "assertions": [
-        "The output keeps runnable app modules focused on composition.",
-        "The output groups reusable Spring configuration by a focused infrastructure concern.",
-        "The output separates migration runtime only when lifecycle or dependency differences justify it."
+        "실행 앱 모듈을 조합에 집중한다.",
+        "재사용 Spring 설정을 집중된 인프라 관심사별로 묶는다.",
+        "생명주기·의존성 차이가 정당화할 때만 마이그레이션 런타임을 분리한다."
+      ]
+    },
+    {
+      "id": "focused-review-context",
+      "prompt": "이 순수 Kotlin 함수의 중첩된 let 두 개가 읽기 어려운지만 검토해 줘. 파일은 수정하지 말고 빌드나 플랫폼 설정은 이번 판단과 관련이 없어.",
+      "expected_output": "제공된 함수의 수신 객체와 반환값을 검토하고 필요한 개선 방향을 제시한다. 관계없는 빌드·버전·플랫폼·소스 세트를 일괄 조사하지 않는다.",
+      "assertions": [
+        "대상 코드로 판단 가능한 가독성 검토를 수행한다.",
+        "관계없는 빌드·환경 파일을 의무적으로 읽지 않는다.",
+        "파일 수정이나 포맷을 실행하지 않는다."
       ]
     }
   ]

@@ -1,52 +1,48 @@
-# Domain
+# 도메인
 
-Use this reference when changing domain packages, including domain models, value objects, aggregates, and domain errors.
+도메인 모델, 값 객체, 애그리거트와 도메인 오류를 다룰 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Model business concepts first, not current table shapes.
-- Keep domain code free of Spring, JPA, HTTP, cache, transaction, and serialization concerns.
-- Put domain-specific violations under the feature's domain error package when they are not reusable shared-kernel validation errors.
-- Put context-level runtime exceptions for not-found or application outcomes in a sibling application/exception package, not under domain.
-- Keep entities and value objects honest about invariants; do not expose partially valid domain objects.
+- 현재 테이블 형태보다 업무 개념을 먼저 모델링한다.
+- 도메인 코드에 Spring, JPA, HTTP, 캐시, 트랜잭션이나 직렬화 관심사를 넣지 않는다.
+- 공유 커널의 검증 오류로 재사용할 수 없는 도메인 위반은 해당 기능의 도메인 오류 패키지에 둔다.
+- 조회 실패나 애플리케이션 처리 결과를 나타내는 컨텍스트 수준 런타임 예외는 도메인 아래가 아닌 인접한 애플리케이션 예외 패키지에 둔다.
+- 엔티티와 값 객체가 불변식을 지키도록 하고, 부분적으로만 유효한 도메인 객체를 노출하지 않는다.
 
-## Factories And Validation
+## 팩터리와 검증
 
-- Prefer static factory methods for domain objects that can fail validation. Name validating factories `create(...)` when that matches local style.
-- Domain factory methods that can fail validation should return the project's validation result type rather than throw for ordinary invalid input.
-- Treat validation results as closed success/failure values: valid results expose a value, invalid results expose errors, and wrong-state access fails through terminal methods.
-- Accept raw inputs when that matches nearby domain factories, normalize only when normalization is part of the domain contract, then validate.
-- Compose child validation results before constructing aggregate objects.
-- Return accumulated errors rather than failing fast when constructing an aggregate from multiple validated children.
-- Use unwrap-or-throw terminal methods only after the relevant validation results are known to be valid.
+- 검증에 실패할 수 있는 도메인 객체에는 정적 팩터리 메서드를 우선한다. 주변 관례와 맞으면 검증 팩터리를 `create(...)`로 명명한다.
+- 일반적인 무효 입력에 예외를 던지기보다 프로젝트의 검증 결과 타입을 반환한다.
+- 검증 결과는 닫힌 성공·실패 값으로 다룬다. 성공 결과는 값, 실패 결과는 오류를 노출하며, 잘못된 상태의 접근은 종단 메서드에서 실패한다.
+- 주변 팩터리와 일치하면 원시 입력을 받는다. 정규화가 도메인 계약인 경우에만 정규화한 뒤 검증한다.
+- 자식 검증 결과를 조합한 뒤 애그리거트를 생성한다. 여러 자식의 검증에서는 첫 실패에서 중단하기보다 오류를 누적해 반환한다.
+- 관련 결과가 유효하다고 확인된 뒤에만 값을 꺼내거나 예외를 던지는 종단 메서드를 사용한다.
 
-## Naming
+## 이름
 
-- Name aggregate and domain model classes with domain nouns.
-- Name value objects by the concept they protect, such as `<Thing>Id`, `<Thing>Name`, or `<DisplayOrder>`.
-- Use `Id` for internal identifiers and a more specific suffix for external identifiers when the distinction matters.
-- Name context-specific domain validation errors by the violation they represent.
-- Keep names aligned with the bounded context's ubiquitous language; avoid table names unless they are also domain language.
+- 애그리거트와 도메인 모델에는 도메인 명사를 사용한다.
+- 값 객체는 보호하는 개념에 맞춰 `<Thing>Id`, `<Thing>Name`, `<DisplayOrder>`처럼 명명한다.
+- 내부 식별자는 `Id`를 사용한다. 외부 식별자와의 구분이 중요하면 외부 식별자에 더 구체적인 접미사를 사용한다.
+- 컨텍스트별 검증 오류는 표현하는 위반을 기준으로 명명한다.
+- 바운디드 컨텍스트의 보편 언어를 따른다. 테이블 이름이 도메인 용어이기도 한 경우에만 그대로 사용한다.
 
-## Design Rules
+## 설계
 
-- Keep value object names aligned with domain language.
-- Use records only for transparent immutable carriers; use classes when invariants, identity, normalization, custom equality, or framework-independent construction make that clearer.
-- Prefer private constructors for validated domain objects and expose creation through factory methods.
-- Keep domain exception classes concrete and closed unless there is a real inheritance contract.
-- Override equality only when the domain contract requires it.
-- Avoid helpers that hide domain logic or exist only to make a single factory look abstract.
+- 투명한 불변 데이터에는 record를 사용한다. 불변식, 식별성, 정규화, 사용자 정의 동등성이나 프레임워크와 독립적인 생성 방식이 중요하면 클래스를 사용한다.
+- 검증된 도메인 객체는 private 생성자와 팩터리를 우선한다.
+- 실제 상속 계약이 없다면 도메인 예외 클래스를 구체적이고 확장할 수 없는 형태로 둔다.
+- 도메인 계약이 요구할 때만 동등성을 재정의한다.
+- 도메인 로직을 숨기거나 단일 팩터리를 추상적으로 보이게 하는 것만이 목적인 보조 함수는 만들지 않는다.
 
-## Fields And Methods
+## 필드와 메서드
 
-- Use `value` as the field name inside single-value value objects.
-- Use domain-language field names inside aggregates.
-- Use `MAX_<PROPERTY>` style constants for domain limits.
-- Keep raw input parameter names close to the domain concept, then convert to validated value objects before construction.
-- Use collection field names that express the domain relationship, not the storage structure.
+- 단일 값 객체의 필드는 `value`로 명명한다.
+- 애그리거트의 필드는 도메인 용어를 사용한다.
+- 도메인 한계값은 `MAX_<PROPERTY>` 형태의 상수로 표현한다.
+- 원시 입력 이름은 도메인 개념과 가깝게 유지하고, 생성 전에 검증된 값 객체로 변환한다.
+- 컬렉션 필드 이름에는 저장 구조보다 도메인 관계를 표현한다.
 
-## Domain Errors
+## 도메인 오류
 
-- Keep error objects simple and data-focused.
-- Use shared-kernel validation errors only for genuinely reusable cross-context violations.
-- Keep domain validation errors separate from runtime exceptions.
+오류 객체는 단순한 데이터 중심으로 유지한다. 실제로 컨텍스트 간에 재사용하는 위반만 공유 커널의 검증 오류로 두고, 도메인 검증 오류와 런타임 예외를 구분한다.

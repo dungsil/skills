@@ -1,73 +1,61 @@
 ---
 name: writing-kdoc
-description: Write or review concise Korean KDoc comments for Kotlin code. Use when adding, revising, or checking KDoc for Kotlin classes, objects, functions, properties, constructors, extension receivers, type parameters, return values, exceptions, deprecations, symbol links, or Dokka output.
+description: Kotlin 선언과 API 계약에 맞는 간결한 한국어 KDoc을 작성·수정·검토한다. 문서 태그, 심볼 링크와 Dokka 문서 정합성을 확인할 때 사용한다.
 ---
 
-# Writing KDoc
+# KDoc 작성
 
-Write concise, contract-focused KDoc that matches the Kotlin code, tests, and project style.
+Kotlin 코드, 테스트와 프로젝트 문체에 맞는 간결한 계약 문서를 작성한다. 검토 요청에서는 파일을 수정하지 않고 발견 사항을 보고한다. 문서 작업만으로 동작, 의존성이나 애너테이션을 변경하지 않는다.
 
-## Core Rules
+## 기본 규칙
 
-- Write KDoc in Korean. Keep Kotlin identifiers, API names, tags, and code literals in their original form.
-- Do not return example code or generate usage examples.
-- Do not add new `@author` or `@since` tags. Preserve existing ones unless the user explicitly asks to remove them.
-- Document public and protected declarations when their contract is useful to callers.
-- Document `internal` and private declarations only when behavior is complex, non-obvious, or intentionally differs from nearby public declarations.
-- Do not generate boilerplate documentation for simple properties or obvious accessors.
-- Keep documentation aligned with the code's actual behavior, tests, and project style.
+- KDoc은 한국어로 작성한다. Kotlin 식별자, API 이름, 태그와 코드 리터럴은 원문을 유지한다.
+- 예제 코드를 응답하거나 사용 예시를 생성하지 않는다.
+- 새 `@author`·`@since` 태그를 추가하지 않는다. 기존 태그는 사용자가 삭제를 명시적으로 요청하지 않으면 유지한다.
+- 호출부에 유용한 계약이 있는 public·protected 선언을 문서화한다.
+- internal·private 선언은 동작이 복잡하거나 명확하지 않거나 인접한 공개 선언과 의도적으로 다를 때만 문서화한다.
+- 단순 프로퍼티나 명백한 접근자에 상투적인 문서를 생성하지 않는다.
 
-## Korean Style
+## 한국어 문체
 
-- Use concise report-style declarative sentences.
-- Do not use endings like `~입니다.`; change `~합니다.` to `~한다.`.
-- Prefer natural Korean developer wording over literal or parser-like translations.
-- Keep the first paragraph's opening line as a short summary phrase.
-- Do not add a period to the summary unless surrounding KDoc requires it for consistency.
+- 간결한 보고서형 평서문을 사용한다.
+- `~입니다.`와 같은 종결을 사용하지 않고, `~합니다.`는 `~한다.`로 바꾼다.
+- 직역이나 구문 분석기처럼 어색한 표현보다 개발자가 자연스럽게 쓰는 한국어를 사용한다.
+- 첫 문단의 첫 줄은 짧은 요약 구절로 작성한다.
+- 주변 KDoc과 일관성을 맞추는 데 필요하지 않으면 요약에 마침표를 붙이지 않는다.
 
-## Contract Documentation
+## 계약 설명
 
-- Document what the declaration promises, not how every line is implemented.
-- Document nullable input, nullable output, and default behavior when they are part of the caller-visible contract.
-- Keep exception conditions in `@throws` or `@exception`, not mixed into general prose.
-- Document only failures callers can reasonably trigger or need to handle.
-- If similar declarations intentionally have different contracts, state the difference briefly and review each contract separately.
-- Let focused tests carry edge-case detail when the KDoc would otherwise become long.
+- 선언이 보장하는 내용을 설명한다. 구현의 모든 줄을 해설하지 않는다.
+- 호출부에 드러나는 널 입력·출력과 기본 동작을 설명한다.
+- 예외 조건은 일반 설명에 섞지 않고 `@throws` 또는 `@exception`에 적는다.
+- 호출부가 실제로 유발하거나 처리해야 하는 실패만 문서화한다.
+- 유사한 선언의 계약이 의도적으로 다르면 차이를 짧게 밝히고 각 계약을 따로 확인한다.
+- 문서가 길어지는 경계 사례의 세부 사항은 관련 테스트로 검증한다.
 
-## KDoc Syntax
+## 문법과 태그
 
-- KDoc uses Markdown, not Javadoc inline tags or paragraph HTML.
-- Treat the first paragraph as the summary. Separate additional detail with one blank KDoc line; do not use `<p>`.
-- A short KDoc may stay on one line. Use the standard multiline `/** ... */` shape for longer contracts.
-- Use backticks for code literals such as `true`, `false`, and `null`; do not use `{@code}`.
-- Link declarations and parameters with `[name]`. Use `[label][qualified.name]` for custom labels. Qualified member links use dots.
-- Prefer inline links over `@see` when the reference fits naturally in prose.
+- KDoc은 Markdown을 사용한다. Javadoc 인라인 태그나 문단용 HTML을 사용하지 않는다.
+- 첫 문단을 요약으로 삼고 추가 설명은 빈 KDoc 줄 하나로 구분한다. `<p>`를 사용하지 않는다.
+- 짧은 문서는 한 줄로 쓸 수 있다. 긴 계약은 표준 여러 줄 `/** ... */` 형태로 작성한다.
+- `true`, `false`, `null` 같은 코드 리터럴은 백틱으로 감싸고 `{@code}`를 사용하지 않는다.
+- 선언과 매개변수는 `[name]`, 별도 표시 문구는 `[label][qualified.name]`으로 연결한다. 수식된 멤버 링크에는 점을 사용한다.
+- 문장에 자연스럽게 들어가면 `@see`보다 인라인 링크를 우선한다.
+- 보통 `@param`·`@return`을 생략하고 본문에서 매개변수와 반환값을 설명한다. 매개변수는 `[parameter]`로 연결한다. 길거나 독립적인 계약을 본문에 명확히 담기 어려울 때만 태그를 사용한다.
+- `@param`은 값 매개변수와 타입 매개변수에 모두 사용한다.
+- 주 생성자 프로퍼티에 직접 KDoc을 달기 어색하면 `@property`를 사용한다.
+- 주 생성자나 확장 수신 객체의 계약을 별도로 설명해야 하면 각각 `@constructor`·`@receiver`를 사용한다.
 
-## Parameters and Return Values
+## Kotlin 계약
 
-- Generally avoid `@param` and `@return`. Describe parameters and return values in the prose and link parameters as `[parameter]`.
-- Use `@param` or `@return` only when a long or independent contract does not fit the prose clearly.
-- `@param` documents both value parameters and type parameters.
-- Use `@property` for primary-constructor properties when direct property KDoc would be awkward.
-- Use `@constructor` for a primary-constructor contract and `@receiver` for an extension receiver contract when either needs separate documentation.
+- 계약이 완전히 명백하지 않으면 공개 선언을 문서화한다. 상속한 계약에 추가할 내용이 없는 재정의는 KDoc을 생략할 수 있다.
+- 프로퍼티 이름과 타입을 되풀이하지 않는다. 호출부에 드러나는 널 허용 여부, 변경 가능성, 단위, 기본값, 정규화, 부수 효과와 도메인 불변식을 설명한다.
+- 확장 함수에서 명백하지 않은 수신 객체 가정, 변경과 부수 효과를 설명한다.
+- Kotlin에는 검사 예외를 빠짐없이 문서화해야 하는 요건이 없다. 호출부가 대응할 가치가 있는 실패 조건에만 `@throws`·`@exception`을 사용한다.
+- KDoc에는 `@deprecated` 태그가 없다. Kotlin의 `@Deprecated` 애너테이션에 대체 방법을 둔다. 필요한 애너테이션 변경이 문서 작업 범위를 벗어나면 보고한다.
+- 사용 예시는 기본적으로 제외하므로 `@sample`을 추가하지 않는다. 기존 유효한 태그는 보존하며, 사용자나 프로젝트가 명시적으로 요구할 때만 추가한다.
+- 외부에 보이는 선언을 생성 문서에서 의도적으로 제외해야 할 때만 `@suppress`를 사용한다.
 
-## Kotlin-Specific Contracts
+## 완료 조건
 
-- Document public declarations unless the contract is completely obvious. An override may omit KDoc when it adds no contract beyond the inherited declaration.
-- Do not restate a property's name and type. Document caller-visible nullability, mutability, units, defaults, normalization, side effects, or domain invariants.
-- For extension functions, document receiver assumptions and mutation or side effects when they are not obvious.
-- Use `@throws` or `@exception` only for caller-visible failure conditions worth acting on; Kotlin has no checked-exception completeness requirement.
-- KDoc has no `@deprecated` tag. Use Kotlin's `@Deprecated` annotation and keep replacement guidance there.
-- Do not add `@sample` by default because usage examples are excluded. Preserve an existing valid `@sample`, or add one only when the user or project explicitly requires it.
-- Use `@suppress` only when an externally visible declaration must intentionally be excluded from generated documentation.
-
-## Review Checklist
-
-- The core rules, Korean style, and contract rules above are satisfied.
-- The first paragraph is a concise Korean summary.
-- Detail paragraphs use blank KDoc lines, not `<p>`.
-- Code literals use backticks and declaration references use KDoc links.
-- `@param` and `@return` are omitted unless prose would be less clear.
-- Primary-constructor properties and extension receivers use the correct KDoc contract shape.
-- Deprecation guidance uses `@Deprecated`, never `@deprecated`.
-- No new usage example or `@sample` was added without an explicit requirement.
+코드·테스트와 문서의 계약이 일치하고, 요약·문단·리터럴·링크·태그가 위 규칙을 따르는지 확인한다. 수정에서는 변경한 문서에 맞는 링크·문법 검증을 수행하고, Dokka 생성에 영향을 주는 변경이면 사용 가능한 관련 검증을 실행한다. 검토에서는 발견 사항과 검증 한계를 보고한다.

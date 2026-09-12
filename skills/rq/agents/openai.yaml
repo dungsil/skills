@@ -1,7 +1,7 @@
 interface:
-  display_name: "Requirement Quality Gate"
-  short_description: "요구사항 충족 여부를 증거 기반으로 검증"
-  default_prompt: "Use \$rq to verify whether an implementation satisfies a stated requirement."
+  display_name: "요구사항 품질 게이트"
+  short_description: "요구사항 충족 여부를 증거로 검증하고 게이트별 판정을 보고한다."
+  default_prompt: "$rq를 사용하여 구현이 명시된 요구사항을 충족하는지 검증해 줘."
 
 policy:
   allow_implicit_invocation: true

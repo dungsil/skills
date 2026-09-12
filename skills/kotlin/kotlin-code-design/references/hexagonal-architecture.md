@@ -1,31 +1,31 @@
-# Hexagonal Architecture
+# 헥사고날 아키텍처
 
-Use this reference when a decision spans several roles or when the primary problem is dependency direction. For role-specific design, load the matching domain, use-case, adapter, shared-kernel, common/support, or Spring reference instead.
+여러 역할에 걸친 판단이나 의존 방향이 핵심인 작업에서 읽는다. 특정 역할의 설계는 도메인·유스케이스·어댑터·공유 커널·공통·지원·Spring 참조 문서를 사용한다.
 
-## Boundaries And Module Roles
+## 경계와 역할
 
-- Identify bounded contexts from business capability, language, rules, ownership, release cadence, and integrations rather than tables or controller groups.
-- Keep a model together when it changes and is reasoned about as one unit. Split only when a boundary protects behavior, ownership, dependency direction, lifecycle, or repeated wiring.
-- Domain modules own domain models, value objects, invariants, domain services, and domain failures.
-- Use-case modules own application orchestration, commands/queries, inbound contracts, outbound ports, and application outcomes.
-- Adapter modules own REST, persistence, messaging, cache, files, schedulers, external clients, serialization, and framework mapping.
-- Shared-kernel modules own only small, stable domain/application contracts deliberately shared by multiple contexts.
-- Common/support modules own narrow technical reuse and must not absorb bounded-context rules.
-- Runnable apps compose modules. They do not own reusable domain rules, use-case behavior, adapter mapping, or technical libraries.
+- 테이블이나 컨트롤러 그룹보다 업무 능력, 언어, 규칙, 소유권, 출시 주기와 통합에서 컨텍스트를 찾는다.
+- 함께 변경하고 이해하는 모델은 함께 둔다. 동작·소유권·의존 방향·생명주기를 보호하거나 반복 구성을 줄일 때만 나눈다.
+- 도메인은 모델, 값 객체, 불변식, 도메인 서비스와 실패를 소유한다.
+- 유스케이스는 애플리케이션 조합, 명령·쿼리, 입력 계약, 출력 포트와 결과를 소유한다.
+- 어댑터는 REST, 영속성, 메시징, 캐시, 파일, 스케줄러, 외부 클라이언트, 직렬화와 프레임워크 매핑을 소유한다.
+- 공유 커널은 여러 컨텍스트가 합의한 작고 안정적인 도메인·애플리케이션 계약만 소유한다.
+- 공통·지원 모듈은 좁은 기술 재사용을 담당하며 컨텍스트 규칙을 흡수하지 않는다.
+- 실행 앱은 모듈을 조합한다. 재사용 도메인 규칙, 유스케이스 동작, 어댑터 매핑이나 기술 라이브러리를 소유하지 않는다.
 
-## Dependency Direction
+## 의존 방향
 
-- Domain code depends on no use case, adapter, runnable app, Spring runtime, JPA, HTTP, cache, transaction, or serialization detail.
-- Use cases depend inward on domain contracts and define the ports they need. They do not depend on concrete adapters.
-- Adapters depend inward and translate external types and behavior into domain/application contracts.
-- Apps and Spring configuration select implementations and compose the graph.
-- Ports describe application needs, not adapter mechanics. Do not expose Spring Data names, JPA entities, HTTP DTOs, cache keys, table fields, joins, serialization shapes, or framework annotations.
-- Keep module dependencies explicit; do not add every starter, adapter, shared, or common module to every app by default.
+- 도메인은 유스케이스, 어댑터, 앱, Spring 런타임, JPA, HTTP, 캐시, 트랜잭션과 직렬화 세부 사항에 의존하지 않는다.
+- 유스케이스는 도메인 계약에 의존하고 필요한 포트를 정의한다. 구체 어댑터에는 의존하지 않는다.
+- 어댑터는 내부를 향해 의존하며 외부 타입·동작을 도메인·애플리케이션 계약으로 변환한다.
+- 앱과 Spring 설정에서 구현을 선택하고 의존 그래프를 구성한다.
+- 포트는 애플리케이션 요구를 설명한다. Spring Data 이름, JPA 엔티티, HTTP DTO, 캐시 키, 테이블 필드, 조인, 직렬화 구조와 프레임워크 애너테이션을 노출하지 않는다.
+- 의존성을 명시한다. 모든 앱에 모든 스타터·어댑터·공유·공통 모듈을 기본으로 추가하지 않는다.
 
-## Boundary Check
+## 경계 확인
 
-- A type lives at the innermost layer that can own its contract without importing outer technology.
-- Mapping occurs where two contracts meet, not in the domain to save adapter code.
-- Transaction, retry, cache, serialization, and framework lifecycle policies stay with the boundary that implements them unless they are explicit application requirements.
-- Cross-context reuse becomes shared only after two contexts deliberately agree on the same concept; first-use code stays with its owner.
-- Technical reuse goes to a named common/support module only after repeated use proves a stable contract.
+- 외부 기술을 가져오지 않고 계약을 소유할 수 있는 가장 안쪽 계층에 타입을 둔다.
+- 매핑은 두 계약이 만나는 곳에서 수행한다. 어댑터 코드를 줄이려고 도메인에 넣지 않는다.
+- 명시적인 애플리케이션 요구가 아니면 트랜잭션·재시도·캐시·직렬화·프레임워크 생명주기 정책은 구현 경계에 둔다.
+- 두 컨텍스트가 같은 개념에 합의한 뒤에만 공유한다. 최초 사용 코드는 소유 컨텍스트에 둔다.
+- 반복 사용에서 안정적인 계약이 확인된 기술 재사용만 이름이 명확한 공통·지원 모듈로 옮긴다.

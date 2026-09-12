@@ -1,65 +1,60 @@
-# Domain Use Case
+# 도메인 유스케이스
 
-Use this reference when changing application packages: use cases, query/command ports, and application-level exceptions.
+유스케이스, 조회·명령 포트와 애플리케이션 예외를 다룰 때 읽는다.
 
-## Responsibility
+## 책임
 
-- Use cases coordinate domain behavior through ports.
-- Put use cases in `<context>-usecase-<usecase>` modules by default when they have meaningful behavior, dependencies, ports, or test boundaries. Keep them in `<context>-core` only for small domains where splitting would add ceremony.
-- Ports live on the inner/application side and describe what the application needs, not how the outside implements it.
-- Ports describe application boundaries; do not leak adapter, JPA, Spring Data, HTTP, cache, transaction, serialization, table, or query-method assumptions into them.
-- Keep use cases focused on application decisions such as invalid input, lookup behavior, sorting policy, query limits, not-found handling, and transaction-sized decisions.
-- Prefer constructor injection; use Lombok `@RequiredArgsConstructor` when it is enough.
-- Keep pure port interfaces contract-oriented. Prefer Javadoc over forced behavior tests for interfaces with no implementation.
+- 유스케이스는 포트를 통해 도메인 동작을 조율한다.
+- 의미 있는 동작·의존성·포트·테스트 경계가 있으면 기본적으로 `<context>-usecase-<usecase>` 모듈에 둔다. 분리가 형식만 늘리는 작은 도메인에서는 `<context>-core`에 유지한다.
+- 포트는 내부 애플리케이션 계층에 두고 외부 구현 방식 대신 애플리케이션의 요구를 표현한다.
+- 포트에 어댑터, JPA, Spring Data, HTTP, 캐시, 트랜잭션, 직렬화, 테이블이나 쿼리 메서드의 전제를 노출하지 않는다.
+- 유스케이스는 무효 입력, 조회, 정렬, 조회 한도, 미발견 처리와 트랜잭션 단위의 결정에 집중한다.
+- 생성자 주입을 우선하고 충분한 경우 Lombok `@RequiredArgsConstructor`를 사용한다.
+- 구현이 없는 순수 포트 인터페이스는 계약에 집중한다. 억지로 동작 테스트를 만들기보다 Javadoc으로 설명한다.
 
-## Naming
+## 이름
 
-- Name use cases as `<Verb><Scope><Thing>UseCase` or `<Verb><Thing>UseCase`.
-- Include cardinality in use-case names when it changes behavior.
-- Name command/query input carriers as `<Verb><Thing>Command` or `<Verb><Thing>Query` when a request object is useful.
-- Name use-case methods from the caller's perspective, such as `get...`, `find...`, `register...`, or `change...`.
-- Name ports by application need: use `Query` for read-only lookup, `Repository` for aggregate persistence semantics, and `Gateway` or `Client` for external systems.
-- Keep technology words in adapter/starter classes, not core domain or use-case names.
-- Name application exceptions by policy, such as invalid query, query limit exceeded, or not found.
-- Put context-specific application outcome exceptions in a sibling exception package.
+- 유스케이스는 `<Verb><Scope><Thing>UseCase` 또는 `<Verb><Thing>UseCase`로 명명한다. 단건·다건 구분이 동작에 영향을 주면 이름에도 드러낸다.
+- 요청 객체가 유용하면 입력 타입을 `<Verb><Thing>Command` 또는 `<Verb><Thing>Query`로 명명한다.
+- 메서드는 호출자 관점에서 `get...`, `find...`, `register...`, `change...`처럼 명명한다.
+- 포트는 애플리케이션 요구에 따라 이름을 정한다. 읽기 전용 조회에는 `Query`, 애그리거트 영속성에는 `Repository`, 외부 시스템에는 `Gateway` 또는 `Client`를 사용한다.
+- 기술 이름은 어댑터·스타터 클래스에 두고 핵심 도메인·유스케이스 이름에 넣지 않는다.
+- 애플리케이션 예외에는 무효 조회, 조회 한도 초과, 미발견 등의 정책을 표현하고 컨텍스트별 인접 예외 패키지에 둔다.
 
-## Error Boundaries
+## 오류 경계
 
-- Separate invalid input from valid-but-missing results.
-- Use shared-kernel application exceptions only when the policy is cross-feature, such as invalid resource queries or query-size limits.
-- Do not reuse validation-error payload accessors for not-found cases.
-- Use invalid-resource exceptions for malformed single-resource lookup input.
-- Let ports return optional/list-shaped results for missing data; let the use case throw, filter, or preserve misses according to its public contract.
+- 무효 입력과 유효하지만 결과가 없는 상태를 구분한다.
+- 잘못된 리소스 조회나 조회 크기 제한처럼 여러 기능이 공유하는 정책에만 공유 커널의 애플리케이션 예외를 사용한다.
+- 미발견 사례에 검증 오류 페이로드 접근자를 재사용하지 않는다.
+- 단일 리소스 조회 입력의 형식이 잘못되면 잘못된 리소스 입력을 나타내는 예외를 사용한다.
+- 포트는 데이터 부재를 `Optional`이나 목록으로 반환한다. 유스케이스는 공개 계약에 따라 예외를 던지거나, 누락을 제외하거나, 그대로 보존한다.
 
-## Input And Output
+## 입력과 출력
 
-- Accept raw input only at the use-case boundary when the use case owns validation policy for that input.
-- Convert raw input into domain value objects before calling outbound ports.
-- Decide explicitly whether invalid or missing values in bulk lookup/filter operations are excluded or rejected.
-- Return domain objects or application results, not REST DTOs, JPA entities, or serialized shapes.
-- Preserve input order when the public use-case contract requires it.
-- Use common/support ordering helpers only for reusable mechanics. Put cross-feature ordering policy in shared-kernel contracts only when it is a deliberate policy.
+- 입력 검증 정책을 유스케이스가 소유할 때만 경계에서 원시 입력을 받는다.
+- 외부 포트를 호출하기 전에 원시 입력을 도메인 값 객체로 변환한다.
+- 다건 조회·필터에서 무효 값과 미발견 값을 제외할지 거절할지 명시한다.
+- REST DTO, JPA 엔티티나 직렬화 형태 대신 도메인 객체 또는 애플리케이션 결과를 반환한다.
+- 공개 계약이 요구하면 입력 순서를 보존한다.
+- 재사용 가능한 정렬 처리에는 공통·지원 유틸리티를 사용한다. 여러 기능의 정렬 정책을 의도적으로 공유할 때만 공유 커널 계약에 둔다.
 
-## Port Shape
+## 포트 형태
 
-- Use domain value objects and domain/application result types in port signatures.
-- Use `Optional<T>` for single-item lookups that may not exist.
-- Use `List<T>` for multiple results where ordering may matter.
-- Accept `Collection<ValueObject>` for bulk input unless a stricter collection type is part of the contract.
-- Keep single and bulk lookup method names distinct in the application language.
-- Document missing-result policy in Javadoc, especially whether missing bulk values are excluded.
-- Do not put adapter filtering constants, deleted flags, joins, entity names, or query method names into ports.
-- Do not annotate ports with Spring stereotypes.
+- 포트 시그니처에 도메인 값 객체와 도메인·애플리케이션 결과 타입을 사용한다.
+- 부재가 가능한 단건 조회는 `Optional<T>`, 순서가 중요할 수 있는 다건 결과는 `List<T>`로 표현한다.
+- 더 엄격한 컬렉션 타입이 계약인 경우를 제외하면 다건 입력은 `Collection<ValueObject>`로 받는다.
+- 단건·다건 조회 메서드 이름을 애플리케이션 용어로 구분한다.
+- 미발견 처리, 특히 다건 입력에서 누락 값을 제외하는지는 Javadoc으로 명시한다.
+- 어댑터 필터 상수, 삭제 플래그, 조인, 엔티티 이름이나 쿼리 메서드 이름을 포트에 넣지 않는다.
+- 포트에 Spring 스테레오타입을 붙이지 않는다.
 
-## Fields And Constants
+## 필드와 상수
 
-- Name outbound port fields by role, such as `query`, `repository`, `gateway`, or `client`.
-- Name injected use-case fields by action when an adapter service composes multiple use cases.
-- Use public constants only when they are part of the use-case contract.
-- Name limit constants with `MAX_...`.
-- Keep constructor dependencies final and minimal.
+- 외부 포트 필드는 `query`, `repository`, `gateway`, `client`처럼 역할로 명명한다.
+- 어댑터 서비스가 여러 유스케이스를 조합하면 주입 필드를 동작에 맞춰 명명한다.
+- 공개 상수는 유스케이스 계약에 포함되는 경우에만 사용한다. 한도 상수는 `MAX_...`로 명명한다.
+- 생성자 의존성은 최소한으로 유지하고 `final`로 둔다.
 
-## Testing Boundary
+## 테스트 경계
 
-- Test use cases with fake ports when behavior matters.
-- Do not duplicate adapter mapping, repository query, HTTP routing, or JSON serialization coverage in use-case tests; use `$writing-java-tests` when test-level choice is unclear.
+동작이 중요한 유스케이스는 가짜 포트로 검증한다. 어댑터 매핑, 저장소 쿼리, HTTP 라우팅이나 JSON 직렬화 검증을 중복하지 않는다. 테스트 수준 판단이 필요하면 `$writing-java-tests`를 사용한다.

@@ -3,32 +3,43 @@
   "evals": [
     {
       "id": "inline-parameter-return",
-      "prompt": "이 Kotlin 함수의 number 파라미터와 반환값을 KDoc으로 설명해줘. 단순 계약인데 @param과 @return을 써야 할까?",
-      "expected_output": "불필요한 @param과 @return을 생략하고, 한국어 본문에서 [number]를 링크해 함수 계약과 반환 의미를 간결하게 설명한다.",
+      "prompt": "이 Kotlin 함수의 number 매개변수와 반환값을 KDoc으로 설명해 줘. 단순한 계약에도 @param과 @return이 필요할까?",
+      "expected_output": "불필요한 @param·@return을 생략하고 한국어 본문에서 [number]를 연결하여 계약과 반환 의미를 간결하게 설명한다.",
       "assertions": [
-        "The output avoids @param and @return for a short contract.",
-        "The output links the parameter as [number].",
-        "The output follows concise Korean declarative style."
+        "짧은 계약에 @param·@return을 사용하지 않는다.",
+        "매개변수를 [number]로 연결한다.",
+        "간결한 한국어 평서문을 사용한다."
       ]
     },
     {
       "id": "primary-constructor-property",
-      "prompt": "primary constructor의 timeoutMillis 프로퍼티에 단위와 기본값 계약이 있어. Kotlin 클래스 KDoc을 작성해줘.",
-      "expected_output": "클래스 KDoc에서 @property timeoutMillis로 밀리초 단위와 기본값의 의미를 설명하고, 이름과 타입만 반복하는 문구는 생략한다.",
+      "prompt": "주 생성자의 timeoutMillis 프로퍼티에 단위와 기본값 계약이 있어. Kotlin 클래스 KDoc을 작성해 줘.",
+      "expected_output": "클래스 KDoc의 @property timeoutMillis로 밀리초 단위와 기본값 의미를 설명하고 이름·타입 반복은 생략한다.",
       "assertions": [
-        "The output uses @property for the primary-constructor property.",
-        "The output documents units and default semantics.",
-        "The output avoids restating only the property name and type."
+        "주 생성자 프로퍼티에 @property를 사용한다.",
+        "단위와 기본값 의미를 설명한다.",
+        "이름과 타입만 반복하지 않는다."
       ]
     },
     {
       "id": "deprecated-extension",
-      "prompt": "String 확장 함수가 더 이상 권장되지 않아. receiver 제약과 대체 API를 포함한 KDoc을 검토해줘.",
-      "expected_output": "receiver 계약은 본문 링크나 @receiver로 설명하고, KDoc @deprecated 태그 대신 Kotlin @Deprecated annotation에 대체 API를 지정하도록 안내한다.",
+      "prompt": "String 확장 함수가 더 이상 권장되지 않아. 수신 객체 제약과 대체 API를 포함한 KDoc을 검토해 줘.",
+      "expected_output": "수신 객체 계약은 본문 링크나 @receiver로 설명하고 KDoc @deprecated 대신 Kotlin @Deprecated에서 대체 API를 안내하도록 권고한다.",
       "assertions": [
-        "The output documents the extension receiver contract.",
-        "The output rejects the KDoc @deprecated tag.",
-        "The output uses Kotlin @Deprecated replacement guidance."
+        "확장 수신 객체 계약을 설명한다.",
+        "KDoc @deprecated 태그를 사용하지 않는다.",
+        "Kotlin @Deprecated의 대체 방법을 안내한다.",
+        "검토 요청에서 KDoc이나 애너테이션을 직접 변경하지 않는다."
+      ]
+    },
+    {
+      "id": "docs-only-no-deprecation-change",
+      "prompt": "이 Kotlin 함수의 현재 동작만 KDoc으로 설명해 줘. @Deprecated가 필요해 보이더라도 동작과 애너테이션은 바꾸지 마.",
+      "expected_output": "현재 계약만 문서화하고 애너테이션·의존성 변경이 필요하면 별도 사항으로 보고한다.",
+      "assertions": [
+        "현재 동작을 근거로 KDoc을 작성한다.",
+        "@Deprecated나 다른 애너테이션을 추가·수정하지 않는다.",
+        "문서 작업 범위를 넘어 의존성이나 동작을 바꾸지 않는다."
       ]
     }
   ]

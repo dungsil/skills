@@ -1,29 +1,28 @@
-# JVM Interoperability And Compatibility
+# JVM 상호 운용성과 호환성
 
-## Platform Types And Boundaries
+## 플랫폼 타입과 경계
 
-- Give public functions and member properties explicit Kotlin types when initialized or returned from Java platform types. Decide nullable versus non-null at the boundary instead of letting `T!` spread.
-- Validate untrusted Java/framework values at ingress. Do not scatter `!!` throughout internal Kotlin code to compensate for one unsafe boundary.
-- Inspect generated getter/setter names for boolean `is...` properties and framework binding expectations.
-- Remember that Kotlin `internal` is represented as public JVM bytecode with name mangling; it is not a security boundary.
+- Java 플랫폼 타입으로 초기화하거나 반환하는 공개 함수·멤버 프로퍼티에는 Kotlin 타입을 명시한다. `T!`를 확산시키지 말고 경계에서 널 허용 여부를 정한다.
+- 신뢰할 수 없는 Java·프레임워크 값은 진입점에서 검증한다. 불안전한 경계를 보완하려고 내부 Kotlin 코드에 `!!`를 흩어 놓지 않는다.
+- 불리언 `is...` 프로퍼티의 getter·setter 이름과 프레임워크 바인딩 기대를 확인한다.
+- Kotlin `internal`은 이름이 변형된 공개 JVM 바이트코드로 표현되므로 보안 경계가 아니다.
 
-## Java Caller Shape
+## Java 호출 형태
 
-- Prefer Kotlin defaults for Kotlin callers. Add `@JvmOverloads` or manual overloads only when Java callers need them and the generated overload set is desirable.
-- Use `@Throws` when Java callers must see checked exceptions in the method signature.
-- Use `@JvmStatic`, `@JvmField`, `@JvmName`, `@JvmWildcard`, and `@JvmSuppressWildcards` only to solve a verified Java API or signature problem.
-- Check top-level declaration file-facade names when Java calls them; use file-level `@JvmName` only when the Java-facing name is part of the intended API.
-- Use annotation use-site targets such as `@field:`, `@get:`, or `@param:` when a framework or Java reflection inspects a specific generated element.
-- Review value classes, function types, `Unit`, `Nothing`, variance, default parameters, and companion objects from the Java call site before exposing them publicly.
+- Kotlin 호출에는 기본 인자를 우선한다. Java 호출부가 필요로 하고 생성되는 오버로드가 적절할 때만 `@JvmOverloads`나 수동 오버로드를 추가한다.
+- Java 호출부가 메서드 시그니처에서 검사 예외를 확인해야 하면 `@Throws`를 사용한다.
+- 확인된 Java API·시그니처 문제에만 `@JvmStatic`, `@JvmField`, `@JvmName`, `@JvmWildcard`, `@JvmSuppressWildcards`를 사용한다.
+- Java에서 최상위 선언을 호출하면 파일 파사드 이름을 확인한다. Java에 노출하는 이름이 의도한 API일 때만 파일 수준 `@JvmName`을 사용한다.
+- 프레임워크나 Java 리플렉션이 특정 생성 요소를 검사하면 `@field:`, `@get:`, `@param:` 같은 사용 지점 대상을 사용한다.
+- 값 클래스, 함수 타입, `Unit`, `Nothing`, 변성, 기본 인자와 companion 객체를 공개하기 전에 Java 호출부에서 확인한다.
 
-## Published API Compatibility
+## 배포 API 호환성
 
-- Treat binary, source, and behavioral compatibility as separate constraints.
-- Enable explicit API mode and binary API validation for published libraries when the project supports them.
-- Declare public return and property types explicitly. Inferred implementation types can become accidental binary contracts.
-- Adding a default parameter can preserve Kotlin source calls while breaking existing JVM binaries. Preserve old entry points with supported version-overload mechanisms or explicit overloads.
-- Changing a return type, including narrowing it, can break JVM binary compatibility.
-- Avoid public `data class` types when constructor, `copy`, destructuring, or property growth must evolve compatibly.
-- Treat public inline bodies and `@PublishedApi internal` declarations as compatibility-sensitive because client bytecode can contain them.
-- Evolve published APIs through deprecation and replacement paths rather than immediate removal.
-
+- 바이너리·소스·동작 호환성을 별도 제약으로 취급한다.
+- 프로젝트가 지원하면 배포 라이브러리에 명시적 API 모드와 바이너리 API 검증을 사용한다.
+- 공개 반환·프로퍼티 타입을 명시한다. 추론된 구현 타입이 우발적으로 바이너리 계약이 될 수 있다.
+- 기본 인자 추가는 Kotlin 소스 호출을 유지해도 기존 JVM 바이너리를 깨뜨릴 수 있다. 지원되는 버전 오버로드 방식이나 명시적 오버로드로 기존 진입점을 유지한다.
+- 반환 타입은 좁히는 변경도 JVM 바이너리 호환성을 깨뜨릴 수 있다.
+- 생성자, `copy`, 구조 분해나 프로퍼티 추가를 호환되게 발전시켜야 하면 공개 `data class`를 피한다.
+- 공개 inline 본문과 `@PublishedApi internal` 선언은 클라이언트 바이트코드에 포함될 수 있으므로 호환성에 민감하게 다룬다.
+- 배포 API는 즉시 삭제하지 말고 지원 중단과 대체 경로를 통해 변경한다.

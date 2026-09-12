@@ -1,49 +1,36 @@
-# Unit Test Reference
+# 단위 테스트
 
-Use this reference for tests that instantiate the unit directly and verify a small public contract.
+대상을 직접 생성하고 작은 공개 계약을 검증할 때 읽는다.
 
-## Scope
+## 적용 범위
 
-Good unit-test targets:
+도메인 값 객체와 애그리거트 팩터리, 검증·결과 타입, 유스케이스 분기, `isDeleted()`·`setDeleted()` 같은 엔티티 도우미, `activeOnly = true` 강제 같은 어댑터 호출 정책을 검증한다.
 
-- Domain value objects and aggregate factories.
-- Validation and result types.
-- Use-case branches.
-- Entity helper methods such as `isDeleted()` and `setDeleted()`.
-- Adapter call-shape policies such as forcing `activeOnly = true`.
+REST 컨트롤러의 JSON 계약, Spring 트랜잭션·캐시·보안·MVC 동작, JPA 매핑과 저장소 쿼리는 단위 테스트로 검증하지 않는다.
 
-Avoid unit tests for:
+## 검증 범위
 
-- REST controller JSON contracts.
-- Spring transaction, cache, security, or MVC behavior.
-- JPA mapping and repository query behavior.
+- 정상 경로: 성공한 생성·상태와 거절하면 안 되는 정상 입력을 검증한다.
+- 실패 경로: 잘못된 입력, 예외와 누적 오류 결과를 검증한다.
+- 경계·정책: `@Nullable`이 선언된 곳의 `null`, 빈 값, 임계값, 타입 불일치와 선택 값 동작을 검증한다.
+- 공개 API: 생성자·팩터리, 공개 도우미, 종단 메서드와 변환 메서드를 검증한다.
+- 상태 무결성: 관련된 불변식, 방어적 복사와 반환 컬렉션의 변경 가능성을 검증한다.
 
-## Coverage
+클래스가 약속하지 않은 동작을 추측하여 테스트하지 않는다.
 
-Cover the contract from both directions:
+## 테스트 대역
 
-- Happy path: successful creation/state and normal inputs that must not be rejected.
-- Failure path: invalid inputs, exception paths, and accumulated error results.
-- Boundaries and policies: `null` only where `@Nullable` is declared, empty values, threshold edges, type mismatch, and optional-value behavior.
-- API surface: constructors/factories, public helper methods, terminal methods, and transformation methods.
-- State integrity: invariants, defensive copies, and returned collection mutability when relevant.
+- 의존성이 데이터나 마커 구현뿐이면 작은 가짜 구현이나 테스트용 레코드·클래스를 사용한다.
+- 상호작용이 중요하거나 협력 객체의 비용이 크거나 가짜 구현이 테스트를 복잡하게 만들면 Mockito를 사용한다.
+- 두 줄짜리 가짜 구현을 피하려고 값 객체, 레코드, 단순 오류 객체나 마커 인터페이스를 모킹하지 않는다.
+- 준비·검증에 Mockito를 사용해도 단언은 JUnit으로 작성한다.
 
-Do not add speculative tests for behavior the class does not promise.
+## 검증 DSL
 
-## Test Doubles
+검증 DSL이나 검증 결과 타입을 테스트할 때 적용한다.
 
-- Use a small fake or test record/class when the dependency is just data or a marker implementation.
-- Use Mockito when interaction matters, when a collaborator is expensive, or when setting up a concrete fake would obscure the test.
-- Do not mock value objects, records, simple error objects, or trivial marker interfaces only to avoid writing a two-line fake.
-- Keep assertions in JUnit even when Mockito is used for setup or verification.
-
-## Validation DSL
-
-Use this section only when testing validation DSLs or validation result types.
-
-- Prefer pass-condition method names: `maxLength(50)`, `positive()`, `notBlank()`.
-- Keep error records named after violations, such as `TooLong`, `NonPositive`, or `Required`.
-- Add success-before-failure cases.
-- Add threshold boundary tests.
-- Add type mismatch tests when a rule is type-specific.
-- Separate terminal methods into groups such as `result` and `resultOptional`.
+- 메서드는 `maxLength(50)`, `positive()`, `notBlank()` 같은 통과 조건으로 이름을 짓는다.
+- 오류 레코드는 `TooLong`, `NonPositive`, `Required`처럼 위반 내용으로 이름을 짓는다.
+- 성공 사례를 실패 사례보다 먼저 두고 임계값 경계를 검증한다.
+- 타입별 규칙에는 타입 불일치 사례를 추가한다.
+- 종단 메서드는 `result`, `resultOptional` 같은 그룹으로 나눈다.

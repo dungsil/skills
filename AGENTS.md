@@ -1,27 +1,20 @@
-# Skills Generate
-Generate [Agent Skills](https://agentskills.io/home) from project documentation.
+# 에이전트 스킬 작성
 
-PLEASE STRICTLY FOLLOW THE BEST PRACTICES FOR SKILL: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+프로젝트 문서를 바탕으로 [Agent Skills](https://agentskills.io/home)를 작성한다. [스킬 작성 지침](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)을 따른다.
 
-- Focus on agents capabilities and practical usage patterns.
-- Ignore user-facing guides, introductions, get-started, install guides, etc.
-- Ignore content that LLM agents already confident about in their training data.
-- Make the skill as concise as possible, avoid creating too many references.
+- 에이전트의 실제 판단과 실행에 필요한 지침을 한국어로 작성한다. 식별자, 경로, 명령과 API 이름은 유지한다.
+- 일반적인 소개나 사용 안내는 생략하되, 작업에 필요한 설치·인증·권한·환경 전제는 보존한다.
+- 모델이 이미 아는 일반 지식보다 프로젝트 관례, 계약과 실수를 막는 제약에 집중한다.
+- 설명은 짧고 구별 가능하게 작성한다. 본문에는 공통 규칙과 참조 경로를 두고, 세부 문서는 해당 작업에 필요할 때만 읽도록 안내한다.
+- 검토와 수정의 완료 조건을 구분한다. 문서·테스트 작업이 요청하지 않은 운영 코드 수정으로 확대되지 않도록 한다.
+- 같은 규칙은 한 곳에서 관리한다. 참조 문서를 불필요하게 늘리지 않는다.
 
-## Validation
+## 검증
 
-- After creating or changing any skill under `skills/`, run `bun run lint` and ensure it passes before considering the skill update complete.
+`skills/` 아래 스킬을 생성하거나 변경하면 완료 전에 `bun run lint`를 실행하여 통과해야 한다.
 
-## Agent skills
+## 관련 문서
 
-### Issue tracker
-
-Issues and PRDs are tracked as local Markdown under `.agents/plans/`. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Canonical triage and planning roles use the default Korean label vocabulary. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-This repository uses a single-context domain model. See `docs/agents/domain.md`.
+- 이슈·PRD는 `.agents/plans/`의 로컬 Markdown으로 관리한다. 추적 작업에 필요하면 [이슈 추적 지침](docs/agents/issue-tracker.md)을 읽는다.
+- 분류·계획 역할의 기본 한국어 라벨은 [라벨 지침](docs/agents/triage-labels.md)을 따른다. 해당 라벨을 다룰 때 읽는다.
+- 단일 컨텍스트 도메인 모델은 [도메인 지침](docs/agents/domain.md)을 따른다. 도메인 용어나 경계를 다룰 때 읽는다.

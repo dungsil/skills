@@ -1,68 +1,55 @@
 ---
 name: java-code-design
-description: Design, write, or review Java production code and modular Spring Boot structure when the task requires design judgment about domain models, use cases, ports, adapters, shared kernel/common modules, JSpecify nullness, validation boundaries, API contracts, or Gradle module roles. Do not use for simple Java syntax/API lookups, generic Spring configuration help, or dependency installation unless a design boundary or public contract decision is involved.
+description: Java 코드의 API 계약과 아키텍처를 설계하거나 검토한다. 도메인 모델, 모듈 경계, 포트·어댑터 또는 공개 계약을 판단하는 작업에 사용한다.
 ---
 
-# Java Code Design
+# Java 코드 설계
 
-Use this skill when shaping Java production code that should be easy to call, hard to misuse, and honest about its state. Keep this file as the routing guide; start with the smallest role-matching reference, then load adjacent references only when the module interface or seam spans domain, use case, adapter, shared kernel, or common/support responsibilities.
+호출하기 쉽고 잘못 사용하기 어려우며, 유효한 상태를 명확하게 표현하는 코드를 설계한다. 단순 문법·API 조회, 일반적인 Spring 설정이나 의존성 설치에는 설계 경계에 관한 판단이 필요한 경우에만 사용한다.
 
-## Workflow
+## 작업 범위와 완료 조건
 
-1. Read the target Java code, its tests, and nearby usage first.
-2. Identify the role first: Spring module structure, shared kernel, common/support module, domain, application use case, or adapter.
-3. Load the smallest matching reference by primary role; add adjacent role references only when needed to evaluate the public contract, dependency direction, or adapter seam:
-   - Modular Spring Boot apps, packages, starters, and Gradle layout: [references/spring-modular-structure.md](references/spring-modular-structure.md)
-   - Shared kernel concepts and cross-context contracts: [references/shared-kernel.md](references/shared-kernel.md)
-   - Technical common/support modules: [references/common-modules.md](references/common-modules.md)
-   - Domain models, value objects, and domain errors: [references/domain.md](references/domain.md)
-   - Application use cases and ports: [references/domain-usecase.md](references/domain-usecase.md)
-   - Persistence, REST, Spring config, and framework adapters: [references/adapter.md](references/adapter.md)
-4. Preserve existing architectural vocabulary before introducing new abstractions.
-5. Define the public contract before adding convenience methods: valid states, invalid states, null/optional policy, exception policy, and boundary behavior.
-6. Add abstractions only when they remove repeated calling code or clarify domain intent.
-7. Use companion skills only when the change crosses their responsibility.
-8. Run focused verification for the changed Java behavior.
+- 검토만 요청받으면 파일을 변경하거나 포맷터를 실행하지 않는다. 발견 사항, 근거, 권고안과 검증 한계를 보고한다.
+- 작성·수정 요청에서는 요청 범위의 변경을 완료하고, 변경한 파일을 프로젝트 방식으로 포맷한 뒤 관련 동작을 집중 검증한다. 계약이나 동작이 달라졌을 때만 관련 Javadoc과 테스트를 갱신한다.
+- 대상 코드와 주변 사용례를 먼저 확인한다. 동작 판단에는 관련 테스트를, 버전 의존 API에는 빌드 설정의 Java 버전을 확인한다. 이미 확인한 설정은 관련 변경이나 불확실성이 없으면 다시 읽지 않는다.
 
-## Companion Skills
+## 참조 문서 선택
 
-- Use `$writing-javadoc` when adding or revising Java Javadocs for classes, methods, private helpers, null behavior, exception contracts, or API/test alignment.
-- Use `$writing-java-tests` when adding, changing, or reviewing Java behavior that needs unit, integration, or E2E coverage.
+가장 가까운 역할의 문서부터 읽고, 공개 계약이나 의존성 경계가 다른 역할에 걸칠 때만 인접 문서를 추가한다.
 
-## Java API Use
+- Spring Boot 앱·패키지·스타터·Gradle 구성: [모듈 구조](references/spring-modular-structure.md)
+- 컨텍스트 간 공통 개념과 계약: [공유 커널](references/shared-kernel.md)
+- 기술적인 공통·지원 모듈: [공통 모듈](references/common-modules.md)
+- 도메인 모델·값 객체·도메인 오류: [도메인](references/domain.md)
+- 애플리케이션 유스케이스·포트: [유스케이스](references/domain-usecase.md)
+- 영속성·REST·Spring 설정: [어댑터](references/adapter.md)
 
-- Confirm the project Java version from build files before relying on version-specific APIs.
-- Prefer project-owned common/support utilities first, Java standard-library utilities second, and dedicated dependencies third. Do not use framework incidental utilities such as Spring Framework `StringUtils` as general-purpose helpers.
-- Prefer role-based field names over type-repeating names when the role is obvious from the class.
-- Use records for transparent immutable carriers; use classes when invariants, identity, lifecycle, or framework construction make that clearer.
-- Prefer Lombok-generated constructors/getters for ordinary state access. Write them by hand only when they encode a contract, normalize inputs, derive values, adapt naming, or hide representation details.
-- Mark concrete classes `final` by default when they have no explicit extension contract. Leave them non-final only for a framework proxy, documented inheritance point, sealed hierarchy, test double, or established local pattern.
-- Use sealed types, pattern matching, switch expressions, collection factories, `copyOf`, and `Stream.toList()` when they improve clarity or safety.
-- Keep newer features subordinate to domain clarity, persistence constraints, Spring/Jackson binding behavior, and JSpecify nullness contracts.
+기존 아키텍처 용어를 보존한다. 편의 메서드보다 유효·무효 상태, null·부재, 예외와 경계 동작을 먼저 정한다. 반복되는 호출 코드를 줄이거나 도메인 의도를 명확하게 할 때만 추상화를 추가한다.
 
-## Gotchas
+Javadoc 작업에는 `$writing-javadoc`, 필요한 테스트의 작성·수정·검토에는 `$writing-java-tests`를 사용한다. 다른 스킬의 호출이 현재 요청의 수정 권한을 확대하지는 않는다.
 
-- Do not put Spring stereotypes on application ports or domain types.
-- Do not treat JPA entities as domain models by default.
-- Do not name application ports after JPA query methods, HTTP endpoints, cache keys, or adapter mechanics.
-- Do not create `shared-*` modules for technical utilities; reserve `shared` for deliberate shared-kernel concepts.
-- Do not add runtime null checks only to duplicate JSpecify non-null contracts.
-- Do not split modules when the split only mirrors a template and does not protect behavior, ownership, dependency direction, or repeated wiring.
+## Java API와 타입
 
-## Nullness Contracts
+- 프로젝트의 공통·지원 유틸리티, Java 표준 라이브러리, 전용 의존성 순서로 검토한다. Spring의 `StringUtils` 같은 부수적인 프레임워크 유틸리티를 일반 도구로 사용하지 않는다.
+- 클래스에서 역할이 명확하면 타입 이름을 반복하기보다 역할 중심의 필드 이름을 사용한다.
+- 투명한 불변 데이터에는 record를 사용한다. 불변식, 식별성, 생명주기나 프레임워크 생성 방식이 중요한 경우에는 클래스를 사용한다.
+- 단순한 상태 접근에는 Lombok 생성자·getter를 우선한다. 계약, 정규화, 파생 값, 이름 변환이나 표현 은닉이 필요할 때만 직접 구현한다.
+- 확장 계약이 없는 구체 클래스는 기본적으로 `final`로 둔다. 프레임워크 프록시, 문서화된 상속 지점, sealed 계층, 테스트 대역이나 기존 프로젝트 관례가 있으면 예외로 한다.
+- 명확성과 안전성이 좋아질 때 sealed 타입, 패턴 매칭, switch 표현식, 컬렉션 팩터리, `copyOf`, `Stream.toList()`를 사용한다.
+- 새 언어 기능보다 도메인의 명확성, 영속성 제약, Spring·Jackson 바인딩과 JSpecify 계약을 우선한다.
 
-- Treat non-null as the default under JSpecify; add nullable annotations only when absence is part of the public contract.
-- Prefer `Optional<T>` for nullable single-result returns, empty collections for multi-result returns, and explicit result/error types when absence carries domain meaning.
-- Do not use `Optional` for fields, parameters, collection elements, or DTO properties unless the local codebase already establishes that convention.
-- Keep runtime null checks at trust boundaries, constructor/factory invariants, and adapter/framework edges; do not add defensive checks that duplicate static nullness for internal non-null calls.
-- Document intentional `null` acceptance or return only on public APIs and utilities where callers cannot infer it from the type.
+## null과 부재의 계약
 
-## Review Pass
+- JSpecify 기본 규칙에서 비널을 전제로 하고, 부재가 공개 계약에 포함될 때만 널 허용 여부를 명시한다.
+- 부재가 가능한 단일 반환값에는 `Optional<T>`, 여러 결과에는 빈 컬렉션, 부재 자체에 도메인 의미가 있으면 명시적인 결과·오류 타입을 우선한다.
+- 기존 관례가 없다면 필드, 매개변수, 컬렉션 요소나 DTO 속성에 `Optional`을 사용하지 않는다.
+- 런타임 널 검사는 신뢰 경계, 생성자·팩터리 불변식, 어댑터·프레임워크 경계에 둔다. 내부 비널 호출에서 정적 계약을 중복 검사하지 않는다.
+- 타입만으로 알기 어려운 공개 API·유틸리티의 의도적인 null 허용·반환 동작을 문서화한다.
 
-Before finishing:
+## 설계 경계
 
-- Package role, class names, and public methods match the actual responsibility.
-- Null, optional, empty, boundary, and exception policies are explicit and JSpecify-compliant.
-- Mutability, Lombok usage, `final`, and Java feature choices match the API contract.
-- Javadocs and tests are updated when API contracts or behavior changed.
-- Changed Java files are formatted and focused tests pass.
+- 도메인 타입과 애플리케이션 포트에 Spring 스테레오타입을 붙이지 않는다.
+- JPA 엔티티를 기본 도메인 모델로 취급하지 않는다.
+- 애플리케이션 포트 이름에 JPA 쿼리 메서드, HTTP 엔드포인트, 캐시 키나 어댑터 구현 방식을 드러내지 않는다.
+- `shared-*`는 의도적으로 공유하는 커널 개념에 사용한다. 기술 유틸리티를 담는 이름으로 사용하지 않는다.
+- 템플릿을 따라가는 것만으로 모듈을 나누지 않는다. 동작, 소유권, 의존성 방향이나 반복 구성을 실제로 보호하는지 판단한다.

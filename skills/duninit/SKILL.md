@@ -9,7 +9,7 @@ license: MIT; see LICENSE and assets/COMMIT_MESSAGE_CONVENTION.md for third-part
 현재 작업 공간의 `AGENTS.md`에 공통 지침을 추가하고, 저장소에 맞는 PR/MR 템플릿을 준비한다.
 자산에 포함되지 않은 기존 지침과 사용자 작성 템플릿은 보존한다.
 
-## Workflow
+## 작업 절차
 
 1. 현재 작업 공간을 기준으로 `git rev-parse --show-toplevel`과 `git remote -v`를 확인한다.
    Git 저장소이면 반환된 저장소 루트를 템플릿 기준 경로로 사용한다. `.git` 디렉터리 유무만으로 판단하지 않는다(worktree에서는 파일일 수 있다).

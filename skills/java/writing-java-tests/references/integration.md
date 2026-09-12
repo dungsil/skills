@@ -1,28 +1,22 @@
-# Integration Test Reference
+# 통합 테스트
 
-Use this reference for tests that verify framework or persistence behavior inside the process.
+프로세스 내부에서 프레임워크나 영속성 동작을 검증할 때 읽는다.
 
-## Scope
+## 적용 범위
 
-Good integration-test targets:
+- JPA 엔티티 매핑과 Spring Data 저장소 쿼리를 검증한다.
+- 트랜잭션과 영속성 생명주기를 검증한다.
+- Spring 빈 구성 자체가 계약이면 해당 구성을 검증한다.
+- 스타터 자동 설정과 빈 등록은 해당 스타터 모듈에서 검증한다.
 
-- JPA entity mapping.
-- Spring Data repository query methods.
-- Transaction and persistence lifecycle behavior.
-- Spring bean wiring when the wiring itself is the contract.
-- Starter auto-configuration and bean registration in the starter module that owns it.
+사용자에게 노출되는 전체 HTTP 계약에는 E2E 테스트를 사용한다.
 
-Do not use integration tests for full user-facing HTTP contracts. Use E2E tests for those.
+## Spring 영속성 테스트
 
-## Spring Persistence Tests
+- JPA 동작만 검증하면 `@DataJpaTest` 같은 테스트 슬라이스를 우선한다.
+- 데이터는 엔티티·저장소 API로 준비한다. 생성이 필요하면 픽스처와 `EntityManager.persist()`를 사용한다.
+- 프로젝트가 기존에 요구하는 방식이 아니면 픽스처 준비에 `@Sql`, 원시 SQL이나 `JdbcTemplate.update("...")`를 사용하지 않는다.
 
-- Prefer Spring test slices such as `@DataJpaTest` when only JPA behavior is under test.
-- Use entity/repository APIs to arrange data.
-- Use fixtures and `EntityManager.persist()` when test data must be created.
-- Do not use `@Sql`, raw SQL, or `JdbcTemplate.update("...")` for fixture setup unless the project already requires that pattern.
+## 범위 관리
 
-## Scope Control
-
-- Keep repository integration tests focused on repository behavior.
-- If an E2E test already proves a user-facing API can retrieve and serialize data, do not duplicate the full API path here.
-- If an adapter unit test already proves call-shape policy, do not duplicate that with repository mocks here.
+저장소 동작에 집중한다. E2E에서 이미 검증한 API의 조회·직렬화 전체 경로를 반복하지 않는다. 어댑터 단위 테스트에서 확인한 호출 정책을 저장소 목으로 다시 검증하지 않는다.

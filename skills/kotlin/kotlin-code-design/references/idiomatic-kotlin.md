@@ -1,45 +1,45 @@
-# Idiomatic Kotlin
+# Kotlin 관용 표현
 
-## State And Domain Types
+## 상태와 도메인 타입
 
-- Default to `val` and expose `List`, `Set`, `Map`, `Collection`, or domain-specific read-only interfaces. Keep mutable implementations private.
-- Use `data class` only when structural equality, `copy`, destructuring, and `toString` are all valid semantics.
-- Use `@JvmInline value class` for scalar domain distinctions such as IDs or codes when validation, serialization, reflection, generic boxing, and Java calling behavior remain acceptable.
-- Use sealed classes or interfaces for closed alternatives that callers should handle exhaustively.
-- Prefer constructor parameters for required state. Use factories when construction validates, normalizes, selects a subtype, or may fail.
-- Avoid `lateinit` outside framework-managed lifecycle points or tests where initialization is externally guaranteed.
+- `val`을 기본으로 사용하고 `List`, `Set`, `Map`, `Collection`이나 도메인 읽기 전용 인터페이스를 노출한다. 가변 구현은 비공개로 유지한다.
+- 구조적 동등성, `copy`, 구조 분해와 `toString`이 모두 적합할 때만 `data class`를 사용한다.
+- 검증, 직렬화, 리플렉션, 제네릭 박싱과 Java 호출이 적합하면 ID·코드 같은 스칼라 구분에 `@JvmInline value class`를 사용한다.
+- 빠짐없이 처리해야 하는 닫힌 선택지는 sealed 클래스·인터페이스로 표현한다.
+- 필수 상태는 생성자 인자로 받는다. 검증·정규화·하위 타입 선택·실패가 있으면 팩터리를 사용한다.
+- 외부에서 초기화를 보장하는 프레임워크 생명주기나 테스트 외에는 `lateinit`을 피한다.
 
-## Nullability And Failure
+## 널과 실패
 
-- Make absence part of the type with `T?`; do not use sentinel values or nullable collections when an empty collection means the same thing.
-- Prefer smart casts, `?.`, `?:`, `firstOrNull`, `getOrNull`, and explicit branching. Use `!!` only when a nearby invariant proves non-null and no typed alternative can express it.
-- Use `require`/`requireNotNull` for caller argument violations, `check`/`checkNotNull` for invalid receiver state, and `error` for unreachable illegal state.
-- Preserve the original cause when translating infrastructure exceptions. Catch the narrowest exception that can be handled meaningfully.
-- Use `Result` or a domain result type only when callers are expected to branch on failure. Do not wrap every internal exception mechanically.
+- 부재는 `T?`로 표현한다. 빈 컬렉션과 같은 의미이면 센티널 값이나 널 허용 컬렉션을 사용하지 않는다.
+- 스마트 캐스트, `?.`, `?:`, `firstOrNull`, `getOrNull`과 명시적 분기를 우선한다. 가까운 불변식이 비널임을 증명하고 타입으로 표현할 대안이 없을 때만 `!!`를 사용한다.
+- 인자 위반에는 `require`·`requireNotNull`, 잘못된 수신 객체 상태에는 `check`·`checkNotNull`, 도달 불가능한 잘못된 상태에는 `error`를 사용한다.
+- 인프라 예외 변환 시 원인을 보존하고 의미 있게 처리할 수 있는 가장 좁은 예외를 잡는다.
+- 호출부가 실패에 따라 분기해야 할 때만 `Result`나 도메인 결과 타입을 사용한다. 내부 예외를 모두 기계적으로 감싸지 않는다.
 
-## Functions And APIs
+## 함수와 API
 
-- Prefer expression bodies for genuinely single-expression functions; use block bodies when steps, branching, logging, or debugging benefit from names.
-- Prefer default parameters over Kotlin-only overloads. Use named arguments for booleans or adjacent same-typed primitives when call-site meaning is otherwise unclear.
-- Prefer a property over a no-argument function only when access is cheap, stable for unchanged state, and non-throwing.
-- Use extension functions for operations naturally expressed on a receiver and implementable from its public contract. Restrict visibility to avoid namespace pollution.
-- Use operator, infix, DSL, and reified APIs only when their reading matches established Kotlin semantics and materially simplifies callers.
-- Minimize public declarations. For published libraries, enable explicit API mode where practical and declare public visibility and types deliberately.
+- 실제 단일 표현식 함수는 표현식 본문을 우선한다. 단계·분기·로깅·디버깅에 이름이 도움이 되면 블록 본문을 사용한다.
+- Kotlin 전용 오버로드보다 기본 인자를 우선한다. 불리언이나 인접한 같은 타입 기본값의 의미가 모호하면 이름 있는 인자를 사용한다.
+- 접근 비용이 작고 상태가 같으면 안정적이며 예외를 던지지 않을 때만 인자 없는 함수보다 프로퍼티를 우선한다.
+- 수신 객체의 공개 계약으로 구현할 수 있고 자연스러운 연산에 확장 함수를 사용한다. 가시성을 제한하여 네임스페이스 오염을 막는다.
+- 기존 Kotlin 의미와 읽는 방식이 일치하고 호출부를 실질적으로 단순하게 할 때만 연산자, infix, DSL과 reified API를 사용한다.
+- 공개 선언을 최소화한다. 배포 라이브러리는 가능하면 명시적 API 모드를 사용하고 공개 가시성과 타입을 의도적으로 선언한다.
 
-## Collections And Control Flow
+## 컬렉션과 제어 흐름
 
-- Prefer `if` for binary conditions and `when` for three or more alternatives or sealed/type dispatch.
-- Prefer `map`, `filter`, `associate`, `groupBy`, `fold`, and related operations when the pipeline remains obvious. Prefer a loop when it avoids a complex chain, repeated passes, or unnecessary allocations.
-- Prefer `for` to terminal `forEach` unless `forEach` belongs in a longer chain or handles a nullable receiver.
-- Use `Sequence` for demonstrably useful laziness: large or unbounded inputs, several intermediate stages, or early termination. Small/simple collection work is usually clearer and faster as eager operations.
-- Avoid rebuilding collections in loops; use builders or mutable accumulation privately, then expose a read-only result.
+- 이진 조건은 `if`, 세 개 이상의 대안이나 sealed·타입 분기는 `when`을 우선한다.
+- 처리가 명확하면 `map`, `filter`, `associate`, `groupBy`, `fold` 등을 사용한다. 복잡한 연쇄, 반복 순회나 불필요한 할당을 줄일 수 있으면 루프를 사용한다.
+- 긴 연쇄의 일부이거나 널 허용 수신 객체를 처리하는 경우가 아니면 종단 `forEach`보다 `for`를 우선한다.
+- 큰 입력·무한 입력, 여러 중간 단계나 조기 종료 등 지연 평가가 유용할 때 `Sequence`를 사용한다. 작고 단순한 작업은 보통 즉시 평가가 더 명확하고 빠르다.
+- 루프마다 컬렉션을 재생성하지 않는다. 내부에서 빌더나 가변 누적을 사용하고 읽기 전용 결과를 노출한다.
 
-## Scope Functions
+## 스코프 함수
 
-- `apply`: configure and return the receiver.
-- `also`: perform a side effect and return the receiver.
-- `let`: transform or operate on a nullable/intermediate value and return the lambda result.
-- `run`: compute a result using receiver members.
-- `with`: group operations on an existing receiver without chaining.
-- Avoid nesting or mixing receiver-style and argument-style scope functions when a named local is clearer.
+- `apply`: 수신 객체를 설정하고 반환한다.
+- `also`: 부수 효과를 수행하고 수신 객체를 반환한다.
+- `let`: 널 허용 값이나 중간값을 처리·변환하고 람다 결과를 반환한다.
+- `run`: 수신 객체 멤버로 결과를 계산한다.
+- `with`: 연쇄 없이 기존 수신 객체에 대한 연산을 묶는다.
 
+이름 있는 지역 변수가 더 명확하면 스코프 함수를 중첩하거나 수신 객체형과 인자형을 섞지 않는다.

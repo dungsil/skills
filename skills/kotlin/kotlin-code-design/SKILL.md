@@ -1,85 +1,77 @@
 ---
 name: kotlin-code-design
-description: Designs, writes, refactors, or reviews idiomatic Kotlin production code and modular Spring Boot systems using Kotlin conventions, hexagonal architecture, coroutines, JVM interoperability, and explicit API contracts. Use for Kotlin design decisions involving domain models, use cases, ports, adapters, shared kernel or common modules, Spring wiring, persistence boundaries, mutability, nullability, coroutines or Flow, library compatibility, or Java callers. Do not use for simple syntax lookups or dependency installation without a design boundary.
+description: Kotlin 운영 코드와 모듈형 Spring Boot 시스템을 설계·작성·리팩터링·검토한다. 도메인 경계, Kotlin API 계약, 코루틴, JVM 상호 운용성에 관한 설계 판단에 사용한다.
 ---
 
-# Kotlin Code Design
+# Kotlin 코드 설계
 
-Use this skill when shaping Kotlin production code that should be concise for Kotlin callers, predictable at framework boundaries, and honest about its state. Keep this file as the routing guide; load the smallest role-matching reference, then add adjacent references only when a contract crosses roles.
+Kotlin 호출부에서 간결하고 프레임워크 경계에서 예측 가능한 코드를 설계한다. 작업 역할에 맞는 참조 문서부터 읽고, 계약이 다른 역할까지 이어질 때만 관련 문서를 추가로 읽는다.
 
-## Workflow
+## 작업 방식
 
-1. Read the target code, nearby callers, tests, build configuration, Kotlin version, platform, JVM target, and source set before changing code.
-2. Identify the primary role: Spring module/runtime composition, shared kernel, common/support module, domain, application use case or port, adapter, coroutine or Flow boundary, published API, JVM interoperability surface, or multiplatform source.
-3. Load the smallest matching reference:
-   - Modular Spring Boot layout, Gradle Kotlin DSL, runtime composition, configuration, and persistence boundaries: [references/spring-modular-structure.md](references/spring-modular-structure.md)
-   - Cross-role hexagonal boundaries and dependency direction: [references/hexagonal-architecture.md](references/hexagonal-architecture.md)
-   - Shared-kernel concepts and cross-context contracts: [references/shared-kernel.md](references/shared-kernel.md)
-   - Technical common/support modules: [references/common-modules.md](references/common-modules.md)
-   - Domain models, value objects, factories, and domain errors: [references/domain.md](references/domain.md)
-   - Application use cases and ports: [references/domain-usecase.md](references/domain-usecase.md)
-   - Persistence, REST, Spring config, and framework adapters: [references/adapter.md](references/adapter.md)
-   - Core language, API, nullability, collections, and performance decisions: [references/idiomatic-kotlin.md](references/idiomatic-kotlin.md)
-   - Coroutines, Flow, cancellation, dispatcher ownership, and lifecycle: [references/coroutines.md](references/coroutines.md)
-   - Java callers, platform types, annotations, and binary compatibility: [references/jvm-interop.md](references/jvm-interop.md)
-4. Preserve existing architectural vocabulary before introducing new abstractions.
-5. Define the observable contract before convenience APIs: valid states, absence, mutation ownership, failures, cancellation, ordering, compatibility, and boundary behavior.
-6. Add abstractions only when they remove repeated caller code or clarify domain intent.
-7. Use companion skills when the change crosses their responsibility.
-8. Format with the project's formatter and run focused verification for the changed Kotlin behavior.
+- 검토 요청에서는 파일을 수정하거나 포맷하지 않는다. 문제의 발생 조건, 영향, 코드 위치와 수정 방향을 보고한다.
+- 구현·리팩터링 요청에서는 승인된 범위의 코드를 수정하고, 프로젝트 포매터와 변경한 동작에 맞는 검증을 실행한다.
+- 대상 코드부터 읽는다. 호출 계약을 확인할 때 호출부와 테스트를, 언어·플랫폼·빌드 제약이 관련될 때 빌드 설정, Kotlin 버전, 플랫폼, JVM 타깃과 소스 세트를 확인한다.
+- 기존 아키텍처 용어를 유지한다. 편의 API를 추가하기 전에 유효한 상태, 부재, 변경 책임, 실패, 취소, 순서, 호환성과 경계 동작을 정한다.
+- 추상화는 반복되는 호출 코드를 줄이거나 도메인 의도를 명확하게 할 때 추가한다.
 
-## Companion Skills
+## 참조 문서 선택
 
-- Use `$writing-kdoc` when adding or revising KDoc for public contracts, private helpers, null behavior, exceptions, symbol links, or API/test alignment.
-- Use `$writing-kotlin-tests` when adding, changing, or reviewing Kotlin behavior that needs unit, integration, or E2E coverage.
+현재 판단에 필요한 문서만 읽는다.
 
-## Kotlin API Use
+- 모듈형 Spring Boot 구성, Gradle Kotlin DSL, 런타임 조합과 영속성 경계: [spring-modular-structure.md](references/spring-modular-structure.md)
+- 헥사고날 아키텍처의 역할 경계와 의존 방향: [hexagonal-architecture.md](references/hexagonal-architecture.md)
+- 공유 커널과 컨텍스트 간 계약: [shared-kernel.md](references/shared-kernel.md)
+- 기술 공통·지원 모듈: [common-modules.md](references/common-modules.md)
+- 도메인 모델, 값 객체, 팩터리와 도메인 오류: [domain.md](references/domain.md)
+- 애플리케이션 유스케이스와 포트: [domain-usecase.md](references/domain-usecase.md)
+- 영속성, REST, Spring 설정과 프레임워크 어댑터: [adapter.md](references/adapter.md)
+- 언어 사용, API, 널 허용 여부, 컬렉션과 성능: [idiomatic-kotlin.md](references/idiomatic-kotlin.md)
+- 코루틴, Flow, 취소, 디스패처 책임과 생명주기: [coroutines.md](references/coroutines.md)
+- Java 호출부, 플랫폼 타입, 애너테이션과 바이너리 호환성: [jvm-interop.md](references/jvm-interop.md)
 
-- Prefer project-owned common/support utilities first, Kotlin and Java standard-library APIs second, and dedicated dependencies third. Do not use incidental Spring utilities as general-purpose helpers.
-- Prefer role-based property names over type-repeating names when the role is obvious from the class.
-- Prefer `val`, read-only collection interfaces, immutable outward-facing state, and constructor-complete objects.
-- Use `data class` only for transparent value-like carriers whose equality, `copy`, destructuring, `toString`, and public construction are all valid contract semantics.
-- Use value classes for type-safe scalar concepts only when validation, boxing, reflection, serialization, generics, and Java calling behavior fit.
-- Use regular classes when invariants, identity, lifecycle, normalization, custom equality, framework construction, or API evolution make generated data-class semantics misleading.
-- Use sealed types for closed alternatives when exhaustive handling improves the caller contract.
-- Prefer expressions, default parameters, named arguments, extension functions, and standard-library operations when they improve call sites. Do not compress code past readability.
-- Keep public surface area minimal. Published libraries require deliberate visibility and explicit return/property types; ordinary application internals do not need ceremonial modifiers or annotations.
-- Keep one filename-matched top-level class, interface, or object per `.kt` file. Keep nested or `inner` types with their owner; allow multiple top-level declarations only in cohesive extension-only files.
-- Use collections by default. Use `Sequence` only when useful laziness, multi-stage processing, early termination, or measurement offsets its overhead.
-- Keep scope functions shallow and intention-revealing. Prefer named locals when receiver, side effect, or return value becomes ambiguous.
-- Add JVM annotations only for a demonstrated Java caller, framework contract, or binary API need.
+공개 계약이나 문서 정합성이 작업에 포함되면 `$writing-kdoc`을 사용한다. Kotlin 테스트 작성·수정·검토가 필요하면 `$writing-kotlin-tests`를 사용한다.
 
-## Absence And Failure Contracts
+## Kotlin API 사용
 
-- Represent legitimate single-value absence with `T?`, multi-result absence with empty collections, and richer domain outcomes with explicit result or sealed types.
-- Do not introduce `Optional` into Kotlin APIs except at a required Java boundary or established local convention.
-- Use `require` or `requireNotNull` for caller argument violations, `check` or `checkNotNull` for invalid object state, and domain-specific results or exceptions when callers must distinguish business outcomes.
-- Keep runtime validation at trust boundaries, constructor/factory invariants, and framework or Java ingress. Do not duplicate Kotlin's non-null type contract with defensive internal checks.
-- Decide explicitly whether collections may contain `null`; prefer non-null elements unless missing positions are part of the contract.
-- Preserve original causes when translating infrastructure failures. Catch only exceptions that can be handled or translated meaningfully.
-- Treat coroutine cancellation as control flow, not an ordinary failure value.
+- 프로젝트의 공통·지원 유틸리티, Kotlin·Java 표준 라이브러리, 전용 의존성 순으로 우선한다. 우연히 사용할 수 있는 Spring 유틸리티를 범용 도우미로 사용하지 않는다.
+- 클래스에서 타입을 알 수 있으면 타입을 반복하는 이름보다 역할을 나타내는 프로퍼티 이름을 우선한다.
+- `val`, 읽기 전용 컬렉션 인터페이스, 외부에 노출하는 불변 상태와 생성 시 완성되는 객체를 우선한다.
+- `data class`는 동등성, `copy`, 구조 분해, `toString`과 공개 생성이 모두 계약에 적합한 값 전달 객체에만 사용한다.
+- 값 클래스는 검증, 박싱, 리플렉션, 직렬화, 제네릭과 Java 호출 동작이 맞을 때 타입 안전한 스칼라 개념에 사용한다.
+- 불변식, 식별성, 생명주기, 정규화, 사용자 정의 동등성, 프레임워크 생성이나 API 변경 때문에 자동 생성 의미가 부적절하면 일반 클래스를 사용한다.
+- 닫힌 선택지를 빠짐없이 처리하는 것이 호출 계약을 개선하면 sealed 타입을 사용한다.
+- 표현식, 기본 인자, 이름 있는 인자, 확장 함수와 표준 라이브러리 연산으로 호출부를 개선하되 가독성을 해칠 만큼 압축하지 않는다.
+- 공개 범위를 최소화한다. 배포하는 라이브러리는 가시성과 반환·프로퍼티 타입을 명시적으로 설계한다. 일반 애플리케이션 내부에는 불필요한 한정자나 애너테이션을 추가하지 않는다.
+- 각 `.kt` 파일에는 파일명과 일치하는 최상위 클래스·인터페이스·객체 하나를 둔다. 중첩 타입과 `inner` 타입은 소유 타입에 두며, 응집된 확장 선언 전용 파일만 여러 최상위 선언을 허용한다.
+- 컬렉션을 기본으로 사용한다. 유용한 지연 평가, 다단계 처리, 조기 종료 또는 측정 결과가 오버헤드를 상쇄할 때만 `Sequence`를 사용한다.
+- 스코프 함수를 얕게 유지한다. 수신 객체, 부수 효과나 반환값이 모호하면 이름 있는 지역 변수를 사용한다.
+- 실제 Java 호출부, 프레임워크 계약이나 바이너리 API에 필요할 때만 JVM 애너테이션을 추가한다.
 
-## Gotchas
+## 부재와 실패 계약
 
-- Do not expose mutable collections, `MutableStateFlow`, or implementation-owned coroutine scopes.
-- Do not hide blocking work inside `suspend`; the boundary performing it owns the execution-context shift.
-- Do not use `runCatching` around suspending work unless cancellation is rethrown and the resulting failure model is intentional.
-- Do not add extension functions that obscure ownership, shadow members, or pollute a broad namespace.
-- Do not use `lateinit` to avoid modeling lifecycle or initialization state.
-- Do not assume Kotlin source compatibility implies JVM binary compatibility for published APIs.
-- Do not put Spring stereotypes on domain types or application ports.
-- Do not expose JPA entities, REST DTOs, Spring Data query names, transaction mechanics, cache keys, or serialization shapes through inner contracts.
-- Do not use `shared` as a technical utility bucket or split modules only to mirror a template.
+- 단일 값의 정상적인 부재는 `T?`, 여러 결과의 부재는 빈 컬렉션, 복잡한 도메인 결과는 명시적 결과 타입이나 sealed 타입으로 표현한다.
+- 필수 Java 경계나 기존 프로젝트 관례를 제외하면 Kotlin API에 `Optional`을 도입하지 않는다.
+- 호출 인자 위반에는 `require`·`requireNotNull`, 잘못된 객체 상태에는 `check`·`checkNotNull`을 사용한다. 호출부가 업무 결과를 구별해야 하면 도메인 결과나 예외를 사용한다.
+- 런타임 검증은 신뢰 경계, 생성자·팩터리 불변식과 프레임워크·Java 진입점에 둔다. Kotlin의 비널 타입 계약을 내부 방어 검사로 반복하지 않는다.
+- 컬렉션 요소의 `null` 허용 여부를 명확히 정한다. 비어 있는 위치 자체가 계약에 포함되지 않으면 비널 요소를 우선한다.
+- 인프라 실패를 변환할 때 원인을 보존한다. 의미 있게 처리하거나 변환할 수 있는 예외만 잡는다.
+- 코루틴 취소를 일반 실패 값으로 취급하지 않는다.
 
-## Review Pass
+## 주의 사항
 
-Before finishing:
+- 가변 컬렉션, `MutableStateFlow`나 구현이 소유한 코루틴 스코프를 노출하지 않는다.
+- `suspend` 안에 블로킹 작업을 숨기지 않는다. 해당 작업을 수행하는 경계에서 실행 컨텍스트를 전환한다.
+- 중단 가능한 작업에 `runCatching`을 사용하려면 취소를 다시 던지고 실패 모델을 의도적으로 정해야 한다.
+- 소유 관계를 흐리거나 멤버를 가리거나 넓은 네임스페이스를 오염시키는 확장 함수를 추가하지 않는다.
+- 생명주기나 초기화 상태를 모델링하지 않으려고 `lateinit`을 사용하지 않는다.
+- Kotlin 소스 호환성을 JVM 바이너리 호환성과 동일하게 보지 않는다.
+- 도메인 타입이나 애플리케이션 포트에 Spring 스테레오타입을 붙이지 않는다.
+- JPA 엔티티, REST DTO, Spring Data 쿼리 이름, 트랜잭션 처리, 캐시 키나 직렬화 구조를 내부 계약에 노출하지 않는다.
+- `shared`를 기술 유틸리티 저장소로 사용하거나 템플릿을 따라 하기 위해 모듈을 나누지 않는다.
 
-- Package and module roles, type names, and public functions match the actual responsibility.
-- Public and cross-module contracts expose only intended states and mutability.
-- Nullable types, empty values, domain failures, infrastructure failures, and cancellation have distinct meanings.
-- Collection pipelines are readable and do not allocate or become lazy without reason.
-- Coroutine ownership, dispatcher choice, exception propagation, and lifecycle are explicit when relevant.
-- Java-facing bytecode shape and published API compatibility were checked when relevant.
-- KDoc and tests were updated when API contracts or behavior changed.
-- Changed Kotlin files were formatted and focused verification passed.
+## 완료 조건
+
+패키지·모듈 역할과 이름, 공개 상태와 변경 가능성, 부재·실패·취소 구분, 컬렉션 처리의 가독성을 확인한다. 코루틴 책임과 생명주기, Java 바이트코드 형태와 공개 API 호환성은 관련될 때 확인한다.
+
+검토에서는 근거가 있는 발견 사항과 검증 한계를 보고하면 완료한다. 수정에서는 계약 변경에 필요한 KDoc과 테스트를 반영하고, 변경한 Kotlin 파일의 포맷과 관련 검증 결과를 보고한다.
